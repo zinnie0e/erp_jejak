@@ -2,7 +2,7 @@ var htmlString = "";
 var total_page;
 var global_uid;
 
-//200601
+//200601 test
 //============================공퉁 함수============================
 
 function numberWithCommas(x) {
