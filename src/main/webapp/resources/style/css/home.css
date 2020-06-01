@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+#login_page
+{
+	display: none;
+	position: absolute;
+	top: 50%;
+	left:50%;
+	transform:translateX(-50%);
+	height: 50px;
+	width: 560px;
+}
+
+#div_jejak
+{
+	display: none;
+}
+
+#div_art
+{
+	display: none;
+}
+
+#btn_jejak
+{ 
+	width: 100px;
+	height: 100px;
+	background-image: url("/resources/style/images/jejak.png");
+	background-size: contain;
+	float: left;
+} 
+
+#btn_art
+{ 
+	width: 100px;
+	height: 100px;
+	background-image: url("/resources/style/images/art.png");
+	background-size: contain;
+	float: left;
+} 
+
+#login_left
+{
+	width: 10px;
+	height: 50px;
+	background-image: url("/resources/style/images/login/bg_left.gif");
+	float: left;
+}
+
+#login_center
+{
+	width:540px; 
+	height:50;
+	background-image: url("/resources/style/images/login/bg_middle.gif");
+	float: left;
+	display: flex;
+	justify-content: center; /*수직*/
+	align-items: center; /*수평*/
+}
+
+#img_sekwanglogin
+{
+	width: 109px; 
+	height: 20px;
+	float: left;
+}
+
+#div_id
+{
+	float: left;
+}
+
+#div_pw
+{
+	float: left;
+}
+
+#img_id
+{
+	margin-left:20px; 
+	margin-right:3px;
+	width: 6px; 
+	height: 20px;
+}
+
+#txb_id
+{
+	margin-right:6px;
+	width:120px; 
+	height:20px;
+}
+
+#img_pw
+{
+	margin-right:3px;
+	width: 40px; 
+	height: 20px;
+}
+
+#txb_pw
+{
+	margin-right:6px;
+	width:120px; 
+	height:20px;
+}
+
+#btn_login
+{
+	width: 56px;
+	height: 20px;
+	background-image: url("/resources/style/images/login/btn_login.gif");
+	float: left;
+}
+
+#login_right{
+	width: 10px;
+	height: 50px;
+	background-image: url("/resources/style/images/login/bg_right.gif");
+	float: left;
+}
+

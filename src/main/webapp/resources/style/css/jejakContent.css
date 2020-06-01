@@ -1,0 +1,23 @@
+#cu_table
+{
+	font-size: 9pt;
+	text-align: center;
+	display:table-cell; vertical-align:middle;
+	
+}
+
+.items
+{
+	background-color: #F4F4F4;
+}
+
+.red
+{
+	color: red;
+}
+
+#div_popup
+{
+	width: 100%;
+	height: 100%;
+}

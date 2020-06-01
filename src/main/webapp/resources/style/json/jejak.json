@@ -1,0 +1,16 @@
+{
+	"top_menu_id" : ["#menu_1", "#menu_2", "#menu_3", "#menu_4", "#menu_5", "#menu_6", "#menu_7", "#menu_8", "#menu_9"],
+	"top_menu_url" : ["/resources/style/images/jejak/m1.gif", "/resources/style/images/jejak/m2.gif", "/resources/style/images/jejak/m3.gif", "/resources/style/images/jejak/m4.gif", "/resources/style/images/jejak/m5.gif", "/resources/style/images/jejak/m6.gif", "/resources/style/images/jejak/m7.gif", "/resources/style/images/jejak/m8.gif", "/resources/style/images/jejak/m9.gif"],
+	"top_menu_ov_url" : ["/resources/style/images/jejak/m1_ov.gif", "/resources/style/images/jejak/m2_ov.gif", "/resources/style/images/jejak/m3_ov.gif", "/resources/style/images/jejak/m4_ov.gif", "/resources/style/images/jejak/m5_ov.gif", "/resources/style/images/jejak/m6_ov.gif", "/resources/style/images/jejak/m7_ov.gif", "/resources/style/images/jejak/m8_ov.gif", "/resources/style/images/jejak/m9_ov.gif"],
+	"side_menu_top_url" : ["/resources/style/images/jejak/l_menu_title1.gif", "/resources/style/images/jejak/l_menu_title2.gif", "/resources/style/images/jejak/l_menu_title3.gif", "/resources/style/images/jejak/l_menu_title4.gif", "/resources/style/images/jejak/l_menu_title5.gif", "/resources/style/images/jejak/l_menu_title6.gif", "/resources/style/images/jejak/l_menu_title7.gif", "/resources/style/images/jejak/l_menu_title8.gif", "/resources/style/images/jejak/l_menu_title9.gif"],
+	"jajak_side_menu_dotline" : "/resources/style/images/jejak/l_menu_dotline.gif",
+	"side_menu_list_1" : ["등록관리", "목록관리", " ", "IP 변경"],
+	"side_menu_list_2" : ["제품 목록", "제픔 등록", "제품 등록 (임시)", " ", "품절 도서"],
+	"side_menu_list_3" : ["용지구입", "거래처별 구매", "용지전표", "용지등록하기", "용지장부", "월별 용지 재고 현황"],
+	"side_menu_list_4" : ["발주예정제품리스트", "제작계획표", "중쇄예정제품", "발주서", "표지작업지시서", "본문작업지시서", "입고 대장", " ", "제작예정리스트 열람", "제작예정리스트 등록", " ", "제품정가인상리스트", "제품보류리스트", "제품폐간리스트", "신간적정재고관리", " ", "SAMPLE제작"],
+	"side_menu_list_5" : ["제작계획표", "표지작업지시서", "본문작업지시서", "발주서"],
+	"side_menu_list_6" : ["선불직접경비", "선불직접경비 입력", "후불직접경비 명세서", "용지대", "출력료", "사보료", "인쇄비", "제본비", "코팅비", "비닐비", "케이스대", "CD음반대", "스티커대", "기타"],
+	"side_menu_list_7" : ["도서별 원가계산서", "잡물 원가계산서", "품목별 원재료명세서 (월별)", "품목별 원재료명세서 (기간)", "제조비명세표", "거래처별 지불명세서", "저자료 지급 내역 (상/하)", "월별 저자료 지출결의서", "저자료 지급 내역 ??", " ", "구매단가입력", "도서 수량.금액 집계", "도서금액집계", " ", "주은교육 제작현황"],
+	"side_menu_list_8" : ["구매관리", "판매관리", "반입관리", "증정관리", "폐기관리", " ", "구매일보", "월입고현황표", "재고조회", "월간거래처구분별일일집계", "도서수불카드", "거래명세서일일번호별집계", "일일집계현황", "폐기리스트", "구분별도서수불재고현황"],
+	"side_menu_list_9" : ["회계전표", "원천징수", " ", "도서별 월별집계", "년도별 월별집계", "도서별 제작현황", " ", "전기 이월 작업", " ", "미입고 도서", " ", "전도서재고조회"]
+}
