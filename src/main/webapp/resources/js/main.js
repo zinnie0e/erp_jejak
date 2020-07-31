@@ -31,21 +31,22 @@ function select(select_num){
 }
 
 function login(){
+	
+	
 	var userId = $("#txb_id").val();
 	var userPw = $("#txb_pw").val();
+	if (userId == "") return $("#txb_id").focus();
+	if (userPw == "") return $("#txb_pw").focus();
+	
 	$('#txb_id').val('');
 	$('#txb_pw').val('');
-
-	if(!userId || !userPw){ //널값 확인
-		alert("다 입력 안함");
+	
+	if(checkNum == 0){
+		showJejak();
+		showSideMenu(2);
+		$('#jejak_detail_view').html(jmenu2("0"));
 	}else{
-		if(checkNum == 0){
-			showJejak();
-			showSideMenu(2);
-			$('#jejak_detail_view').html(jmenu2("0"));
-		}else{
-			showArt();
-		}
+		showArt();
 	}
 }
 

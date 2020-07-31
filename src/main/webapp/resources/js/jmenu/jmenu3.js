@@ -417,6 +417,7 @@ function jmenu3(val) { //용지관리
 										'<table id="data3" border="0" cellspacing="1" width="784" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
+								'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',			
 								'<tr>',
 									'<td width="780" height="50" align="center" valign="middle"><span style="font-size:9pt;"></span></td>',
 								'</tr>',
@@ -765,6 +766,49 @@ function jmenu3(val) { //용지관리
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "5-월별-popup": //팝업
+			return [
+				'<div style="width:804px; height:547px;">',
+					'<table border="0" width="600">',
+						'<tr>',
+							'<td colspan="4" align="left">* <a id="jname"></a></td>',
+						'</tr>',
+					'</table>',
+					'<table border="1" width="800" cellpadding="0" cellspacing="0" bordercolor="black">',
+						'<tr>',
+							'<td width="60" height="30" align="center">사용일</td>',
+							'<td width="340" height="30" align="center">적요</td>',
+							'<td width="80" height="30" align="center">기초수량</td>',
+							'<td width="80" height="30" align="center">입고수량</td>',
+							'<td width="80" height="30" align="center">출고수량</td>',
+							'<td width="80" height="30" align="center">기말수량</td>',
+							'<td width="80" height="30" align="center">거래처</td>',
+						'</tr>',
+						'<tr>',
+							'<td align="center" height="25">&nbsp;</td>',
+							'<td align="left" height="25"><span style="padding-left:3pt;">기초</span></td>',
+							'<td align="center" height="25"><a id="iw1"></a></td>',
+							'<td align="center" height="25">&nbsp;</td>',
+							'<td align="center" height="25">&nbsp;</td>',
+							'<td align="center" height="25">&nbsp;</td>',
+							'<td align="center" height="25">&nbsp;</td>',
+						'</tr>',
+					'</table>',
+					'<table id="popdate" border="1" width="800" cellpadding="0" cellspacing="0" bordercolor="black"></table>',
+					'<table border="1" width="800" cellpadding="0" cellspacing="0" bordercolor="black">',
+						'<tr>',
+							'<td colspan="2" align="center" height="25" width="330">기말재고수량</td>',
+							'<td align="center" height="25" width="79"><a id="s_iw1"></a></td>',
+							'<td align="center" height="25" width="79"><a id="sum3"></a></td>',
+							'<td align="center" height="25" width="79"><a id="sum4"></a></td>',
+							'<td align="center" height="25" width="79"><a id="s_iw2"></a></td>',
+							'<td align="center" height="25" width="79">&nbsp;</td>',
+						'</tr>',
+					'</table>',
+				'</div>'
+			].join('');
+			
 		default:
 			break;
 	}

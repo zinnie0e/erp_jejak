@@ -102,7 +102,7 @@ function jmenu6(val) { //직접경비
 												'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:110px;" name="cprice"></span>',
 											'</td>',
 											'<td width="160" height="30" align="center" style="padding-right:10" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<input type="button" value=" 등 록 " onClick="javascript:InIt(4);"></span>',
+												'<input type="button" value=" 등 록 " onClick="javascript:(4);"></span>',
 											'</td>',
 										'</tr>',
 										'</form>',

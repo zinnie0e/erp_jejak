@@ -33,8 +33,8 @@
 			<div id="login_left"></div>
 			<div id="login_center">
 				<img id="img_sekwanglogin" src="/resources/style/images/login/login_txt.gif">
-				<div id="div_id"><img id="img_id" src="/resources/style/images/login/txt_id.gif"><input type="text" id="txb_id"></div>
-				<div id="div_pw"><img id="img_pw" src="/resources/style/images/login/txt_pw.gif"><input type="password" id="txb_pw"></div>
+				<div id="div_id"><img id="img_id" src="/resources/style/images/login/txt_id.gif"><input type="text" id="txb_id" onkeydown="javascript:Enter_Check(0);"></div>
+				<div id="div_pw"><img id="img_pw" src="/resources/style/images/login/txt_pw.gif"><input type="password" id="txb_pw" onkeydown="javascript:Enter_Check(0);"></div>
 				<div id="btn_login" onclick="javascript:login();"></div>
 			</div>
 			<div id="login_right"></div>
