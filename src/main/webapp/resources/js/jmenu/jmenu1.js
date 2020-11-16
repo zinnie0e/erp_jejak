@@ -59,7 +59,7 @@ function jmenu1(val) { //거래처관
 									'<td width="390" colspan="3" height="35" align="center" valign="middle" bgcolor="white"><INPUT style="text-align:left; padding-right:5pt; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:380px;" name="wcemail" autocomplete=off></td>',
 								'</tr>',
 							'</table>',
-							'<div style="width:780px; height:24px; padding-top:53px; text-align:center;"><input type="button" onclick="javascript:InIt(1);" value="등  록"></div>',
+							'<div style="width:780px; height:24px; padding-top:53px; text-align:center;"><input type="button" onclick="javascript:InsertCuList();" value="등  록"></div>',
 						//'</form>',
 					'</div>',
 				'</div>',

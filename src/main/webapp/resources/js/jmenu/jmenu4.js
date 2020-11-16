@@ -34,15 +34,31 @@ function jmenu4(val) { //제품제작진행
 								'<tr>',
 									'<td width="1410">',
 										'<table id="jpBalYjData" border="0" cellpadding="5" cellspacing="0" width="1410" bgcolor="#CCCCCC"></table>',
+										'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',			
 									'</td>',
     							'</tr>',
     							'<tr>',
 									'<td height=40 align=left valign=middle>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
 										'<span style="font-size:10pt"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-										'<input type="button" value=" 인쇄 " onClick="javascript:PrintAll(<?=$sy?>,<?=$sm?>,<?=$sd?>);">',
+										'<input type="button" id="PopUpPrintBjlist" value=" 인쇄 ">',
 									'</td>',
 								'</tr>',
 						'</table>',						
+					'</div>',
+				'</div>',
+			'</div>',
+			].join('');
+		
+		case "0_인쇄팝업": //발주예정제품리스트 인쇄
+			return [
+			'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="780"></table>'+
+						
+						
+							
+						
 					'</div>',
 				'</div>',
 			'</div>',
@@ -100,6 +116,7 @@ function jmenu4(val) { //제품제작진행
 														'</tr>',						
 													'</table>',	
 													'<table id="jpJejakplanData" border="0" cellspacing="0" width="880" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" style="border-top-width:2px; border-bottom-width:1px; border-top-color:black; border-bottom-color:black; border-top-style:solid; border-bottom-style:solid;">',
+													'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',			
 													'<!-- 표 끝 -->',
 												'</td>',
 											'</tr>',
@@ -408,6 +425,7 @@ function jmenu4(val) { //제품제작진행
 											'</tr>',	
 										'</table>',
 										'<table id="jpBonData" border="0" cellspacing="1" width="784" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',			
 									'</td>',
 								'</tr>',
 						'</table>',												
@@ -624,7 +642,7 @@ function jmenu4(val) { //제품제작진행
 																					'</SELECT>',
 																				'</td>',
 																				'<td width="370"><INPUT style="font-family:굴림; font-size:9pt; width:270px;" name=key onkeydown="javascript:Enter_Check(2);" size="23"></td>',
-																				'<td width="65" align="right"><input type="button" value="검색하기" onclick="javascript:Search_Book(2);"></td>',
+																				'<td width="65" align="right"><input type="button" value="검색하기" onclick="javascript:SearchBook(2);"></td>',
 																			'</tr>',
 																		'</table>',
 																	'</td>',
@@ -828,7 +846,7 @@ function jmenu4(val) { //제품제작진행
 								'</tr>',
 								'<tr>',
 									'<td width="760" align="center" valign="middle" height="40"><b><span style="font-size:9pt;">',
-										'<input type="submit" value=" 수 정 ">',
+										'<input type="button" value=" 수 정 " onClick="javascript:ModiJpNewstockList();">',
 									'</span></b></td>',
 								'</tr>',
 							'</table>',

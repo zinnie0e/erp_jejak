@@ -10,7 +10,7 @@ function m1(e) {
 		goToPage(1);
 	}
 	if (val == "3") {
-		SelIt(6);
+		SelIpList();
 	}
 }
 
@@ -19,20 +19,21 @@ function m2(e) {
 	$('#jejak_detail_view').html(jmenu2(val));
 
 	if (val == "0") {
-		type = "제품등록";
-		page_code = "도서";
+		menuTitle = "제품등록";
+		page_code = "전체도서검색";
 		goToPage(1);
 	}
 }
 
 var htmlString_yjBuy;
 function m3(e) {
+	logNow(e);
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu3(val));
 
 	if (val == "0") {
-		SelIt(3);
-		SelIt(4);
+		SetoptionYongji(3);
+		SetoptionCust(4);
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -44,51 +45,11 @@ function m3(e) {
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
 
-		$("#btn_buy")
-				.click(
-						function click() {
-							var jiname = ($("select[name=jicode] option:checked")
-									.text()).split(' - ')[1];
-
-							htmlString_yjBuy += '<tr>'
-									+ '<td width="130" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'
-									+ d.getFullYear()
-									+ ' / '
-									+ month
-									+ ' / '
-									+ day
-									+ '</span></td>'
-									+ '<td width="190" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;">'
-									+ jiname
-									+ '</span></td>'
-									+ '<td width="70" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">( '
-									+ $("select[name=jicode]").val()
-									+ ' )</span></td>'
-									+
-									// '<form method="post"
-									// action="yongju3.php">'+
-									'<input type="hidden" name="jm_id" value="<?=$row[uid]?>">'
-									+ '<input type="hidden" name="ib" value="<?=$row[ib]?>">'
-									+ '<input type="hidden" name="fx" value="<?=$row[fxamount]?>">'
-									+ '<td width="200" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">'
-									+ '<select name="comid_buy" style="font-family:굴림; font-size:9pt; width:180px;" size="1"></select></span></p>'
-									+ '</td>'
-									+ '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><font color="red">'
-									+ $("input[name=jnum]").val()
-									+ '</font></span></td>'
-									+ '<td width="110" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"></span>'
-									+ '<input type="button" id="btn_dell" value=" test "></span></p>'
-									+ '</td>' + '</tr>';
-
-							// $('select[name=comid_buy]').val("4");
-
-							$('#data9').html(htmlString_yjBuy);
-							SelIt(4);
-						});
+		
 		return;
 	}
 	if (val == "1") {
-		SelIt(4);
+		SetoptionCust(4);
 		var d = new Date();
 		for (var i = 2007; i <= d.getFullYear(); i++) {
 			$("select[name=sy]").append(
@@ -105,60 +66,8 @@ function m3(e) {
 		$('select[name=ey]').val(d.getFullYear());
 		$('select[name=em]').val(month);
 		$('select[name=ed]').val(day);
-
-		$("#btn_Search").click(
-				function click() {
-					var date1 = new Date($("select[name=sy]").val() + "/"
-							+ $("select[name=sm]").val() + "/"
-							+ $("select[name=sd]").val()).getTime() / 1000;
-					var date2 = new Date($("select[name=ey]").val() + "/"
-							+ $("select[name=em]").val() + "/"
-							+ $("select[name=ed]").val()).getTime() / 1000;
-					var wccode = $("select[name=ccode]").val();
-
-					SearchYjCu(wccode, date1, date2);
-				});
-		return;
 	}
 	if (val == "2") {
-		$("#btn_yjShow")
-				.click(
-						function click() {
-							if ($('input[name=sdate]').val() == "")
-								return $("input[name=sdate]").focus();
-							if ($('input[name=sdate]').val() == "")
-								return $("input[name=sdate]").focus();
-
-							var sdate = $('input[name=sdate]').val().substring(
-									0, 4)
-									+ "/"
-									+ $('input[name=sdate]').val().substring(4,
-											6)
-									+ "/"
-									+ $('input[name=sdate]').val().substring(6,
-											8);
-							var edate = $('input[name=edate]').val().substring(
-									0, 4)
-									+ "/"
-									+ $('input[name=edate]').val().substring(4,
-											6)
-									+ "/"
-									+ $('input[name=edate]').val().substring(6,
-											8);
-
-							var date1 = new Date(sdate).getTime() / 1000;
-							var date2 = new Date(edate).getTime() / 1000;
-							var year;
-							if (($('input[name=sdate]').val()).substring(2, 4) == ($('input[name=edate]')
-									.val()).substring(2, 4)) {
-								year = ($('input[name=sdate]').val())
-										.substring(2, 4);
-								SearchYjjp(year, date1, date2);
-							} else {
-								alert("같은 년도를 입력해야합니다.");
-							}
-						});
-		return;
 	}
 	if (val == "3") {
 		page_code = "용지등록";
@@ -225,20 +134,20 @@ function m4(e) {
 		}
 	}
 	if (val == "8")
-		SelIt(13); // 제품정가인상리스트
-	if (val == "9") {// 제품정가인상리스트
-		type = "제품제작진행";
-		page_code = "도서";
+		SelJpJejakYejung(13); 
+	if (val == "9") {
+		menuTitle = "제품제작진행";
+		page_code = "전체도서검색";
 		goToPage(1);
 	}
 	if (val == "11")
-		SelIt(8); // 제품정가인상리스트
+		SelJpPriceupList(8); // 제품정가인상리스트
 	if (val == "12")
-		SelIt(7); // 제품보류리스트
+		SelJpHoldList(7); // 제품보류리스트
 	if (val == "13")
-		SelIt(9); // 제품폐간리스트
+		SelJpCloseList(9); // 제품폐간리스트
 	if (val == "14")
-		SelIt(10); // 신간적정재고관리
+		SelJpNewstockList(10); // 신간적정재고관리
 }
 
 function m5(e) {
@@ -280,15 +189,15 @@ function m6(e) {
 		$('select[name=tm]').val(month);
 	}
 	if (val == "4")
-		SelIt(11); // 출력료
+		SelKbPrint(11); // 출력료
 	if (val == "5")
-		SelIt(12); // 사보료
+		SelKbHouseOrgan(12); // 사보료
 }
 
 function m7(e) {
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu7(val));
-	if (val == "0" || val == "1" || val == "6" || val == "7" || val == "8" || val == "14") {
+	if (val == "0" || val == "1" || val == "2" || val == "3" || val == "6" || val == "7" || val == "8" || val == "14") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -313,6 +222,20 @@ function m8(e) {
 	} else {
 		$("#jejak_middle").css('padding-left', 'calc((100% - 1000px) / 2)');
 	}
+	
+	if (val == "6" || val == "7" || val == "12" || val == "13") {
+		var d = new Date();
+		for (var i = 2008; i <= d.getFullYear(); i++) {
+			$("select[name=ty]").append(
+					"<option value='" + i + "'>" + i + "</option>");
+		}
+		var month = (d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0'
+				+ (d.getMonth() + 1);
+		$('select[name=ty]').val(d.getFullYear());
+		$('select[name=tm]').val(month);
+		
+		return;
+	}
 	//
 }
 
@@ -320,4 +243,19 @@ function m9(e) {
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu9(val));
 	//
+	if (val == "0" || val == "1") {
+		var d = new Date();
+		for (var i = 2008; i <= d.getFullYear(); i++) {
+			$("select[name=ty]").append(
+					"<option value='" + i + "'>" + i + "</option>");
+		}
+		var month = (d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1);
+		$('select[name=ty]').val(d.getFullYear());
+		$('select[name=tm]').val(month);
+		
+		return;
+	}
+	if (val == "9") {
+		SelBooksNotin();
+	}
 }

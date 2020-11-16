@@ -8,7 +8,18 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="/resources/js/main.js"></script>
 	<script src="/resources/js/jejakContent.js"></script>
+	
 	<script src="/resources/js/jejakFunction.js"></script>
+	<script src="/resources/js/mfunction/m1_f.js"></script>
+	<script src="/resources/js/mfunction/m2_f.js"></script>
+	<script src="/resources/js/mfunction/m3_f.js"></script>
+	<script src="/resources/js/mfunction/m4_f.js"></script>
+	<script src="/resources/js/mfunction/m5_f.js"></script>
+	<script src="/resources/js/mfunction/m6_f.js"></script>			
+	<script src="/resources/js/mfunction/m7_f.js"></script>
+	<script src="/resources/js/mfunction/m8_f.js"></script>
+	<script src="/resources/js/mfunction/m9_f.js"></script>
+	
 	<script src="/resources/js/jmenu/jmenu1.js"></script>
 	<script src="/resources/js/jmenu/jmenu2.js"></script>
 	<script src="/resources/js/jmenu/jmenu3.js"></script>

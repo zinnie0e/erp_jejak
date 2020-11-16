@@ -1,5 +1,6 @@
 const IS_DEBUG = true;
 
+
 function logNow(logContents){
     if(IS_DEBUG){
         console.log(logContents);
