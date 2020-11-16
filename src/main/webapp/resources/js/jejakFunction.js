@@ -7,10 +7,7 @@ var popUp;
  
 var SETTING_URL = "http://localhost:9090";
 
-<<<<<<< HEAD
-=======
-//200601 test
->>>>>>> refs/remotes/origin/master
+
 //============================공퉁 함수============================
 
 function numberWithCommas(x) {
