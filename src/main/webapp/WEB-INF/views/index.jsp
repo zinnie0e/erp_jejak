@@ -10,7 +10,7 @@
 </head>
 <frameset rows="0,*" border="0">
 	<frame name="header" scrolling="no" noresize>
-	<frame name="main" src="/home">
+	<frame name="main" src="/jejak">
 	<noframes>
 	<body>
 	<p>이 페이지에는 프레임이 있지만 사용 중인 브라우저에서 프레임을 지원하지 않습니다.</p>

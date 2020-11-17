@@ -34,12 +34,8 @@
 	<link rel="stylesheet" type="text/css" href="/resources/style/css/jejakContent.css">
 	<link rel="shortcut icon" href="#">
 </head>
-<body>
+<body onload="javascript:getString(-1);">
 	<div id="div_home">
-		<div id="select_page">
-			<div id="btn_jejak" onclick="javascript:getString(0);"></div>
-			<div id="btn_art" onclick="javascript:getString(100);"></div> 
-		</div>
 		<div id="login_page">
 			<div id="login_left"></div>
 			<div id="login_center">
@@ -50,6 +46,36 @@
 			</div>
 			<div id="login_right"></div>
 		</div>
+	</div>
+	
+	<div id="div_jejak">
+		<div id="jejak_top">
+			<div id="jejak_top_body">
+				<div id="div_logoTitle"><img id="img_logoTitle" src="/resources/style/images/jejak/title.gif"></div>
+				<div id="div_logoTitleExc">
+					<div id="btn_logout" onclick="javascript:logout();"></div>
+					<div id="btn_datatec" onclick="javascript:datatec();"></div>
+				</div>
+			</div>
+			<div id="jejak_top_menu">
+				<div id="div_menu">
+					<div class="menu_btn" value="0" id="menu_1" onclick="javascript:showSideMenu(1);"></div>
+					<div class="menu_btn" value="1" id="menu_2" onclick="javascript:showSideMenu(2);"></div>
+					<div class="menu_btn" value="2" id="menu_3" onclick="javascript:showSideMenu(3);"></div>
+					<div class="menu_btn" value="3" id="menu_4" onclick="javascript:showSideMenu(4);"></div>
+					<div class="menu_btn" value="4" id="menu_5" onclick="javascript:showSideMenu(5);"></div>
+					<div class="menu_btn" value="5" id="menu_6" onclick="javascript:showSideMenu(6);"></div>
+					<div class="menu_btn" value="6" id="menu_7" onclick="javascript:showSideMenu(7);"></div>
+					<div class="menu_btn" value="7" id="menu_8" onclick="javascript:showSideMenu(8);"></div>
+					<div class="menu_btn" value="8" id="menu_9" onclick="javascript:showSideMenu(9);"></div>
+				</div>
+			</div>
+		</div>
+		<div id="jejak_middle">
+			<div id="jejak_side_menu"></div>
+			<div id="jejak_detail_view"></div>
+		</div>
+		<div id="jejak_bottom"></div>
 	</div>
 </body>
 </html>
