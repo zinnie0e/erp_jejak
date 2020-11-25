@@ -14,6 +14,11 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function fillZero(str, width){
+	str = str + '';
+	return str.length >= width ? str : new Array(width - str.length + 1).join('0') + str;//남는 길이만큼 0으로 채움
+}
+
 function MsToFulldate(milisecond){
 	var d = new Date(milisecond * 1000);
 	var month = (d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1);
@@ -157,6 +162,11 @@ function goToPage(current_page){
 			}
 		});
 	}
+	if(page_code == "용지전표"){
+		$("#data5").html("");
+		
+		SearchYjjp(current_page);
+	}
 	if(page_code == "용지등록"){
 		$("#data3").html("");
 		
@@ -173,6 +183,11 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
+	}
+	if(page_code == "용지현재고"){
+		$("#data8").html("");
+		
+		yjpresent("", "", current_page);
 	}
 	//도서별원가계산서
 	if(page_code == "도서별원가계산서"){
@@ -266,7 +281,7 @@ function goToPage(current_page){
 			type: "POST",
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
-			url: SETTING_URL + "//jmjejak/select_jmbon_list0",
+			url: SETTING_URL + "/jmjejak/select_jmbon_list0",
 			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
@@ -495,7 +510,7 @@ function ChangeDate(code){
 			var date2 = new Date($("select[name=ty]").val() + "/" + month + "/" + "01").getTime()/1000;
 		}
 		
-		if(code == 1) SelYjDealLedger(date1, date2); 
+		if(code == 1) yongjiBuyOrder(date1, date2); 
 		if(code == 2){ 
 			var year = $("select[name=ty]").val().substring(2,4);
 			var value = $("select[name=pgubn]").val();
