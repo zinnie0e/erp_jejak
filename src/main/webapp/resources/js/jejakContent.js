@@ -25,15 +25,11 @@ function m2(e) {
 	}
 }
 
-var htmlString_yjBuy;
 function m3(e) {
-	logNow(e);
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu3(val));
 
 	if (val == "0") {
-		SetoptionYongji(3);
-		SetoptionCust(4);
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -44,12 +40,10 @@ function m3(e) {
 		var day = (d.getDate()) >= 10 ? (d.getDate()) : '0' + (d.getDate());
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
-
 		
-		return;
-	}
-	if (val == "1") {
-		SetoptionCust(4);
+		yongjiBuyOrder($('select[name=ty]').val(), $('select[name=tm]').val());
+	} else if (val == "1") {
+		setOptionCust(0);
 		var d = new Date();
 		for (var i = 2007; i <= d.getFullYear(); i++) {
 			$("select[name=sy]").append(
@@ -66,14 +60,13 @@ function m3(e) {
 		$('select[name=ey]').val(d.getFullYear());
 		$('select[name=em]').val(month);
 		$('select[name=ed]').val(day);
-	}
-	if (val == "2") {
-	}
-	if (val == "3") {
+	} else if (val == "2") {
+		page_code = "용지전표";
+		goToPage(1);
+	} else if (val == "3") {
 		page_code = "용지등록";
 		goToPage(1);
-	}
-	if (val == "4") {
+	} else if (val == "4") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -84,9 +77,8 @@ function m3(e) {
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
 
-		return;
-	}
-	if (val == "5") {
+		ChangeDate(2);
+	} else if (val == "5") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -96,7 +88,6 @@ function m3(e) {
 				+ (d.getMonth() + 1);
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
-		return;
 	}
 }
 

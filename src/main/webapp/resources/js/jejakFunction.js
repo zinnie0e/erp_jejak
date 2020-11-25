@@ -7,15 +7,11 @@ var popUp;
  
 var SETTING_URL = "http://localhost:9090";
 
+///l test11
 //============================공퉁 함수============================
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function fillZero(str, width){
-	str = str + '';
-	return str.length >= width ? str : new Array(width - str.length + 1).join('0') + str;//남는 길이만큼 0으로 채움
 }
 
 function MsToFulldate(milisecond){
@@ -280,7 +276,7 @@ function goToPage(current_page){
 			type: "POST",
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
-			url: SETTING_URL + "/jmjejak/select_jmbon_list0",
+			url: SETTING_URL + "//jmjejak/select_jmbon_list0",
 			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
@@ -621,3 +617,4 @@ function ChangeDate(code){
 		}
 	}
 }
+
