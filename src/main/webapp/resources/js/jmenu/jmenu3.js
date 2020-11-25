@@ -12,41 +12,7 @@ function jmenu3(val) { //용지관리
 							'</tr>',
 							'<tr>',
 								'<td width="780" align="left" valign="top">',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-										'<tr>',
-											'<td width="130" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;"><b>사용의뢰일</b></span></p></td>',
-											'<td width="260" colspan="2" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;"><b>용지구입</b></span></p></td>',
-											'<td width="200" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;"><b>거래처</b></span></p></td>',
-											'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;"><b>수량</b></span></p></td>',
-											'<td width="110" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;"><b>메뉴</b></span></p></td>',
-										'</tr>',
-									'</table>',
-									'<table id="data9" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-										'<!-- 기타 용지 주문 -->',
-										'<tr>',
-											'<td width="780" colspan="6" height="5" align="center" valign="middle" bgcolor="white"> </td>',
-										'</tr>',
-										//'<form name="jform" method="post" action="yongju2_b.php">',
-										'<tr>',
-											'<td width="130" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">-</span></p></td>',
-											'<td width="260" colspan="2" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">',
-												'<select name="jicode" style="font-family:굴림; font-size:9pt; width:200px;" size="1">',
-												'</select></span></p>',
-											'</td>',
-											'<td width="200" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">',
-												'<select name="comid" style="font-family:굴림; font-size:9pt; width:180px;" size="1">',
-												'</select></span></p>',
-											'</td>',
-											'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">',
-												'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:50px;" name="jnum"> R</span></p>',
-											'</td>',
-											'<td width="110" height="30" align="center" valign="middle" bgcolor="white"><p><span style="font-size:9pt;">',
-												'<input type="button" value=" 구 입 " onClick="javascript:BuyNow();"></span></p>',
-											'</td>',
-										'</tr>',
-									'</table>',
+									'<table id="data9" border="0" cellspacing="1" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 								'</td>',
 							'</tr>',
 						'</table>',
@@ -79,8 +45,8 @@ function jmenu3(val) { //용지관리
 							'</form>',
 							'<tr>',
 								'<td width="780" align="left" valign="top" colspan="2">',
-									//'<form name="cuform2" method="post" action="yong_1_a.php">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+//									'<form name="cuform2" method="post" action="yong_1_a.php">',
+										'<table id="data6" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="60" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구입일</span></td>',
 												'<td width="75" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구입처</span></td>',
@@ -94,9 +60,6 @@ function jmenu3(val) { //용지관리
 												'<td width="70" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">세액</span></td>',
 												'<td width="75" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">합계</span></td>',
 											'</tr>',
-										'</table>',
-										'<table id="data6" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td colspan="7" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt; letter-spacing:50;">합계</span></td>',
 												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
@@ -113,7 +76,24 @@ function jmenu3(val) { //용지관리
 												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;"><a id="sum3"></a></span></td>',
 											'</tr>',
 										'</table>',
-									//'</form>',	
+//										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+//											'<tr>',
+//												'<td colspan="7" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt; letter-spacing:50;">합계</span></td>',
+//												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
+//													'<table width="100%" border="0">',
+//														'<tr>',
+//															'<td width="40%" align="right"><span style="font-size:9pt; padding-right:3pt;"><a id="sum31"></a></span></td>',
+//															'<td width="20%" align="center"><span style="font-size:9pt;">R</span></td>',
+//															'<td width="40%" align="left"><span style="font-size:9pt; padding-left:3pt;"><a id="sum32"></a></span></td>',
+//														'</tr>',
+//													'</table></span>',
+//												'</td>',
+//												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;"><a id="sum1"></a></span></td>',
+//												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;"><a id="sum2"></a></span></td>',
+//												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;"><a id="sum3"></a></span></td>',
+//											'</tr>',
+//										'</table>',
+//									'</form>',	
 								'</td>',
 							'</tr>',
 							'<tr>',
@@ -128,7 +108,7 @@ function jmenu3(val) { //용지관리
 						'</p>',
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 			
 		case "0-구입일-popup": //구입일팝업
@@ -335,7 +315,7 @@ function jmenu3(val) { //용지관리
 						'</form>',						
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 
 		case "2": //용지전표 -> jejak/yj/je_list.php
@@ -351,9 +331,9 @@ function jmenu3(val) { //용지관리
 											'<tr>',
 												'<td width="150" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:12pt;"><b>- 용지전표</b></span></td>',
 												'<td width="530" height="30" align="left" valign="middle" bgcolor="white"><span style="padding-left:30pt; font-size:9pt;">',
-													'<input name="sdate" placeholder="20000101" type="text" maxlength="8" size="10" style="text-align:center;">&nbsp;&nbsp;-&nbsp;&nbsp;',
-													'<input name="edate" placeholder="20000101" type="text" maxlength="8" size="10" style="text-align:center;">&nbsp;&nbsp;&nbsp;&nbsp;',
-													'<input type="button" value="보 기" onClick="javascript:SearchYjjp()"></span>',
+													'<input name="sdate" type="number" maxlength="8" size="10" style="text-align:center;">&nbsp;&nbsp;-&nbsp;&nbsp;',
+													'<input name="edate" type="number" maxlength="8" size="10" style="text-align:center;">&nbsp;&nbsp;&nbsp;&nbsp;',
+													'<input type="button" value="보 기" onClick="javascript:SearchYjjp(1)"></span>',
 												'</td>',
 												'<td width="100" height="30" align="right" valign="middle" bgcolor="white"><span style="padding-right:10pt; font-size:9pt;">',
 													'<input type="button" value="모두 인쇄" onClick="javascript:Print_All()"></span>',
@@ -377,6 +357,7 @@ function jmenu3(val) { //용지관리
 										'</tr>',
 									'</table>',
 									'<table id="data5" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+									'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',
 								'</td>',
 							'</tr>',
 							'<tr>',
@@ -385,9 +366,97 @@ function jmenu3(val) { //용지관리
 						'</table>',
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 		
+		case "2-전표-popup": //전표팝업
+			//원본은 body에 왼쪽마진 50이지만, 테이블 왼쪽마진 42로 적용해야 같음
+			return [
+				'<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-left:42;" bordercolor="#111111" width="358" id="AutoNumber1">',
+					'<tr>',
+						'<td width="55" height="34">　</td>',
+						'<td width="132" height="34" colspan="2" align="right">',
+							'<p style="padding-right:40pt;"><a id="a1"></a></p>',
+						'</td>',
+						'<td width="82" height="34">　</td>',
+						'<td width="84" height="34" align="left">',
+							'<p style="padding-left:32pt;"><a id="a2"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="31">　</td>',
+						'<td width="48" height="31">　</td>',
+						'<td width="250" height="31" colspan="3" align="left">',
+							'<p style="padding-left:25"><a id="b1"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="b2"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="b3"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="31">　</td>',
+						'<td width="48" height="31">　</td>',
+						'<td width="166" height="31" colspan="2"><a id="c1"></a></td>',
+						'<td width="84" height="30" align="right">',
+							'<p style="padding-right:10pt;"><a id="c2"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="30">　</td>',
+						'<td width="48" height="30">　</td>',
+						'<td width="166" height="30" colspan="2"><a id="d1"></a></td>',
+						'<td width="84" height="30" align="right">',
+							'<p style="padding-right:5pt;"><a id="d2"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="30">　</td>',
+						'<td width="48" height="30">　</td>',
+						'<td width="84" height="30"><a id="e1"></a></td>',
+						'<td width="82" height="30">　</td>',
+						'<td width="84" height="30" align="left">',
+							'<p style="padding-left:3pt;"><a id="e2"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="34">　</td>',
+						'<td width="48" height="34">　</td>',
+						'<td width="166" height="34" colspan="2"><a id="f1"></a></td>',
+						'<td width="84" height="30" align="right">',
+							'<p style="padding-right:10pt;"><a id="f2"></a></p>',
+						'</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="34">　</td>',
+						'<td width="48" height="34">　</td>',
+						'<td width="84" height="34">　</td>',
+						'<td width="82" height="34">　</td>',
+						'<td width="84" height="34">　</td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="31">　</td>',
+						'<td width="48" height="31">　</td>',
+						'<td width="84" height="31" align="left">',
+							'<span style="padding-left:5pt;"><a id="g1"></a></span>',
+						'</td>',
+						'<td width="82" height="31" align="center"><a id="g2"></a></td>',
+						'<td width="84" height="31" align="center"><a id="g3"></a></td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="32">　</td>',
+						'<td width="48" height="32">　</td>',
+						'<td width="250" height="32" colspan="3"><a id="h1"></a></td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="50">　</td>',
+						'<td width="298" height="50" colspan="4"><a id="i1"></a></td>',
+					'</tr>',
+					'<tr>',
+						'<td width="55" height="25">　</td>',
+						'<td width="298" height="25" colspan="4" align="right" valign="top">',
+							'<span style="font-size:9pt;"><a id="j1"></a></span>',
+						'</td>',
+				    '</tr>',
+				  '</table>'
+			].join('');
+			
 		case "3": //용지등록하기 -> jejak/yj/yjang1.htm
 			return [
 			'<div style="width:810px; height:815px;">',
@@ -417,7 +486,7 @@ function jmenu3(val) { //용지관리
 										'<table id="data3" border="0" cellspacing="1" width="784" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
-								'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',			
+								'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',
 								'<tr>',
 									'<td width="780" height="50" align="center" valign="middle"><span style="font-size:9pt;"></span></td>',
 								'</tr>',
@@ -425,7 +494,7 @@ function jmenu3(val) { //용지관리
 						'</div>',						
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 			
 		case "3-등록":
@@ -503,8 +572,8 @@ function jmenu3(val) { //용지관리
 							            '<table border="0" cellpadding="0" cellspacing="0" width="130">',
 							                '<tr>',
 							                    '<td width="65" align="center" valign="middle"><a href="javascript:InYongjiList();"><img src="/resources/style/images/jejak/btn_save.gif" width="60" height="24" border="0"></a></td>',
-							                    '<td width="65" align="center" valign="middle"><a href="javascript:m3(3);"><img src="/resources/style/images/jejak/btn_cancel.gif" width="60" height="24" border="0"></a></td>',
-							                '</tr>',//여기하는중ㅋㅎ
+							                    '<td width="65" align="center" valign="middle"><div onclick="javascript:m3(this);" value="3" style="cursor: pointer;"><img src="/resources/style/images/jejak/btn_cancel.gif" width="60" height="24" border="0"></div></td>',
+							                '</tr>',
 							            '</table>',
 							        '</td>',
 							    '</tr>',
@@ -512,7 +581,7 @@ function jmenu3(val) { //용지관리
 							'</form>',				
 						'</div>',
 					'</div>',
-				'</div>',
+				'</div>'
 				].join('');
 			
 		case "3-수정":
@@ -603,7 +672,7 @@ function jmenu3(val) { //용지관리
 							'</form>',				
 						'</div>',
 					'</div>',
-				'</div>',
+				'</div>'
 				].join('');
 			
 		case "3-용지현재고": // -> jejak/yj/yjang.htm
@@ -631,12 +700,13 @@ function jmenu3(val) { //용지관리
 							                '</tr>',
 							            '</table>',
 							            '<table id="data8" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+							            '<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',
 							        '</td>',
 								'</tr>',
 							'</table>',
 						'</div>',
 					'</div>',
-				'</div>',
+				'</div>'
 				].join('');
 		
 		case "4": //용지장부 -> jejak/yj/0101.php
@@ -706,7 +776,7 @@ function jmenu3(val) { //용지관리
 						'</table>',
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 
 		case "5": //월별 용지 재고 현황 -> jejak/yj/yj101.php
@@ -764,7 +834,7 @@ function jmenu3(val) { //용지관리
 						'</table>',						
 					'</div>',
 				'</div>',
-			'</div>',
+			'</div>'
 			].join('');
 			
 		case "5-월별-popup": //팝업

@@ -72,7 +72,6 @@ function login(){
 			data : JSON.stringify(json_data),
 			success : function(result) {
 				if ("success" == result["result"] || "login" == result["result"]) {
-					
 					if(checkNum == 0){
 						//jsp 제작
 						showJejak();
@@ -230,7 +229,7 @@ function showSideMenu(menu_num){
 					str += '<div style="width:190px; height:1px; background-image:url(' + string.jajak_side_menu_dotline + ')" />';
 				}
 			} else {
-				str += '<div class="jejak_side_menu_btn" value="' + i + '" '+ onclickHtml +' title="' + v + '">- ' + v + '</div>';
+				str += '<div id="'+ 'jejak_side_menu_btn' + i + '" class="jejak_side_menu_btn" value="' + i + '" '+ onclickHtml +' title="' + v + '">- ' + v + '</div>';
 				str += '<div style="width:190px; height:1px; background-image:url(' + string.jajak_side_menu_dotline + ')" />';
 			}
 		}
@@ -239,9 +238,9 @@ function showSideMenu(menu_num){
 	$('#jejak_side_menu').html(str);
 	
 	mouseOverOut();
-	if(menu_num == 1){$('#jejak_detail_view').html(jmenu1("1"));}
-	if(menu_num == 2){$('#jejak_detail_view').html(jmenu2("0"));}
-	if(menu_num == 3){$('#jejak_detail_view').html(jmenu3("0"));}
+	if(menu_num == 1){$('#jejak_detail_view').html(jmenu1("1")); m1($('#jejak_side_menu_btn1'));}
+	if(menu_num == 2){$('#jejak_detail_view').html(jmenu2("0")); m2($('#jejak_side_menu_btn0'));}
+	if(menu_num == 3){$('#jejak_detail_view').html(jmenu3("0")); m3($('#jejak_side_menu_btn0'));}
 	if(menu_num == 4){$('#jejak_detail_view').html(jmenu4("1"));}
 	if(menu_num == 5){$('#jejak_detail_view').html(jmenu5("0"));}
 	if(menu_num == 6){$('#jejak_detail_view').html(jmenu6("4"));}
