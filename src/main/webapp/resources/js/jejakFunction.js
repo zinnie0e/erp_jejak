@@ -92,7 +92,7 @@ function goToPage(current_page){
 				var total_record = result[0]["count"] 
 				var lm_t = 15;	
 				var lm_s = (current_page - 1) * lm_t;
-				SelCuList(lm_s, lm_t);
+				selCuList(lm_s, lm_t);
 				pasing(total_record, current_page, lm_t);
 			}
 		});
@@ -109,7 +109,7 @@ function goToPage(current_page){
 				var total_record = result[0]["count"] 
 				var lm_t = 15;	
 				var lm_s = (current_page - 1) * lm_t;
-				SelBookList(lm_s, lm_t);
+				selBookList(lm_s, lm_t);
 				pasing(total_record, current_page, lm_t);
 			}
 		});

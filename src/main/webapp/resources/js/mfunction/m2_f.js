@@ -4,7 +4,7 @@
 
 
 //제품 목록
-function SelBookList(lm_s, lm_t){
+function selBookList(lm_s, lm_t){
 	$.ajax({
 		type: "POST",
 		dataType: "json",
@@ -38,8 +38,7 @@ function SelBookList(lm_s, lm_t){
 								'<a href="javascript:DelBookList(' + data["uid"] + ');" class="n">삭제</a></font></span>' +
 							'</td>' +
 						'</tr>';
-				}
-				if(menuTitle == "제품제작진행"){
+				} else if(menuTitle == "제품제작진행"){
 					htmlString +=
 						'<tr>'+
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbbook"] + '</font></span></td>'+
@@ -55,7 +54,7 @@ function SelBookList(lm_s, lm_t){
 	});
 }
 
-function ModiBookList(uid){ 
+function ModiBookList(uid){
 	var from = {uid: uid}
 	
 	$('#jejak_detail_view').html(jmenu2("0-수정"));
@@ -153,14 +152,16 @@ function ModiBookList(uid){
 			$("input[name=SBMYUN]").val(data["sbmyun"]); //면지
 			$("input[name=SBBYUL]").val(data["sbbyul"]); //별지
 			$("input[name=SBHWBO]").val(data["sbhwbo"]); //화보
-			$("select[name=in_gu]").val(data["in_gu"]); //인세
 			if(data["sbinse"] != 0){
+				$("select[name=in_gu]").val('1'); //인세
 				$("input[name=SBINSE]").val(data["sbinse"]); //인세
+				$("select[name=in_gu3]").val('1'); //인세
 			}else{
+				$("select[name=in_gu]").val('2'); //인세
 				$("input[name=SBINSE]").val(data["sbhj04"]); //인세
+				$("select[name=in_gu3]").val('1'); //인세
 			}
-			$("select[name=in_gu2]").val(data["sbhjgb"]); //인세
-			$("select[name=in_gu3]").val(data["in_gu3"]); //인세
+			$("select[name=in_gu2]").val("0"); //인세
 			$("select[name=SBKC]").val(data["sbkc"]); //KC
 			$("input[name=SBBIGO]").val(data["sbbigo"]); //기타사항
 			$("input[name=MEMO_JB]").val(data["memo_jb"]); //기타(제본)
@@ -256,7 +257,10 @@ function ModiBookList(uid){
 		var SBHWBO = $("input[name=SBHWBO]").val(); //화보
 		var in_gu = $("select[name=in_gu]").val(); //인세
 		var SBINSE = $("input[name=SBINSE]").val(); //인세
+		
 		var SBHJGB = $("select[name=in_gu2]").val(); //인세
+		SBHJGB = SBHJGB == null ? "" : SBHJGB;
+		
 		var in_gu3 = $("select[name=in_gu3]").val(); //인세
 		var SBKC = $("select[name=SBKC]").val(); //KC
 		var SBBIGO = $("input[name=SBBIGO]").val(); //기타사항
@@ -415,12 +419,13 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 		var dbname = "KSWDESU0";
 	}
 	
+	logNow(tmpcode + "/" + dbname);
 	var from = {tmpcode: tmpcode, dbname: dbname}
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
 		dataType: "json",
-		url: SETTING_URL + "/books/select_book_deasu1",
+		url: SETTING_URL + "/books/select_book_daesu1",
 		async: false,
 		data : JSON.stringify(from),
 		success: function (result) {
@@ -431,7 +436,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 					type: "POST",
 					contentType: "application/json; charset=utf-8;",
 					dataType: "json",
-					url: SETTING_URL + "/books/select_book_deasu2",
+					url: SETTING_URL + "/books/select_book_daesu2",
 					async: false,
 					data : JSON.stringify(from),
 					success: function (result) {
@@ -517,6 +522,10 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 			}
 		}
 	});
+}
+
+function booksDaesuModify(){
+	//검증필요_delBooksDaesu, selBooksKswdesu0MaxUid, inBooksDaesu를 만들어뒀으나 $check 값을 못찾아서 작업 중단
 }
 
 function SelBookYongji(uid, sbname, sbbook){//용지정보
@@ -765,6 +774,10 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 	});
 }
 
+function booksYongjiModify(){
+	//검증필요_delBooksYongji, inBooksYongji를 만들어뒀으나 $check 값을 못찾아서 작업 중단
+}
+
 function DelBookList(uid){
 	var delcheck = confirm("삭제하시겠습니까?");
 	if(delcheck){
@@ -840,9 +853,7 @@ function SelSearchBook(lm_s, lm_t){ //도서검색결과 (m4_제작예정리스�
 			error : function(){
 			}
 		});
-	}
-	
-	if(menuTitle == "제품제작진행"){
+	} else if(menuTitle == "제품제작진행"){
 		var from = {keyfield: keyfield, key: key}
 		$.ajax({
 			type: "POST",
@@ -923,9 +934,16 @@ function InBookList(){
 	var SBBYUL = $("input[name=SBBYUL]").val(); //별지
 	var SBHWBO = $("input[name=SBHWBO]").val(); //화보
 	var in_gu = $("select[name=in_gu]").val(); //인세select
-	var SBINSE = $("input[name=SBINSE]").val(); //인세
 	var SBBIGO = $("input[name=SBBIGO]").val(); //기타사항
-
+	
+	var SBINSE = 0; //인세(국내)
+	var SBHJ04 = 0; //인세(국외)
+	if(in_gu == 1){
+		SBINSE = $("input[name=SBINSE]").val();
+	} else {
+		SBHJ04 = $("input[name=SBINSE]").val();
+	}
+	
 	if (SBBOOK == "") return $("input[name=SBBOOK]").focus();
 	if (SBNAME == "") return $("input[name=SBNAME]").focus();
 	if (SBUPRC == "") return $("input[name=SBUPRC]").focus();
@@ -968,6 +986,7 @@ function InBookList(){
 		sbhwbo: SBHWBO,
 		//in_gu: in_gu,
 		sbinse: SBINSE,
+		sbhj04: SBHJ04,
 		sbbigo: SBBIGO
 	}
 	$.ajax({
@@ -987,5 +1006,184 @@ function InBookList(){
 }
 
 //제품 등록(임시)
+function checkInBook(temp_key){
+	var from = {key: temp_key}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url : SETTING_URL + "/books/sel_books_max_sbbook",
+		async: false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			
+			var sbbook = "";
+			
+			if(result == "") {
+				sbbook = temp_key + "10000";
+			} else {
+				var sbbook_num = parseInt(result.substring(1));
+				
+				if(sbbook_num > 99999){
+					sbbook_num = 10000;
+				} else {
+					sbbook_num++;
+				}
+				
+				sbbook = temp_key + sbbook_num;
+			}
+			
+			$("input[name=SBBOOK]").val(sbbook);
+		}
+	});
+}
+
 
 //품절 도서
+function soldOutCheckDate(){
+	if($("select[name=kgubn]").val() != 3){
+		if($("input[name=kgubn2]").val() != ""){
+			soldOutList();
+		} else {
+			$("input[name=kgubn2]").focus();
+		}
+	} else {
+		soldOutList();
+	}
+}
+
+function soldOutCheckGubn(){
+	$("input[name=kgubn2]").val("");
+	if($("select[name=kgubn]").val() != 3){
+		$("input[name=kgubn2]").focus();
+	} else {
+		if($("input[name=date1]").val() != ""){
+			soldOutList();
+		} else {
+			$("input[name=date1]").focus();
+		}
+	}
+}
+
+function soldOutCheckGubn2(){
+	if($("input[name=date1]").val() != ""){
+		soldOutList();
+	} else {
+		$("input[name=date1]").focus();
+	}
+}
+
+function soldOutList(){
+	$("#data1").css('display', '');
+	htmlString =
+		'<tr>'+
+			'<td width="30" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">No</font></span></td>'+
+			'<td width="50" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">CODE</font></span></td>'+
+			'<td width="240" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">도서명</font></span></td>'+
+			'<td width="50" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">일자</font></span></td>'+
+			'<td width="60" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">수량</font></span></td>'+
+			'<td width="40" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">구분</font></span></td>'+
+			'<td width="160" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">거래처</font></span></td>'+
+			'<td width="40" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">CODE</font></span></td>'+
+			'<td width="50" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">전표</font></span></td>'+
+		'</tr>';
+	
+	var date1 = $("input[name=date1]").val();
+	var gubn = $("select[name=kgubn]").val();
+	var gubn2 = $("input[name=kgubn2]").val();
+	
+	var url;
+	if(gubn == 1){
+		url = SETTING_URL + "/books/sel_books_sold_out1";
+	} else if(gubn == 2){
+		url = SETTING_URL + "/books/sel_books_sold_out2";
+	} else if(gubn == 3){
+		url = SETTING_URL + "/books/sel_books_sold_out3";
+	}
+	
+	var count_num = 1;
+	var sum_s1jjch = 0;
+	
+	var temp_td_2 = "";
+	var temp_td_4 = "";
+	var temp_td_8 = "";
+	
+	var json_data = {value: date1, num_value: gubn2};
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url : url,
+		async: false,
+		data : JSON.stringify(json_data),
+		success : function(result) {
+			logNow(result);
+			
+			var object_num = Object.keys(result);
+			for(var i in object_num){
+				var data = result[i];
+				
+				var td_2 = data["s1book"];
+				var td_3 = data["sbname"];
+				if(td_2 == temp_td_2){
+					td_2 = "";
+					td_3 = "";
+				} else {
+					temp_td_2 = td_2;
+				}
+
+				var td_4 = date1.substring(0, 2) + "." + date1.substring(2) + "." + data["s1ilja"].substring(4);
+				if(td_4 == temp_td_4){
+					td_4 = "";
+				} else {
+					temp_td_4 = td_4;
+				}
+				
+				var td_6 = data["s1pumj"] == 1 ? "품절" : "미달";
+				
+				var td_7 = data["scyakc"];
+				var td_8 = data["s1cust"];
+				if(gubn == 1){
+					if(td_8 == temp_td_8){
+						continue;
+					} else {
+						temp_td_8 = td_8;
+					}
+				} else {
+					if(td_8 == temp_td_8){
+						td_8 = "";
+						td_7 = "";
+					} else {
+						temp_td_8 = td_8;
+					}
+				}
+				
+				htmlString +=
+					'<tr>'+
+				        '<td width="30" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ count_num +'</span></td>'+
+				        '<td width="50" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ td_2 +'</span></td>'+
+				        '<td width="240" height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:5;">'+ td_3 +'</span></td>'+
+						'<td width="50" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ td_4 + '</span></td>'+
+				        '<td width="60" height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:10;">'+ numberWithCommas(data["s1jjch"]) +'</span></td>'+
+				        '<td width="40" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ td_6 + '</span></td>'+
+				        '<td width="160" height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:5;">'+ td_7 +'</span></td>'+
+				        '<td width="40" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ td_8 +'</span></td>'+
+				        '<td width="50" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["s1bunh"] +'</span></td>'+
+				    '</tr>';
+				
+				count_num++;
+				sum_s1jjch += Number(data["s1jjch"]);
+			}
+			$("#data1").html(htmlString);
+		}
+	});
+	
+	htmlString +=
+		'<tr>'+
+			'<td width="30" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#000000">계</font></span></td>'+
+			'<td colspan="4" width="400" bgcolor="#F4F4F4" align="right" valign="middle" height="30"><span style="font-size:9pt; padding-right:9pt;"><font color="#000000">' + sum_s1jjch + '</font></span></td>'+
+			'<td colspan="4" width="290" bgcolor="#F4F4F4" align="right" valign="middle" height="30"><span style="font-size:9pt; padding-right:15;"><font color="#000000">&nbsp;</font></span></td>'+
+		'</tr>';
+	
+	$("#data1").html(htmlString);
+}

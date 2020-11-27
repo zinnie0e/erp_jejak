@@ -22,6 +22,9 @@ function m2(e) {
 		menuTitle = "제품등록";
 		page_code = "전체도서검색";
 		goToPage(1);
+	} else if (val == "1") {
+	} else if (val == "2") {
+		checkInBook("U");
 	}
 }
 
