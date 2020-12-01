@@ -53,7 +53,7 @@ function InsertCuList(){
 }
 
 //목록관리
-function SelCuList(lm_s, lm_t){
+function selCuList(lm_s, lm_t){
 	var from = {lm_s: lm_s, lm_t: lm_t}
 	$.ajax({
 		type: "POST",

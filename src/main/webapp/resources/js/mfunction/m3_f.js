@@ -156,7 +156,7 @@ function yongjiBuyOrder(date1, date2){ //거래별원장 출력
 				var json_data = {
 						jicode : $("select[name=jicode]").val(),
 						comid : $("select[name=comid]").val(),
-						jsum : $('input[name=jnum]').val(min_date)};
+						jsum : $('input[name=jnum]').val()};
 				
 				htmlString += '<input type="button" value=" 구 입 " onclick="javascript:buyOrder(' + "'" + json_data + "'" + ');"></span></p>' +
 			'</td>' +
@@ -282,7 +282,7 @@ function yongjiBuyOrder(date1, date2){ //거래별원장 출력
 	});
 }
 
-//검증필요_구입
+//검증필요_입력
 function buyOrderInput(json_list_data){
 	logNow(json_list_data);
 	$.ajax({
@@ -301,14 +301,14 @@ function buyOrderInput(json_list_data){
 }
 
 //검증필요_입력
-function buyOrderList(json_data){
+function buyOrder(json_data){
 	logNow(json_data);
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
 		dataType: "json",
 		async: false,
-		url : SETTING_URL + "/yongji/in_order_check_input_list",
+		url : SETTING_URL + "/yongji/in_order_check_input",
 		data : JSON.stringify(json_data),
 		success : function(result) {
 			logNow(result);
@@ -1621,7 +1621,8 @@ function showPopUpYJ(msdate, yjcode, wjname){ //원재료 링크 팝업
 	(popUp.document.getElementById("sum4")).innerHTML = sum4;
 }
 
-function newYjMonth(){ //새로 작성(Mk_New)
+//검증필요_새로 작성
+function newYjMonth(){
 	var msdate = $("select[name=ty]").val() + $("select[name=tm]").val();
 	
 	if(msdate == 200901) return;
