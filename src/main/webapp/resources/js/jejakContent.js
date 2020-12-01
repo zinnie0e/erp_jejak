@@ -22,6 +22,9 @@ function m2(e) {
 		menuTitle = "제품등록";
 		page_code = "전체도서검색";
 		goToPage(1);
+	} else if (val == "1") {
+	} else if (val == "2") {
+		checkInBook("U");
 	}
 }
 
@@ -165,8 +168,7 @@ function m6(e) {
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu6(val));
 	//
-	if (val == "3" || val == "6" || val == "7" || val == "8" || val == "9"
-			|| val == "10" || val == "11" || val == "12" || val == "13") {
+	if (val == "3" || val == "6" || val == "7" || val == "8" || val == "9" || val == "10" || val == "11" || val == "12" || val == "13") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
@@ -178,6 +180,10 @@ function m6(e) {
 
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
+		
+		if(val == "3") ChangeDate(17);
+		if(val == "6") ChangeDate(18);
+		if(val == "7") ChangeDate(19);
 	}
 	if (val == "4")
 		SelKbPrint(11); // 출력료
@@ -225,7 +231,7 @@ function m8(e) {
 		$('select[name=ty]').val(d.getFullYear());
 		$('select[name=tm]').val(month);
 		
-		return;
+		if(val == "12") ChangeDate(812);
 	}
 	//
 }

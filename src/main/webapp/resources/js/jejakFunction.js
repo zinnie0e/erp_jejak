@@ -7,11 +7,15 @@ var popUp;
  
 var SETTING_URL = "http://localhost:9090";
 
-///l test11
 //============================공퉁 함수============================
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function fillZero(str, width){
+	str = str + '';
+	return str.length >= width ? str : new Array(width - str.length + 1).join('0') + str;//남는 길이만큼 0으로 채움
 }
 
 function MsToFulldate(milisecond){
@@ -92,7 +96,7 @@ function goToPage(current_page){
 				var total_record = result[0]["count"] 
 				var lm_t = 15;	
 				var lm_s = (current_page - 1) * lm_t;
-				SelCuList(lm_s, lm_t);
+				selCuList(lm_s, lm_t);
 				pasing(total_record, current_page, lm_t);
 			}
 		});
@@ -109,7 +113,7 @@ function goToPage(current_page){
 				var total_record = result[0]["count"] 
 				var lm_t = 15;	
 				var lm_s = (current_page - 1) * lm_t;
-				SelBookList(lm_s, lm_t);
+				selBookList(lm_s, lm_t);
 				pasing(total_record, current_page, lm_t);
 			}
 		});
@@ -276,7 +280,7 @@ function goToPage(current_page){
 			type: "POST",
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
-			url: SETTING_URL + "//jmjejak/select_jmbon_list0",
+			url: SETTING_URL + "/jmjejak/select_jmbon_list0",
 			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
@@ -375,6 +379,7 @@ function SearchDays(code, bdate){
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
 			url: SETTING_URL + "/jpjejak/select_jp_date",
+			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
 				
@@ -399,6 +404,7 @@ function SearchDays(code, bdate){
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
 			url: SETTING_URL + "/jmjejak/select_jm_date",
+			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
 				logNow(result);
@@ -469,6 +475,7 @@ function SearchDays(code, bdate){
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
 			url: SETTING_URL + "/productio/select_purchase_daily1",
+			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
 				
@@ -523,9 +530,9 @@ function ChangeDate(code){
 	}
 	
 	if(code == 3 || code == 4 || code == 12 || code == 19 || code == 20 || code == 28 || code == 29 || code == 31 || code == 33 || code == 35 || 
-			code == 86 || code == 812 || code == 91){ 
+			code == 37 || code == 50 || code == 86 || code == 812 || code == 91){ 
 		//yj_월별용지재고현황(3), 제품(4), 잡물(12), kb_제본비(19), kb_코팅비(20) 년월 변경, 
-		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35)
+		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35),mc_품목별 원재료명세서 새로작성(월별)
 		//pio_구매일보(86)
 		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val();
 		
@@ -539,6 +546,8 @@ function ChangeDate(code){
 		if(code == 31) SearchDays(1, bdate);
 		if(code == 33) SearchDays(2, bdate);
 		if(code == 35) SelPumMon(bdate);
+		if(code == 37) btnPumMonInsert(bdate);
+		if(code == 50) SelPaymentAccount(bdate);
 		if(code == 86) SearchDays(4, bdate);
 		if(code == 812) SelDailyStatus(bdate);
 		if(code == 91) SelhWithholdingTax(bdate);
@@ -552,9 +561,16 @@ function ChangeDate(code){
 		SelRoyaltyUD(bdate, gubn, gubn2); 
 	}
 	
-	if(code == 36){ 
-		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
-		SelPumPer(bdate);
+	if(code == 36 || code == 38){
+		if(code == 36){
+			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
+			SelPumPer(bdate);
+		}
+		if(code == 38){
+			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
+			btnPumPerInsert(bdate);
+		}
+		
 	}
 	
 	////////////
@@ -617,4 +633,3 @@ function ChangeDate(code){
 		}
 	}
 }
-
