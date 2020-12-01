@@ -36,15 +36,6 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-											'<tr>',
-												'<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>번호</b></span></td>',
-												'<td width="400" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>거래처명</b></span></td>',
-												'<td width="70" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>건수</b></span></td>',
-												'<td width="140" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
-												'<td width="120" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>인쇄</b></span></td>',
-											'</tr>',
-										'</table>',
 										'<table id="kbYongjiData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"><table>',
 									'</td>',
 								'</tr>',
@@ -52,6 +43,15 @@ function jmenu6(val) { //직접경비
 					'</div>',
 				'</div>',
 			'</div>',
+			].join('');
+			
+		case "3_인쇄팝업": 
+			return [
+			'<div style="width:780px;">',
+				'<table id="popdata" width="750" border="0" cellpading="0" cellspacing="0"></table>',
+				'<br>',
+				'<table id="popdata2" width="750" border="0" cellpading="0" cellspacing="0"></table>',
+			'</div>'
 			].join('');
 
 		case "4": //출력료 -> jejak/kb/exl_4.php
@@ -65,48 +65,7 @@ function jmenu6(val) { //직접경비
 							'</tr>',					
 							'<tr>',
 								'<td width="780">',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',                
-										'<tr>',
-											'<td width="140" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>지급년월일</b></span></td>',                    
-											'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>거래처</b></span></td>',
-											'<td width="140" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>구분</b></span></td>',
-											'<td width="120" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
-											'<td width="160" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>메뉴</b></span></td>',
-										'</tr>',
-									'</table>',
 									'<table id="kbPrintData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-										'<form name="frmMain" method="post" action="ex_4_a.php">',
-										'<tr>',
-											'<td width="140" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:120px;" placeholder="2000-01-01" name="cdate"></span>',
-											'</td>',
-											'<td width="220" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<select name="ccode" size="1">',
-													'<option value="">======================</option>',
-												'</select></span>',
-											'</td>',
-											'<td width="140" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<select name="cgubn" size="1">',
-													'<option value="">==========</option>',
-													'<option value="표지">표지</option>',
-													'<option value="본문">본문</option>',
-													'<option value="칼라프린트">칼라프린트</option>',
-													'<option value="스티커">스티커</option>',
-													'<option value="전단지">전단지</option>',
-													'<option value="프로그램">프로그램</option>',
-													'<option value="포스트">포스트</option>',
-												'</select></span>',
-											'</td>',
-											'<td width="120" height="30" align="right" style="padding-right:10" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:110px;" name="cprice"></span>',
-											'</td>',
-											'<td width="160" height="30" align="center" style="padding-right:10" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<input type="button" value=" 등 록 " onClick="javascript:InsertKbPrint();"></span>',
-											'</td>',
-										'</tr>',
-										'</form>',
-									'</table>',
 								'</td>',
 							'</tr>',
 						'</table>',					
@@ -126,43 +85,7 @@ function jmenu6(val) { //직접경비
 							'</tr>',
 							'<tr>',
 								'<td width="780">',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',                
-										'<tr>',
-											'<td width="140" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>지급년월일</b></span></td>',                    
-											'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>거래처</b></span></td>',
-											'<td width="100" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>구분</b></span></td>',
-											'<td width="120" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
-											'<td width="200" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>메뉴</b></span></td>',
-										'</tr>',
-									'</table>',
 									'<table id="kbHouseOrganData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>', 
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',              
-										'<form name="frmMain" method="post" action="ex_3_a.php">',
-										'<tr>',
-											'<td width="140" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:120px;" placeholder="2000-01-01" name="cdate"></span>',
-											'</td>',
-											'<td width="220" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<select name="ccode" size="1">',
-													'<option value="">======================</option>',
-												'</select></span>',
-											'</td>',
-											'<td width="100" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<select name="cgubn" size="1">',
-													'<option value="">========</option>',
-													'<option value="악보">악보</option>',
-													'<option value="가사">가사</option>',
-												'</select></span>',
-											'</td>',
-											'<td width="120" height="30" align="right" style="padding-right:10" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:110px;" name="cprice"></span>',
-											'</td>',
-											'<td width="200" height="30" align="center" style="padding-right:10" valign="middle" bgcolor="white"><span style="font-size:9pt;">',
-												'<input type="button" value=" 등 록 " onClick="javascript:InsertKbHouseOrgan();"></span>',
-											'</td>',
-										'</tr>',
-										'</form>',
-									'</table>',
 								'</td>',
 							'</tr>',
 						'</table>',
@@ -198,13 +121,13 @@ function jmenu6(val) { //직접경비
 										'</select>월&nbsp;인쇄비 관리 리스트</b></span></p>',
 									'</td>',
 									'<td width="391" height="40" align="right" valign="middle">',
-										'<input type="button" value="거래명세 출력" onClick="javascript:ms_pr();">&nbsp;&nbsp;',
+										'<input type="button" value="거래명세 출력" onClick="javascript:PrintPresswork();">&nbsp;&nbsp;',
 									'</td>',
 								'</tr>',
 							'</form>',
 								'<tr>',
 									'<td width="780" colspan="2">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbPressworkDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제작번호</span></td>',
 												'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">년월일</span></td>',
@@ -216,8 +139,7 @@ function jmenu6(val) { //직접경비
 												'<td width="70" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">회계</span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbPressworkData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbPressworkData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="kbPressworkData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 								'<tr>',
@@ -252,17 +174,6 @@ function jmenu6(val) { //직접경비
 						                '</tr>',
 						                '<tr>',
 						                    '<td width="780">',
-						                        '<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-						                            '<tr>',
-						                                '<td width="114" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">구분</span></td>',
-						                                '<td width="114" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">필름량</span></td>',
-						                                '<td width="114" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">필름단가</span></td>',
-						                                '<td width="114" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">금액</span></td>',
-						                                '<td width="110" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">대지비</span></td>',
-						                                '<td width="141" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">합계</span></td>',
-						                                '<td width="60" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">수정</span></td>',
-						                            '</tr>',
-						                        '</table>',
 						                        '<table id="kbPressworkDetailData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 						                    '</td>',
 						                '</tr>',
@@ -280,16 +191,6 @@ function jmenu6(val) { //직접경비
 						                '</tr>',
 						                '<tr>',
 						                    '<td width="780">',
-						                        '<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-						                            '<tr>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">구분</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">판종</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">판수</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">단가</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">금액</span></td>',
-						                                '<td width="125" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">합계</span></td>',
-						                            '</tr>',
-						                        '</table>',
 						                        '<table id="kbPressworkDetailData3" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 						                    '</td>',
 						                '</tr>',
@@ -307,16 +208,6 @@ function jmenu6(val) { //직접경비
 						                '</tr>',
 						                '<tr>',
 						                    '<td width="780">',
-						                    	'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-						                            '<tr>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">구분</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">R수</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">도수</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">단가</span></td>',
-						                                '<td width="128" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">금액</span></td>',
-						                                '<td width="125" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">합계</span></td>',
-						                            '</tr>',
-						                        '</table>',
 						                        '<table id="kbPressworkDetailData4" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 						                    '</td>',
 						                '</tr>',
@@ -341,6 +232,14 @@ function jmenu6(val) { //직접경비
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "6_인쇄팝업": 
+			return [
+			'<div style="width:780px;">',
+				'<div id="popdata" width="700px" border="0" cellpading="0" cellspacing="0"></div>',
+				'<div id="popdata2" width="700px" border="0" cellpading="0" cellspacing="0"></div>',
+			'</div>'
+		].join('');
 
 		case "7": //제본비 -> jejak/kb/ex_7_1.php
 			return [
@@ -369,30 +268,13 @@ function jmenu6(val) { //직접경비
 										'</select>월 제본비 관리 리스트</b></span></p>',
 									'</td>',
 									'<td width="391" height="40" align="right" valign="middle">',
-										'<input type="button" value=" 거래명세 출력 " onClick="javascript:ms_pr();">',
+										'<input type="button" value=" 거래명세 출력 " onClick="javascript:PrintBinding();">',
 									'</td>',
 								'</tr>',
 							'</form>',
 								'<tr>',
 									'<td width="780" colspan="2">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-											'<tr>',
-												'<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제작일</span></td>',
-												'<td width="60" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">입고일</span></td>',
-												'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">코드</span></td>',
-												'<td width="260" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>',
-												'<td width="140" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">거래처</span></td>',
-												'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">제작부수</span></td>',
-												'<td width="100" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">제본비</span></td>',
-											'</tr>',
-										'</table>',
 										'<table id="kbBindingData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-											'<tr>',
-												'<td colspan="6" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:30pt; letter-spacing:40pt;">합계</span></td>',
-												'<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;"><a id="tsum"></a></span></td>',
-											'</tr>',
-										'</table>',
 									'</td>',
 								'</tr>',
 						'</table>',
@@ -400,6 +282,13 @@ function jmenu6(val) { //직접경비
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "7_인쇄팝업": 
+			return [
+			'<div style="width:750px;">',
+				'<div id="popdata" width="750" border="0" cellpading="0" cellspacing="0"></table>',
+			'</div>'
+		].join('');
 
 		case "8": //코팅비 -> jejak/kb/ex_8_1.php
 			return [
@@ -430,13 +319,13 @@ function jmenu6(val) { //직접경비
 										'</select>일&nbsp;코팅비 관리 리스트</b></span></p>',
 									'</td>',
 									'<td width="391" height="40" align="right" valign="middle">',
-										'<input type="button" value=" 거래명세 출력 " onClick="javascript:ms_pr();">',
+										'<input type="button" value=" 거래명세 출력 " onClick="javascript:PrintKbCoating();">',
 									'</td>',
 								'</tr>',
 							'</form>',
 								'<tr>',
 									'<td width="780" colspan="2">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbCoatingDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제작번호</span></td>',
 												'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">년월</span></td>',
@@ -447,16 +336,13 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">거래처</span></td>',
 												'<td width="70" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">회계</span></td>',
 											'</tr>',
-										'</table>',
-										'<table id="kbCoatingData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbCoatingData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="547" height="30" colspan="5" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">합계</span></td>',
-												'<td width="70" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;"><a id="sp3"></a></span></td>',
+												'<td width="70" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;"></span></td>',
 												'<td width="160" height="30" colspan="2" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">&nbsp;</span></td>',
 											'</tr>',
 										'</table>',
+										'<table id="kbCoatingData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 								'<tr>',
@@ -467,6 +353,13 @@ function jmenu6(val) { //직접경비
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "8_인쇄팝업": 
+			return [
+			'<div style="width:750px;">',
+				'<div id="popdata" width="750" border="0" cellpading="0" cellspacing="0"></table>',
+			'</div>'
+		].join('');
 			
 		case "관리비_디테일": 
 			return [
@@ -487,32 +380,7 @@ function jmenu6(val) { //직접경비
 						    '</tr>',
 						    '<tr>',
 						        '<td width="780">',
-						            '<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-						                '<tr>',
-						                    '<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">번호</span></td>',
-						                    '<td width="80" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">년월일</span></td>',
-						                    '<td width="270" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">도서명</span></td>',
-						                    '<td width="70" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">단가</span></td>',
-						                    '<td width="70" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">수량</span></td>',
-						                    '<td width="70" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">금액</span></td>',
-						                    '<td width="162" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">메뉴</span></td>',
-						                '</tr>',
-						            '</table>',
-						            '<table id="kbManagementDetailData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-						            '<table id="kbManagementDetailData3" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-						            '<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-										'<input type="hidden" name="ccode" value="<?=$cc?>">',
-										'<input type="hidden" name="tag" value="<?=$tag?>">',
-									'</table>',
-									'<table id="kbManagementDetailData4" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-						                '<tr>',
-						                    '<td width="470" align="center" valign="middle" bgcolor="#F4F4F4" height="30" colspan="4"></td>',
-						                    '<td width="70" align="right" style="padding-right:10" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">합계</span></td>',
-						                    '<td width="70" align="right" style="padding-right:10" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><a id="sum"></a></span></td>',
-						                    '<td width="162" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"></span></td>',
-						                '</tr>',
-						            '</table>',
+						            '<table id="kbManagementDetailData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 						        '</td>',
 						    '</tr>',
 						'</table>',
@@ -520,6 +388,108 @@ function jmenu6(val) { //직접경비
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "사보검색": 
+			return [
+			'<div style="width:780px;">',
+				'<table border="0" cellpadding="0" cellspacing="0" width="500" bgcolor="#F6F5F5">',
+				    '<tr>',
+				        '<td width="500" height="30"></td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="500" height="30" align="left" valign="top"><p style="margin-left:50px;"><span style="font-size:9pt;"><b>- 거래처 검색</b></span></p></td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" align="center" valign="top">',
+				            '<table cellpadding="0" cellspacing="0" width="400">',
+				                '<tr>',
+				                    '<td width="100" height="30">',
+				                        '<select id="key" size="1" style="font-family:돋움; font-size:9pt; width:95px;">',
+				                            '<option value="wcname">거래처명</option>',
+				                            '<option value="wccode">거래처코드</option>',
+				                            '<option value="wcjob">작업분류</option>',
+				                        '</select>',
+				                    '</td>',
+				                    '<td width="230" height="30"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:230px; height:20px; ime-mode:active" id="keyfield"></td>',
+				                    '<td width="70" height="30"><input type ="image" id="btnSearch" src="/resources/style/images/jejak/btn_pop_search.gif" width="60" height="20" border="0"></td>',
+				                '</tr>',
+				            '</table>',
+				        '</td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" height="10"></td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" height="10"></td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" align="center" valign="top">',
+				            '<table id="popdata" cellpadding="0" cellspacing="1" width="400" align="center" bgcolor="#CCCCCC"></table>',
+				        '</td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" height="10"></td>',
+				    '</tr>',
+				    '<tr>',
+				        '<td width="600" height="30"></td>',
+				    '</tr>',
+				'</table>',
+			'</div>'
+		].join('');
+			
+		case "도서검색": 
+			return [
+			'<div style="width:780px;">',
+				'<table border="0" cellpadding="0" cellspacing="0" width="500" bgcolor="#F6F5F5">'+
+				    '<tr>'+
+				        '<td width="500" height="30"></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="500" height="30" align="left" valign="top"><p style="margin-left:50px;"><span style="font-size:9pt;"><b>- 도서 검색</b></span></p></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" align="center" valign="top">'+
+				            '<table cellpadding="0" cellspacing="0" width="400">'+
+				                '<tr>'+
+				                    '<td width="100" height="30">'+
+				                        '<select id="key" size="1" style="font-family:돋움; font-size:9pt; width:95px;">'+
+				                            '<option value="sbname2">도서명</option>'+
+				                            '<option value="sbbook">도서코드</option>'+
+				                        '</select>'+
+				                    '</td>'+
+				                    '<td width="230" height="30"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:230px; height:20px; ime-mode:active" id="keyfield"></td>'+
+				                    '<td width="70" height="30"><input type ="image" id="btnSearch" src="/resources/style/images/jejak/btn_pop_search.gif" width="60" height="20" border="0"></td>'+
+				                '</tr>'+
+				            '</table>'+
+				        '</td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" height="10"></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" height="10"></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" align="center" valign="top">'+
+				            '<table id="popdataTemp" cellpadding="0" cellspacing="1" width="400" align="center" bgcolor="#CCCCCC">'+
+				                '<tr>'+
+				                    '<td width="100" height="30" align="center" valign="middle" bgcolor="#E5E5E5"><span style="font-size:9pt;"><b><font color="#333333">코드</font></b></span></td>'+
+				                    '<td width="200" bgcolor="#E5E5E5" height="30" align="center" valign="middle"><p><span style="font-size:9pt;"><b><font color="#333333">도서명</font></b></span></p></td>'+
+				                    '<td width="96" height="30" bgcolor="#E5E5E5" align="center" valign="middle"><span style="font-size:9pt;"><b><font color="#333333">선택</font></b></span></td>'+
+				                '</tr>'+
+				            '</table>'+
+				            '<table id="popdata" style="display:none;" cellpadding="0" cellspacing="1" width="400" align="center" bgcolor="#CCCCCC"></table>',
+				        '</td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" height="10"></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="600" height="30"></td>'+
+				    '</tr>'+
+				'</table>'+
+			'</div>'
+		].join('');
 
 		case "9": //비닐비 -> jejak/kb/exl_9.php?tag=1
 			return [
@@ -553,7 +523,7 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbManagementDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>년월일</b></span></td>',
 												'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>도서명</b></span></td>',
@@ -564,8 +534,7 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbManagementData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbManagementData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="kbManagementData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 						'</table>',
@@ -606,7 +575,7 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbManagementDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>년월일</b></span></td>',
 												'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>도서명</b></span></td>',
@@ -617,8 +586,7 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbManagementData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbManagementData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="kbManagementData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 						'</table>',
@@ -659,7 +627,7 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbManagementDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>년월일</b></span></td>',
 												'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>도서명</b></span></td>',
@@ -670,8 +638,7 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbManagementData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbManagementData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="kbManagementData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 						'</table>',
@@ -712,7 +679,7 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbManagementDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>년월일</b></span></td>',
 												'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>도서명</b></span></td>',
@@ -723,8 +690,7 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbManagementData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbManagementData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<table id="kbManagementData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 						'</table>',
@@ -765,7 +731,7 @@ function jmenu6(val) { //직접경비
 							'</form>',
 								'<tr>',
 									'<td width="780">',
-										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+										'<table id="kbManagementDataTemp" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 											'<tr>',
 												'<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;"><b>년월일</b></span></td>',
 												'<td width="220" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>도서명</b></span></td>',
@@ -776,9 +742,8 @@ function jmenu6(val) { //직접경비
 												'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><b>금액</b></span></td>',
 											'</tr>',
 										'</table>',
-										'<table id="kbManagementData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<table id="kbManagementData2" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
-										'<p><center><a href="ex_9.php?tag=5"><img src="/resources/style/images/jejak/b_in.gif" border="0"></a></center></p>',
+										'<table id="kbManagementData" style="display:none;" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+										'<p><center><a href="javascript:SelKbManagementDetail(0,5);"><img src="/resources/style/images/jejak/b_in.gif" border="0"></a></center></p>',
 									'</td>',
 								'</tr>',
 						'</table>',

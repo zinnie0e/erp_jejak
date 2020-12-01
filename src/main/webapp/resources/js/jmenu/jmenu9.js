@@ -38,10 +38,10 @@ function jmenu9(val) {
 												'<td width="30"></td>',
 												'<td width="340" align="left">',
 													'<input type="button" value=" 보기 " onClick="javascript:SelAccountingSlip();">&nbsp;&nbsp;&nbsp;&nbsp;',
-													'<input type="button" value=" 전표작성 " onClick="javascript:MakeAll();">&nbsp;&nbsp;',
+													'<input type="button" value=" 전표작성 " onClick="javascript:MakeAccountingSlip();">&nbsp;&nbsp;',
 													'<input type="button" value=" EXCEL " onClick="javascript:MakeEx();">',
 												'</td>',
-												'<td width="155" align="right"><input type="button" value=" 인 쇄 " onClick="javascript:PrintAll();"></td>',
+												'<td width="155" align="right"><input type="button" id="btnPrint" value=" 인 쇄 "></td>',
 											'</tr>',
 										'</table>',
 									'</form>',
@@ -49,7 +49,7 @@ function jmenu9(val) {
 							'</tr>',
 							'<tr>',
 								'<td width="780">',
-									'<table id="testestestest" border="0" cellspacing="2" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
+									'<table id="accountingSlipData" border="0" cellspacing="2" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 								'</td>',
 							'</tr>',
 						'</table>',
@@ -57,6 +57,13 @@ function jmenu9(val) {
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "0_프린터팝업": 
+			return [
+			'<div style="width:810px; height:815px;">',
+				'<table id="popdata" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="508"></table>'+
+			'</div>',
+		].join('');
 			
 		case "1": //원천징수 -> jejak/su/401.php
 			return [
@@ -71,7 +78,7 @@ function jmenu9(val) {
 											'<tr>',
 												'<td width="10"></td>',
 												'<td width="65">',
-													'<select name="ty" size="1" style="font-family:굴림; font-size:9pt; width:60;">',
+													'<select name="ty" size="1" style="font-family:굴림; font-size:9pt; width:60;" onChange="javascript:ChangeDate(91);">',
 													'</select>',
 												'</td>',
 												'<td width="20" align="left"><span style="font-size:9pt;">년</span></td>',
@@ -103,7 +110,7 @@ function jmenu9(val) {
 							'</tr>',
 							'<tr>',
 								'<td width="780">',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="#F4F4F4" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
+									'<table id="asWithholdingTaxDataTemp" border="0" cellspacing="1" width="780" bordercolordark="#F4F4F4" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 										'<tr>',
 											'<td width="50" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt;">성명</span></td>',
 											'<td width="50" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt;">날짜</span></td>',
@@ -116,20 +123,7 @@ function jmenu9(val) {
 											'<td width="60" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt;">합계</span></td>',
 										'</tr>',
 									'</table>',
-									'<table id="asWithholdingTaxData" border="0" cellspacing="1" width="780" bordercolordark="#F4F4F4" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-									'<table border="0" cellspacing="1" width="780" bordercolordark="#F4F4F4" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-										'<tr>',
-											'<td width="50" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt;"><?=$rec_no?></span></td>',
-											'<td width="50" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-left:0pt;"></span></td>',
-											'<td width="100" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-left:0pt;"></span></td>',
-											'<td width="280" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-left:0pt;"></span></td>',
-											'<td width="50" height="25" align="center" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-left:0pt;"></span></td>',
-											'<td width="70" height="25" align="right" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:3pt;"><a id="sum1"/></span></td>',
-											'<td width="60" height="25" align="right" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:3pt;"><a id="sum2"/></span></td>',
-											'<td width="60" height="25" align="right" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:3pt;"><a id="sum3"/></span></td>',
-											'<td width="60" height="25" align="right" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:3pt;"><a id="sum4"/></span></td>',
-										'</tr>',
-									'</table>',
+									'<table id="asWithholdingTaxData" border="0" cellspacing="1" width="780" bordercolordark="#F4F4F4" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 								'</td>',
 							'</tr>',
 						'</table>',
@@ -229,7 +223,7 @@ function jmenu9(val) {
 								'</tr>',
 								'<tr>',
 									'<td width="720">',
-										'<table id="MonthlySumByBookData" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
+										'<table id="MonthlySumByBookData" style="display:none;" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 								'<tr>',
@@ -297,7 +291,7 @@ function jmenu9(val) {
 								'</tr>',
 								'<tr>',
 									'<td width="720">',
-										'<table id="asMonthlyAggregateByYearData" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
+										'<table id="asMonthlyAggregateByYearData" style="display:none" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 								'<tr>',
@@ -344,7 +338,7 @@ function jmenu9(val) {
 											'<tr>',
 												'<td width="90" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">도서코드</font></span></td>',
 												'<td width="100" height="30" align="center"><p style="margin-left:0px;"><INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="man1" maxlength="6" onKeypress="if(event.keyCode == 13){javascript:SelProductionByBook();}"></p></td>',
-												'<td width="530" height="30"><p style="margin-left:10px;"><INPUT style="font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:320px;" name="book2" onFocus="blur();" onClick="javascript:srcBook();"></p></td>',
+												'<td width="530" height="30"><p style="margin-left:10px;"><INPUT style="font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:320px;" name="book2" onFocus="blur();" onClick="javascript:SearchBookcode_m9();"></p></td>',
 											'</tr>',
 										'</table>',
 									'</td>',
@@ -357,17 +351,7 @@ function jmenu9(val) {
 								'</tr>',
 								'<tr>',
 									'<td width="720">',
-										'<table border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC">',
-											'<tr>',
-												'<td width="120" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">제작년월</font></span></td>',        
-												'<td width="120" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">부수</font></span></td>',
-												'<td width="140" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">제작비</font></span></td>',
-												'<td width="120" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">입고수량</font></span></td>',
-												'<td width="120" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">미입고수량</font></span></td>',
-												'<td width="100" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">증감</font></span></td>',
-											'</tr>',
-										'<table id="asByBookData" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
-										'<table id="asByBookData2" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
+										'<table id="asByBookData" style="display:none;" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
 									'</td>',
 								'</tr>',
 								'<tr>',
@@ -388,13 +372,30 @@ function jmenu9(val) {
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "5_popup": 
+			return [
+			'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:146px; margin-left:15px;">',
+					'<div style="width:780px; height:126px; padding:10px 0px 10px 0px;">',
+						'<table width="300" border="0">',
+							'<tr>',
+								'<td width=250" align="center"><input id="txtBookcode" type="text" name="bname" size="30"></td>',
+								'<td width=50" align="center"><input id="btnSearchbookcode" type="button" value=" 검색 "></td>',
+							'</tr>',
+						'</table>',
+						'<table id="pioMoncuDailytotalData2" width="300" border="1"></table>',
+					'</div>',
+				'</div>',
+			'</div>',
+			].join('');
 
 		case "7": //전기 이월 작업 -> jejak/su/304.php
 			return [
 			'<div style="width:810px; height:815px;">',
 				'<div style="width:780px; height:540px; margin-left:15px;">',
 					'<div style="width:780px; height:520px; padding:10px 0px 10px 0px;">',
-						'<form name="frmMain">',
+						//'<form name="frmMain">',
 							'<table border="0" cellpadding="0" cellspacing="0" width="720" height="500">',
 								'<tr>',
 									'<td width="720" valign="middle">',
@@ -413,24 +414,50 @@ function jmenu9(val) {
 										'<table border="0" cellspacing="0" width="290" bordercolordark="white" bordercolorlight="#CCCCCC">',
 											'<tr>',
 												'<td width="90" bgcolor="white" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">기준년도</font></span></td>',
-												'<td width="100" height="30" align="center"><p style="margin-left:0px;"><INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="date1" maxlength="2" onKeypress="if(event.keyCode == 13){javascript:chkDate();}"></p></td>',
-												'<td width="100" height="30" align="center"><input type="button" value=" 실 행 " onClick="javascript:SendFrm();"></td>',
+												'<td width="100" height="30" align="center"><p style="margin-left:0px;"><INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="date1" maxlength="2"></p></td>',
+												'<td width="100" height="30" align="center"><input type="button" value=" 실 행 " onClick="javascript:SelElecCarryoverWork();"></td>',
 											'</tr>',
 										'</table>',
 									'</td>',
 								'</tr>',
 							'</table>',
-						'</form>',
+						//'</form>',
 						'<div id="Lay1" name="Layer1" style="visibility:hidden; position:absolute; width:300pt height:300pt; top:210pt; left:400pt;">',
 							'<img src="/resources/style/images/jejak/time_02.gif" width="300" height="300" border="0">',
 						'</div>',
 						'<div>',
-							'<iframe name="tFrm" width="0" height="0"></iframe>',
+							//'<iframe name="tFrm" width="0" height="0"></iframe>',
 						'</div>',
 					'</div>',
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "7_디테일": 
+			return [
+			'<div style="width:810px; height:815px;">',
+				'<SCRIPT language=Javascript> '+
+				'</SCRIPT>'+
+				'<center>'+
+				'<table width="400" height="500">'+
+				    '<tr>'+
+				        '<td width="400" height="200"></td>'+
+				    '</tr>'+
+				    '<tr>'+
+				        '<td width="400" height="30"><img src="/resources/style/images/jejak/loading.gif" border="0"></td>'+
+				    '</tr>'+
+				    //'<form name="frm1">'+
+				        '<tr>'+
+				            '<td width="400" height="50" valign="bottom"><INPUT style="text-align:center; font-family:굴림; font-size:14pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:380px;" name="tmp_msg2"></td></td>'+
+				        '</tr>'+
+				        '<tr>'+
+				            '<td width="400" height="50" valign="bottom"><INPUT style="text-align:center; font-family:굴림; font-size:11pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:380px;" name="tmp_msg"></td></td>'+
+				        '</tr>'+
+				    //'</form>'+
+				'</table>'+
+				'</center>'+
+			'</div>',
+		].join('');
 
 		case "9": //미입고 도서 -> jejak/su/502.php
 			return [
@@ -454,7 +481,7 @@ function jmenu9(val) {
 														'<tr>',
 															'<td width="300" height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:10pt;"><a id="full_date"/> 기준</span></td>',
 															'<td width="420" height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:10pt;">',
-																'<input type="button" value="새로 계산" onClick="javascript:MkNew();">&nbsp;&nbsp;&nbsp;&nbsp;',
+																'<input type="button" value="새로 계산" onClick="javascript:MakeBooksNotin();">&nbsp;&nbsp;&nbsp;&nbsp;',
 																'<input type="button" id="PopUpBooknotin" value=" 인쇄 "></span>',
 															'</td>',
 														'</tr>',
@@ -476,17 +503,6 @@ function jmenu9(val) {
 							'</tr>',
 							'<tr>',
 								'<td width="720">',
-									'<table border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC">',
-										'<tr>',
-											'<td width="40" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">번호</font></span></td>',
-											'<td width="60" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">제작일</font></span></td>',
-											'<td width="60" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">도서코드</font></span></td>',
-											'<td width="350" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">도서명</font></span></td>',
-											'<td width="60" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">제작부수</font></span></td>',
-											'<td width="80" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">미입고수량</font></span></td>',
-											'<td width="70" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">제본소</font></span></td>',
-										'</tr>',
-									'</table>',
 									'<table id="asBooksNotinData" border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC"></table>',
 								'</td>',
 							'</tr>',
@@ -518,6 +534,9 @@ function jmenu9(val) {
 			'<div style="width:810px; height:815px;">',
 				'<div style="width:780px; height:120px; margin-left:15px;">',
 					'<div style="width:780px; height:100px; padding:10px 0px 10px 0px;">',
+						'<div id="Lay1" name="Layer1" style="display:none; position:absolute; width:300pt height:300pt; top:210pt; left:400pt;">',
+							'<img src="/resources/style/images/jejak/time_02.gif" width="300" height="300" border="0">',
+						'</div>',
 						//'<form name="frmAdd" method="post" action="505.php">',
 							'<table border="0" cellpadding="0" cellspacing="0" width="720">',
 								'<tr>',
@@ -554,69 +573,11 @@ function jmenu9(val) {
 								/* '<tr>',
 									'<td width="720">',
 										'<table border="1" cellspacing="0" width="720" bordercolordark="white" bordercolorlight="#CCCCCC">',
-											'<tr>',
-												'<td width="30" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">번호</font></span></td>',
-												'<td width="50" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">도서코드</font></span></td>',
-												'<td width="240" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">도서명</font></span></td>',
-												'<td width="100" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">출판사재고</font></span></td>',
-												'<td width="100" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">아트재고</font></span></td>',        
-												'<td width="100" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">합계</font></span></td>',
-												'<td width="100" bgcolor="#F4F4F4" align="center" valign="middle" height="30"><span style="font-size:9pt;"><font color="#666666">미입고</font></span></td>',
-											'</tr>',
-											'<tr>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',////////////
-											'<tr bgcolor="CCFFCC">',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',
-											'<tr>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',
-											'<tr bgcolor="CCFFCC">',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',
-											'<tr>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',
-											'<tr bgcolor="CCFFCC">',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$ii?></span></td>',
-												'<td height="30" align="center" valign="middle"><span style="font-size:9pt; padding-right:0pt;"><?=$mrow[0]?></span></td>',
-												'<td height="30" align="left" valign="middle"><span style="font-size:9pt; padding-left:2pt;"><?=$mrow[1]?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num1)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($num2)?></span></td>',        
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?=number_format($sum)?></span></td>',
-												'<td height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:3pt;"><?if ($num3) {?><font color="red"><?=number_format($num3)?></font><?}?></span></td>',
-											'</tr>',
+											
+											
+											
+											
+											
 										'</table>',
 									'</td>',
 								'</tr>',
