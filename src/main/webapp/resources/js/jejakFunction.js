@@ -523,9 +523,9 @@ function ChangeDate(code){
 	}
 	
 	if(code == 3 || code == 4 || code == 12 || code == 19 || code == 20 || code == 28 || code == 29 || code == 31 || code == 33 || code == 35 || 
-			code == 86 || code == 812 || code == 91){ 
+			code == 37 || code == 50 || code == 86 || code == 812 || code == 91){ 
 		//yj_월별용지재고현황(3), 제품(4), 잡물(12), kb_제본비(19), kb_코팅비(20) 년월 변경, 
-		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35)
+		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35),mc_품목별 원재료명세서 새로작성(월별)
 		//pio_구매일보(86)
 		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val();
 		
@@ -539,6 +539,8 @@ function ChangeDate(code){
 		if(code == 31) SearchDays(1, bdate);
 		if(code == 33) SearchDays(2, bdate);
 		if(code == 35) SelPumMon(bdate);
+		if(code == 37) btnPumMonInsert(bdate);
+		if(code == 50) SelPaymentAccount(bdate);
 		if(code == 86) SearchDays(4, bdate);
 		if(code == 812) SelDailyStatus(bdate);
 		if(code == 91) SelhWithholdingTax(bdate);
@@ -552,9 +554,16 @@ function ChangeDate(code){
 		SelRoyaltyUD(bdate, gubn, gubn2); 
 	}
 	
-	if(code == 36){ 
-		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
-		SelPumPer(bdate);
+	if(code == 36 || code == 38){
+		if(code == 36){
+			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
+			SelPumPer(bdate);
+		}
+		if(code == 38){
+			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
+			btnPumPerInsert(bdate);
+		}
+		
 	}
 	
 	////////////
