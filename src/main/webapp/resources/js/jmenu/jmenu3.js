@@ -102,7 +102,9 @@ function jmenu3(val) { //용지관리
 						'</table>',
 						'<p>',
 							'<div align="center">',
+								//검증필요_안쓰는 기능, buyOrderInput 만들어는 둠
 								'<input type ="button" value=" 입 력 " onClick="javascript:SendIt();"></input>',
+								//검증필요_안쓰는 기능
 								'<!-- <input type ="button" value=" 단가 계산 " onClick="javascript:SendIt2(<?=$st?>,<?=$et?>);"></input> -->',	
 							'</div>',
 						'</p>',
@@ -828,6 +830,7 @@ function jmenu3(val) { //용지관리
 								'</tr>',
 								'<tr>',
 									'<td width="780" colspan="2" height="40" align="center" valign="bottom">',
+										//검증필요_안쓰는 기능, newYjMonth 만들어는 둠
 										'<input type="button" value=" 새로 작성 " onClick="javascript:Mk_New();">',
 									'</td>',							
 								'</tr>',

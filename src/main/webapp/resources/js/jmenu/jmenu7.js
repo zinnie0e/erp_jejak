@@ -41,8 +41,8 @@ function jmenu7(val) { //월결산자료
 												'<td width="30"><span style="font-size:9pt;">일</span></td>',
 												'<td width="155" align="left"><b><span style="font-size:9pt;"> 원가 계산서</span></b></td>',
 												'<td width="340" align="right">',
-													'<input type="button" value="용지대 계산" onClick="javascript:CalcYJ2();">&nbsp;&nbsp;&nbsp;',
-													'<input type="button" value="모두 인쇄" onClick="javascript:PrintAll();">',
+													'<input type="button" value="용지대 계산" onClick="javascript:CalcYJ2('+ $("select[name=ty]").val() +','+ $("select[name=tm]").val() +','+ $("select[name=td]").val() +');">&nbsp;&nbsp;&nbsp;',
+													'<input type="button" id="btnBookCostStatementPrint" value="모두 인쇄">',
 												'</td>',
 											'</tr>',
 										'</table>',
@@ -64,12 +64,68 @@ function jmenu7(val) { //월결산자료
 									'<table id="mcBookCostStatementData" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC"></table>',
 									'<table id="pagination" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0"></table>',
 								'</td>',
+								
+								
+								
+								
+								
 							'</tr>',
 						'</table>',
 					'</div>',
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "0_인쇄팝업":
+			return [
+				'<center>',
+				'<div id=popdata>',
+				'</div>',
+				'</center>',
+				
+				'<div id="popdata2">',
+				'</div>',
+					
+				//'<div id="aaa"></div>',
+				
+			/*'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+					
+					'<table border="0" id="popdata" cellpadding="20" cellspacing="1" width="620" bgcolor="#333333">',
+					'<div id="Testzz"></div>',
+						
+					'</div>',
+				'</div>',
+			'</div>',*/
+			].join('');		
+		
+		case "0_상세계산": //상세 원가계산서 -> jejak/kb/ex_view.php
+			return [
+			'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:123px; margin-left:15px;">',
+					'<div style="width:780px; height:103px; padding:10px 0px 10px 0px;">',
+					'<table id="mcBookCostStatementDetailData" border="0" cellpaddig="20" cellspacing="1" width="620" bgcolor="#333333"></table>',
+					'<br>',
+					'<table id="mcBookCostStatementDetailData2" border="0" cellpadding="20" cellspacing="1" width="620" bgcolor="#FFFFFF"></table>',
+
+				'</div>',
+			'</div>',
+			].join('');	
+		
+		case "0_소부대지수정": //소부대지수정-> jejak/kb/ex_view_m1.php
+			return [
+			'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:123px; margin-left:15px;">',
+					'<div style="width:780px; height:103px; padding:10px 0px 10px 0px;">',
+						'<div id="BookCostStatementSobuModify">',
+						'</div>',
+					'<br>',
+					'aaaaaaaaaaaaaaa',
+
+				'</div>',
+			'</div>',
+			].join('');	
 			
 		case "1": //잡물 원가계산서 -> jejak/cu/ex_j.htm
 			return [
@@ -112,7 +168,7 @@ function jmenu7(val) { //월결산자료
 												'<td width="30"><span style="font-size:9pt;">일</span></td>',
 												'<td width="155" align="left"><b><span style="font-size:9pt;">잡물 원가 계산서</span></b></td>',
 												'<td width="340" align="right">',				
-												'<input type="button" value="모두 인쇄" onClick="javascript:PrintAll();"></td>',
+												'<input type="button" value="모두 인쇄" id="btnJMCostStatementPrint"></td>',
 											'</tr>',
 										'</table>',
 									'</form>',
@@ -137,6 +193,25 @@ function jmenu7(val) { //월결산자료
 						'</table>',
 					'</div>',
 				'</div>',
+			'</div>',
+			].join('');
+		
+		case "1_상세계산": //상세 잡물계산서 -> jejak/kb/ex_view.php
+			return [
+			'<center>',
+			'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:123px; margin-left:15px;">',
+					'<div style="width:780px; height:103px; padding:10px 0px 10px 0px;">',
+					'<table id="mcJMCostStatementDetailData" border="0" cellpaddig="20" cellspacing="1" width="620" bgcolor="#333333">',
+					'<div>',
+				'</div>',
+			'</div>',
+			'</center>',
+			].join('');	
+		
+		case "1_인쇄팝업": //잡물 원가계산서 모두인쇄  jejak/kb/exj_view2.php
+			return [
+			'<div id="popdata">',
 			'</div>',
 			].join('');
 
@@ -167,7 +242,7 @@ function jmenu7(val) { //월결산자료
 										'</select> 월 &nbsp;원재료 명세서</b></span></p>',
 									'</td>',
 									'<td width="390" height="40" align="right" valign="middle">',
-										'<input type="button" value=" 인 쇄 " onClick="javascript:ms_pr();">',
+										'<input type="button" id="btnPumPerPrint1"  value=" 인 쇄 " >',
 									'</td>',
 								'</tr>',
 							'</form>',
@@ -198,7 +273,7 @@ function jmenu7(val) { //월결산자료
 								'</tr>',
 								'<tr>',
 									'<td width="780" colspan="2" height="40" align="center" valign="bottom">',
-										'<input type="button" value=" 새로 작성 " onClick="javascript:Mk_New();">',
+										'<input type="button" value="새로 작성" onclick="javascript:ChangeDate(37);">',
 									'</td>',								
 								'</tr>',
 						'</table>',
@@ -206,6 +281,25 @@ function jmenu7(val) { //월결산자료
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "2_품목원재료월별새로작성":
+			return [
+			'<div id="mcPumMonInsert">',
+			'</div>',
+			].join('');	
+			
+		case "2_인쇄팝업":
+			return [
+			'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="780"></table>',
+							
+						
+						'</div>',
+				'</div>',
+			'</div>',
+			].join('');	
 		
 		case "3": //품목별 원재료명세서(기간) -> jejak/kb/yj_ms3.php
 			return [
@@ -248,7 +342,7 @@ function jmenu7(val) { //월결산자료
 										'</select> 월 &nbsp;원재료 명세서</b></span></p>',
 									'</td>',
 									'<td width="190" height="40" align="right" valign="middle">',
-										'<input type="button" value=" 인 쇄 " onClick="javascript:ms_pr();">',
+										'<input type="button" id="btnPumPerPrint" value=" 인 쇄 ">',
 									'</td>',
 								'</tr>',
 							'</form>',
@@ -366,11 +460,24 @@ function jmenu7(val) { //월결산자료
 								'</tr>',
 								'<tr>',
 									'<td width="780" colspan="2" height="40" align="center" valign="bottom">',
-										'<input type="button" value=" 새로 작성 " onClick="javascript:Mk_New();">',
+										'<input type="button" value=" 새로 작성 " onClick="javascript:ChangeDate(38);">',
 									'</td>',	
 								'</tr>',
 						'</table>',
 					'</div>',
+				'</div>',
+			'</div>',
+			].join('');
+			
+		case "3_인쇄팝업":
+			return [
+			'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="780"></table>',
+							
+						
+						'</div>',
 				'</div>',
 			'</div>',
 			].join('');
@@ -389,11 +496,47 @@ function jmenu7(val) { //월결산자료
 
 		case "5": //거래처별 지불명세서 -> jejak/kb/jejo2.php
 			return [
-			'<div style="width:810px; height:815px;">',
-				'<div style="width:870px; height:194px; margin-left:15px;">',
-					'<div style="width:870px; height:174px; padding:10px 0px 10px 0px;">',
-						'<div style="width:780px; height:30px; display:table-cell; vertical-align:middle; font-size:13pt;"><b>- 거래처별 지불명세서</b></div>',
-
+				'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:123px; margin-left:15px;">',
+					'<div style="width:780px; height:103px; padding:10px 0px 10px 0px;">',
+						'<table border="0" cellpadding="0" cellspacing="0" width="780">',
+							'<tr>',
+								'<td width="780" height="40">',
+									'<form name="dform" method="post" action="jejo2.php">',
+										'<table border="0" cellpadding="0" cellspacing="0" width="780">',
+											'<tr>',
+												'<td width="10"></td>',
+												'<td width="65">',
+													'<select name="ty" size="1" style="font-family:굴림; font-size:9pt; width:60;" onChange="javascript:ChangeDate(50);">',
+													'</select>',
+												'</td>',
+												'<td width="20" align="left"><span style="font-size:9pt;">년</span></td>',
+												'<td width="65">',
+													'<select name="tm" size="1" style="font-family:굴림; font-size:9pt;  width:60;" onChange="javascript:ChangeDate(50);">',
+														'<option value="01">01</option>',
+														'<option value="02">02</option>',
+														'<option value="03">03</option>',
+														'<option value="04">04</option>',
+														'<option value="05">05</option>',
+														'<option value="06">06</option>',
+														'<option value="07">07</option>',
+														'<option value="08">08</option>',
+														'<option value="09">09</option>',
+														'<option value="10">10</option>',
+														'<option value="11">11</option>',
+														'<option value="12">12</option>',
+													'</select>',
+												'</td>',
+												'<td width="30"><span style="font-size:9pt;">월</span></td>',
+												'<td width="155" align="left"><b><span style="font-size:9pt;">거래처별 지불명세서</span></b></td>',
+												'<td width="340" align="right">',				
+												'<input type="button" value="모두 인쇄" id="btnJMCostStatementPrint"></td>',
+											'</tr>',
+										'</table>',
+									'</form>',
+								'</td>',
+							'</tr>',
+						'</table>',
 					'</div>',
 				'</div>',
 			'</div>',
@@ -420,9 +563,9 @@ function jmenu7(val) { //월결산자료
 										'</select>&nbsp;&nbsp;저자료 지급 내역</b></span></p>',
 									'</td>',
 									'<td width="390" height="40" align="right" valign="middle">',
-										'<input type="button" value=" 인 쇄 " onClick="javascript:ms_pr();">&nbsp;',
+										'<input type="button" id="btnPumPerPrint" value=" 인 쇄 ">&nbsp;',
 										'<input type="button" value=" EXCEL " onClick="javascript:Exc();">&nbsp;',
-										'<input type="button" value=" 지출결의서 " onClick="javascript:ms_pr2();">',
+										'<input type="button" value=" 지출결의서 " onClick="javascript:btnRoyaltyUDER();">',
 									'</td>',
 								'</tr>',
 							'</form>',
@@ -455,6 +598,25 @@ function jmenu7(val) { //월결산자료
 				'</div>',
 			'</div>',
 			].join('');
+			
+		case "6_인쇄팝업":
+			return [
+			'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="780"></table>',
+							
+						
+						'</div>',
+				'</div>',
+			'</div>',
+			].join('');	
+		
+		case "6_지출결의서": //저자료 지급내역(상/하) -> jejak/kb/inse.php
+			return [
+				'<table border="0" width="720" id="btnRoyaltyUD" cellspacing="0" cellpadding="0">',
+				'</table>',
+			].join('');
 
 		case "7": //월별 저자료 지출결의서 -> jejak/kb/inse3.php
 			return [
@@ -483,7 +645,7 @@ function jmenu7(val) { //월결산자료
 										'</select>&nbsp;&nbsp;월&nbsp;&nbsp;저자료</b></span></p>',
 									'</td>',
 									'<td width="390" height="40" align="right" valign="middle">',
-										'<input type="text" size="5" name="pdate" maxlength="4">&nbsp;&nbsp;<input type="button" value=" 인 쇄 " onClick="javascript:ms_pr();">',
+										'<input type="text" size="5" name="pdate" maxlength="4">&nbsp;&nbsp;<input type="button" id="btnMonthlyRoyaltyPrint" value=" 인 쇄 "">',
 									'</td>',
 								'</tr>',
 							'</form>',
@@ -518,6 +680,18 @@ function jmenu7(val) { //월결산자료
 				'</div>',
 			'</div>',
 			].join('');
+		case "7_인쇄팝업":
+			return [
+			'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="780"></table>',
+							
+						
+						'</div>',
+				'</div>',
+			'</div>',
+			].join('');	
 
 		case "8": //저자료 지급 내역 ?? -> jejak/kb/inse2.php
 			return [
@@ -606,7 +780,7 @@ function jmenu7(val) { //월결산자료
 													'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="date1" maxlength="4"></p>',
 												'</td>',
 												'<td width="100" height="30" align="center">',
-													'<input type="button" value=" 실 행 " onClick="javascript:SendFrm();">',
+													'<input type="button" value=" 실 행 " onClick="javascript:PurchasePrice();">',
 												'</td>',
 											'</tr>',
 										'</table>',
@@ -653,7 +827,7 @@ function jmenu7(val) { //월결산자료
 													'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="date1" maxlength="4" onKeypress="if(event.keyCode == 13){javascript:chkDate();}"></p>',
 												'</td>',
 												'<td width="100" height="30" align="center">',
-													'<input type="button" value=" 실 행 " onClick="javascript:SendFrm();">',
+													'<input type="button" value=" 실 행 " onClick="javascript:BookQuantityAmountTotal()">',
 												'</td>',
 											'</tr>',
 										'</table>',
@@ -700,7 +874,7 @@ function jmenu7(val) { //월결산자료
 													'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:96px;" name="date1" maxlength="4" onKeypress="if(event.keyCode == 13){javascript:chkDate();}"></p>',
 												'</td>',
 												'<td width="100" height="30" align="center">',
-													'<input type="button" value=" 실 행 " onClick="javascript:SendFrm();">',
+													'<input type="button" value=" 실 행 " onClick="javascript:BookAmountTotal()">',
 												'</td>',
 											'</tr>',
 										'</table>',
@@ -718,6 +892,7 @@ function jmenu7(val) { //월결산자료
 				'</div>',
 			'</div>',
 			].join('');
+			
 
 		case "14": //주은교육 제작현황 -> jejak/kb/juen.php
 			return [
