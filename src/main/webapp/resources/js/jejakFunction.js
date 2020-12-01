@@ -372,127 +372,136 @@ function goToPage(current_page){
 //============================날짜 변화 함수============================
 
 function SearchDays(code, bdate){
-	if(code == 1){//제품제작
-		var from = {bdate: bdate}
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			url: SETTING_URL + "/jpjejak/select_jp_date",
-			async: false,
-			data : JSON.stringify(from),
-			success: function (result) {
-				
-				logNow(result);
-				var object_num = Object.keys(result);
-			    
-			    $("select[name=td] option").remove(); //select option 초기화
-			    $("select[name=td]").append("<option value=''>-</option>");
-				
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					var day = MsToFulldate(data["bdate"]).substring(6,8);
-					$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
-				}
-			}
-		});
-	}
-	if(code == 2){//잡물제작
-		var from = {jbdate: bdate}
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			url: SETTING_URL + "/jmjejak/select_jm_date",
-			async: false,
-			data : JSON.stringify(from),
-			success: function (result) {
-				logNow(result);
-				var object_num = Object.keys(result);
-			    
-			    $("select[name=td] option").remove(); //select option 초기화
-			    $("select[name=td]").append("<option value=''>-</option>");
-				
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					var day = MsToFulldate(data["jbdate"]).substring(6,8);
-					$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
-				}
-			}
-		});
-	}
+	var from;
+	var add_url;
 	
-	if(code == 3){//둘다합친거
-		$("select[name=td] option").remove(); //select option 초기화
-		var from = {bdate: bdate}
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			async: false,
-			url: SETTING_URL + "/jpjejak/select_jp_date",
-			data : JSON.stringify(from),
-			success: function (result) {
+	if(code == 1){//jp_발주예정제품리스트
+		from = {date1: bdate.substring(0, 4), date2: bdate.substring(4)};
+	 
+		add_url = "/jpjejak/select_bjlist_date_list";
+	} else if(code == 11 || code == 12 || code == 3){//jp_제작계획표, jp_중쇄예정제품, 직접경비_코팅비1
+		from = {bdate: bdate};
+		add_url = "/jpjejak/select_jp_date";
+	} else if(code == 2 || code == 31){//잡물제작, 직접경비_코팅비2
+		from = {jbdate: bdate};
+		add_url = "/jmjejak/select_jm_date";
+	} else if(code == 4){//구매일보
+		from = {dbname: bdate.substring(2,6)};
+		add_url = "/productio/select_purchase_daily1";
+ 
+		
+			
 				
-				logNow(result);
-				var object_num = Object.keys(result);
-			    
-			    $("select[name=td]").append("<option value=''>-</option>");
-				
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					var day = MsToFulldate(data["bdate"]).substring(6,8);
-					$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
-				}
-			}
-		});
-		var from = {jbdate: bdate}
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			async: false,
-			url: SETTING_URL + "/jmjejak/select_jm_date",
-			data : JSON.stringify(from),
-			success: function (result) {
-				logNow(result);
-				var object_num = Object.keys(result);
-			    
-			    $("select[name=td]").append("<option value=''>-</option>");
-				
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					var day = MsToFulldate(data["jbdate"]).substring(6,8);
-					$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
-				}
-			}
-		});
+					  
+  
+ 
+  
 	}
-	if(code == 4){//구매일보
-		var from = {dbname: bdate.substring(2,6)}
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			url: SETTING_URL + "/productio/select_purchase_daily1",
-			async: false,
-			data : JSON.stringify(from),
-			success: function (result) {
+		
+	   
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + add_url,
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+		    
+			 if(code != 31){//직접경비_코팅비2
+				 $("select[name=td] option").remove(); //select option 초기화
+			 }
+			
+			for(var i in object_num){
+				var data = result[i]; 
+				var day;
 				
-				logNow(result);
-				var object_num = Object.keys(result);
-			    
-			    $("select[name=td] option").remove(); //select option 초기화
-			    $("select[name=td]").append("<option value=''>-</option>");
-				
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					var day = data["s1ilja"].substring(4,6);
-					$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
+				if(code == 1){//jp_발주예정제품리스트
+					day = data["signdate"].substring(6,8);
+			    } else if(code == 11 || code == 12 || code == 3){//jp_제작계획표, jp_중쇄예정제품, 직접경비_코팅비1
+			    	day = MsToFulldate(data["bdate"]).substring(6,8);
+			    } else if(code == 2 || code == 31){//잡물제작, 직접경비_코팅비2
+			    	day = MsToFulldate(data["jbdate"]).substring(6,8);
+				} else if(code == 4){//구매일보
+					day = data["s1ilja"].substring(4,6);
 				}
+ 
+  
+  
+ 
+		
+				 
+		 
+	
+	
+			   
+	 
+				
+			
+		  
+		  
+	
+	   
+		   
+	
+				  
+ 
+		
+			
+				
+				$("select[name=td]").append("<option value='" + day + "'>" + day + "</option>");
+  
 			}
-		});
-	}
+  
+	   
+	
+	
+			   
+	 
+	
+			
+		  
+		  
+	   
+		   
+	
+				  
+ 
+		
+			
+				 
+					  
+		}
+ 
+  
+  
+		
+			 
+	
+	
+			   
+	 
+				
+	
+		  
+		  
+ 
+	   
+		   
+	
+				   
+				  
+ 
+		
+			
+			
+					  
+  
+ 
+	});
+  
 }
 
 function ChangeDate(code){
@@ -513,123 +522,165 @@ function ChangeDate(code){
 		}
 		
 		if(code == 1) yongjiBuyOrder(date1, date2); 
-		if(code == 2){ 
+		else if(code == 2){ 
 			var year = $("select[name=ty]").val().substring(2,4);
 			var value = $("select[name=pgubn]").val();
 			SearchYjJang(date1, date2, value, year);
-		}
-		if(code == 17) SelKbYongjiDae(date1, date2);
-		if(code == 18) SelKbPresswork(date1, date2);
-		if(code == 22) SelKbManagement(1, date1, date2);
-		if(code == 23) SelKbManagement(2, date1, date2);
-		if(code == 24) SelKbManagement(3, date1, date2);
-		if(code == 25) SelKbManagement(4, date1, date2); 
-		if(code == 26) SelKbManagement(5, date1, date2); 
-		if(code == 27) SearchMkJueun(date1, date2); 
-		if(code == 87) SelMonStockStatusTable(date1, date2); 
-	}
-	
-	if(code == 3 || code == 4 || code == 12 || code == 19 || code == 20 || code == 28 || code == 29 || code == 31 || code == 33 || code == 35 || 
-			code == 37 || code == 50 || code == 86 || code == 812 || code == 91){ 
-		//yj_월별용지재고현황(3), 제품(4), 잡물(12), kb_제본비(19), kb_코팅비(20) 년월 변경, 
-		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35),mc_품목별 원재료명세서 새로작성(월별)
+   
+		} else if(code == 17) SelKbYongjiDae(date1, date2);
+		else if(code == 18) SelKbPresswork(date1, date2);
+		else if(code == 22) SelKbManagement(1, date1, date2);
+		else if(code == 23) SelKbManagement(2, date1, date2);
+		else if(code == 24) SelKbManagement(3, date1, date2);
+		else if(code == 25) SelKbManagement(4, date1, date2); 
+		else if(code == 26) SelKbManagement(5, date1, date2); 
+		else if(code == 27) SearchMkJueun(date1, date2); 
+		else if(code == 87) SelMonStockStatusTable(date1, date2); 
+  
+ 
+	} else if(code == 3 || code == 12 || code == 19 || code == 20 || code == 28 || code == 29 || code == 31 || code == 33 || code == 35 || code == 86 || code == 812 || code == 91){ 
+				   
+		//yj_월별용지재고현황(3), 잡물(12), kb_제본비(19), kb_코팅비(20) 년월 변경, 
+		//mc_저자료지급내역(28), mc_월별저자료지출결의서(29), mc_도서별 원가계산서(31), mc_잡물 원가계산서(33), mc_품목별 원재료명세서(월별)(35)
 		//pio_구매일보(86)
 		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val();
 		
 		if(code == 3) SearchYjMonth(bdate);
-		if(code == 4){ $("#jpdeaData").html(""); SearchDays(1, bdate); }
-		if(code == 12) SearchDays(2, bdate);
-		if(code == 19) SelKbBinding(bdate);
-		if(code == 20) SearchDays(3, bdate); 
-		if(code == 28) SelRoyalty(bdate); 
-		if(code == 29) SelMonthlyRoyalty(bdate); 
-		if(code == 31) SearchDays(1, bdate);
-		if(code == 33) SearchDays(2, bdate);
-		if(code == 35) SelPumMon(bdate);
-		if(code == 37) btnPumMonInsert(bdate);
-		if(code == 50) SelPaymentAccount(bdate);
-		if(code == 86) SearchDays(4, bdate);
-		if(code == 812) SelDailyStatus(bdate);
-		if(code == 91) SelhWithholdingTax(bdate);
-	}
-	
-	if(code == 30){ //mc_저자료 지급 내역(상/하)(30),
+				  
+		else if(code == 12) SearchDays(2, bdate);
+		else if(code == 19) SelKbBinding(bdate);
+		else if(code == 20) {
+			SearchDays(3, bdate);
+			SearchDays(31, bdate);
+		}else if(code == 28) SelRoyalty(bdate); 
+		else if(code == 29) SelMonthlyRoyalty(bdate); 
+		else if(code == 31) SearchDays(1, bdate);
+		else if(code == 33) SearchDays(2, bdate);
+		else if(code == 35) SelPumMon(bdate);
+		else if(code == 37) btnPumMonInsert(bdate);
+		else if(code == 50) SelPaymentAccount(bdate);
+		else if(code == 86) SearchDays(4, bdate);
+		else if(code == 812) SelDailyStatus(bdate);
+		else if(code == 91) SelhWithholdingTax(bdate);
+  
+ 
+	} else if(code == 30){ //mc_저자료 지급 내역(상/하)(30),
 		var bdate = $("select[name=ty]").val();
 		var gubn = $("select[name=gubn]").val();
 		var gubn2 = $("select[name=gubn2]").val();
 		
 		SelRoyaltyUD(bdate, gubn, gubn2); 
-	}
-	
-	if(code == 36 || code == 38){
-		if(code == 36){
-			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
-			SelPumPer(bdate);
-		}
-		if(code == 38){
-			var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
-			btnPumPerInsert(bdate);
-		}
+  
+ 
+	} else if(code == 36 || code == 38){
+	 
+		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=tm2]").val();
+	 
+   
+	 
+						  
 		
-	}
+   
+		
+		if(code == 36) SelPumPer(bdate);
+		else if(code == 38) btnPumPerInsert(bdate);
 	
-	////////////
-	//  일 변경  //
-	////////////
-	if(code == 5 || code == 861){//jp_발주예정(5) 일 변경
+	   
+	
+	} else if(code == 861){//구매일보
 		var signdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=td]").val();
 		
-		if(code == 5) {
-			page_code = "발주예정제품리스트";
-			goToPage(1);
-		}
-		if(code == 861) SelPurchaseDaily(signdate); //구매일보
-	}
-	
-	if(code == 6 || code == 8 || code == 9 || code == 10  || code == 11 || code == 13 || code == 14 || code == 15 || code == 16 || code == 21 || code == 32 || code == 34){ //일 변경
-		//jp_제작계획표(6), jp_발주서(8), jp_표지작업(9), jp_본문작업(10), jp_입고대장(11)
+		SelPurchaseDaily(signdate);
+			
+	  
+   
+			   
+  
+ 
+	} else if(code == 5 || code == 6 || code == 7 || code == 8 || code == 9 || code == 10  || code == 11 || code == 13 || code == 14 || code == 15 || code == 16 || code == 21 || code == 32 || code == 34){ //일 변경
+		//jp_발주예정리스트(5), jp_제작계획표(6), jp_중쇄예정제품(7), jp_발주서(8), jp_표지작업(9), jp_본문작업(10), jp_입고대장(11)
 		//jm_제작계획표(13),jm_표지작업(14), jm_본문작업(15), jm_발주서(16)
 		//kb_코팅비(21)
 		//mc_도서별 원가계산서(31), mc_잡물 원가계산서(34)
+		
+		var temp_td = $("select[name=td]").val();
 		
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
 		day = parseInt($("select[name=td]").val()) + 1;
 		day = day >= 10 ? day : '0' + day;
 		var date2 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + day).getTime()/1000;
 		
+		var bdate = $("select[name=ty]").val() + $("select[name=tm]").val();
+		
 		//제품
-		if(code == 6) {
-			page_code = "제품_제작계획표";
-			goToPage(1);
-		}
-		if(code == 8) SelBalju(1, date1, date2);
-		if(code == 9) SelPyoji(1, date1, date2);
-		if(code == 10) {
-			page_code = "제품_본문작업지시서";
-			goToPage(1);
-		}
-		if(code == 11) SelJpWarehousing(date1, date2);
-		//잡물
-		if(code == 13) {
+		if(code == 5) { //  일 변경
+			SearchDays(1, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			if($("select[name=td]").val() != null){
+				page_code = "발주예정제품리스트";
+				goToPage(1);
+			}
+		} else if(code == 6) {
+			SearchDays(11, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			if($("select[name=td]").val() != null){
+				page_code = "제품_제작계획표";
+				goToPage(1);
+			}
+		} else if(code == 7) {
+			SearchDays(11, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			selReprint(date1, date2);
+		} else if(code == 8) {
+			SearchDays(1, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			SelBalju(1, date1, date2);
+		} else if(code == 9) {
+			SearchDays(1, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			SelPyoji(1, date1, date2);
+		} else if(code == 10) {
+			SearchDays(1, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			if($("select[name=td]").val() != null){
+				page_code = "제품_본문작업지시서";
+				goToPage(1);
+			}
+		} else if(code == 11) {
+			$("#jpdeaData").html("");
+			
+			SearchDays(1, bdate);
+			$("select[name=td]").val(temp_td);
+			
+			SelJpWarehousing(date1, date2);
+	
+		} else  if(code == 13) { //잡물
 			page_code = "잡물_제작계획표";
 			goToPage(1);
-		}
-		if(code == 14) SelPyoji(2, date1, date2);
-		if(code == 15) {
+   
+		} else  if(code == 14) SelPyoji(2, date1, date2);
+		else if(code == 15) {
 			page_code = "잡물_본문작업지시서";
 			goToPage(1);
 		}
-		if(code == 16) SelBalju(2, date1, date2);
+		else if(code == 16) SelBalju(2, date1, date2);
 		//직접경비
-		if(code == 21) SelKbCoating(date1, date2); 
+		else if(code == 21) SelKbCoating(date1, date2); 
 		//월결산자료
-		if(code == 32) {
+		else if(code == 32) {
 			page_code = "도서별원가계산서";
 			goToPage(1);
-		}
-		if(code == 34) {
+   
+		} else if(code == 34) {
 			page_code = "잡물원가계산서";
 			goToPage(1);
 		}
 	}
 }
+

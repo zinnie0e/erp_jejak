@@ -132,17 +132,8 @@ function jmenu2(val) { //제품등록
 												'<a><img name="btn_yong" src="/resources/style/images/jejak/btn_yong.gif" border="0"></a>',
 											'</td>',
 										'</tr>',
-										'<form name="form1" method="post" action="b_mod.php">',
-										'<tr>',
-											'<td align="center">',
-												'<input type="text" size="6" name="bnum">부&nbsp;',
-												//검증필요_안쓰는 기능
-												'<input type="button" value="잡물제작" onClick="javascript:JabBal();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-												//검증필요_안쓰는 기능
-												'<input type="button" value="임시도서코드변경" onClick="javascript:ChgCode(<?=$row[uid]?>);">',
-											'</td>',
-										'</tr>',
 									'</table>',
+									'<table id="u_table" border=0 width=720></table>',
 									'<p><input type="hidden" name="my_uid">',
 									'<table border="0" cellpadding="0" cellspacing="0" width="720" style="border-width:1px; border-color:rgb(222,222,222); border-style:solid;">',
 										'<tr>',
@@ -1560,6 +1551,3 @@ function jmenu2(val) { //제품등록
 			break;
 	}
 }
-
-
-

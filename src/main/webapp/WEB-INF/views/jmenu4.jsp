@@ -10,6 +10,7 @@
 	<script src="/resources/js/jejakContent.js"></script>
 	
 	<script src="/resources/js/jejakFunction.js"></script>
+	<script src="/resources/js/mfunction/m2_f.js"></script>
 	<script src="/resources/js/mfunction/m4_f.js"></script>
 	<script src="/resources/js/mfunction/m5_f.js"></script>
 

@@ -68,6 +68,36 @@ function ModiBookList(uid){
 		success: function (result) {
 			var data = result[0];
 			
+			//구현_세션이 추가되어 권한을 파싱해야 함
+			var json_data = { id : "ajk" };
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				async: false,
+				url: SETTING_URL + "/login/dung",
+				data : JSON.stringify(json_data),
+				success: function (result) {
+					logNow(result);
+					
+					if (data["sbbook"].substring(0, 1) == "U"  && result <= 1){
+					htmlString =
+						'<form name="form1" method="post" action="b_mod.php">'+
+						'<tr>'+
+							'<td align="center">'+
+								'<input type="text" size="6" name="bnum">부&nbsp;'+
+								//검증필요_안쓰는 기능
+								'<input type="button" value="잡물제작" onClick="javascript:JabBal();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+								//검증필요_안쓰는 기능
+								'<input type="button" value="임시도서코드변경" onClick="javascript:ChgCode(<?=$row[uid]?>);">'+
+							'</td>'+
+						'</tr>';
+						
+						(document.getElementById("u_table")).innerHTML = htmlString;
+					}
+				}
+			});
+			
 			$("img[name=btn_deasu]").click(function(){
 				SelBookDeasu(data["uid"], data["sbname"], data["sbbook"]);
 			});

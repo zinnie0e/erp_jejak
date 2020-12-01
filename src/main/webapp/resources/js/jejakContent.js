@@ -128,7 +128,7 @@ function m4(e) {
 		}
 	}
 	if (val == "8")
-		SelJpJejakYejung(13); 
+		SelJpJejakYejung(); 
 	if (val == "9") {
 		menuTitle = "제품제작진행";
 		page_code = "전체도서검색";

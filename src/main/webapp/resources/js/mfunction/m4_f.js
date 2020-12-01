@@ -6,7 +6,6 @@
 //발주예정제품리스트
 function SelJpBaljuYj(signdate, lm_s, lm_t){
 	var from = {signdate: signdate, lm_s: lm_s, lm_t: lm_t}
-	logNow(signdate);
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
@@ -481,8 +480,7 @@ function Searchjejakplan(code, date1, date2, lm_s, lm_t){ //제품이랑 잡물�
 				$("#jpJejakplanData").html(htmlString);
 			}
 		});
-	}
-	if(code == 2){ //잡물
+	} else if(code == 2){ //잡물
 		var from = {date1: date1, date2: date2, lm_s: lm_s, lm_t: lm_t}
 		$.ajax({
 			type: "POST",
@@ -654,6 +652,310 @@ function Searchjejakplan(code, date1, date2, lm_s, lm_t){ //제품이랑 잡물�
 }
 
 //중쇄예정제품
+function selReprint(date1, date2){
+	var pgubn2 = "";
+	var new_num = 0;
+	
+	var from = { date1: date1, date2: date2 }
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_reprint1",
+		data : JSON.stringify(from),
+		success: function (result) {
+			logNow(result);
+			
+			htmlString =
+				'<tr>'+
+					'<td width="50" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">코드</span></td>'+
+					'<td width="200" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">KC</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구분</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">판형</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">장형</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">면수</span></td>'+
+					'<td width="50" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">가격</span></td>'+
+					'<td width="55" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">부수</span></td>'+
+					'<td width="45" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">중쇄</span></td>'+
+					'<td width="45" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">인세</span></td>'+
+					'<td width="45" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">지불</span></td>'+
+					'<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제본</span></td>'+
+					'<td width="40" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">비고</span></td>'+
+				'</tr>';
+			
+			var object_num = Object.keys(result);
+			for(var i in object_num){
+				var data = result[i]; 
+				
+				var bucode = data["bucode"];
+				
+				var bookname = "";
+				var bookcode = "";
+				var bookcode2 = "";
+				
+				var tpanh = "";
+				var tjanh = "";
+				var tpage = "";
+				
+				var temp_tjanh = "";
+				if(bucode != 0){
+					bookname = ">> 부 록 <<";
+					bookcode = "";
+					bookcode2 = "";
+					
+					var t_p = "sbsbph" + bucode;
+					var t_j = "sbsbjh" + bucode;
+					var t_g =  "sbsbpg" + bucode;
+					tpanh = data[t_p];
+					tjanh = setTjanh(data[t_j]);
+					tpage = data[t_g];
+				} else {
+					bookname = data["bname"];
+					bookcode = data["bcode"];
+					bookcode2 = bookcode.substring(0, 5);
+					
+					tpanh = data["sbpanh"];
+					tjanh = setTjanh(data["sbjanh"]);
+					tpage = data["sbpage"];
+				}
+				
+				var kc = "";
+				switch (data["sbkc"]){
+					case 1:
+						kc = "Y";
+						break;
+					case 2:
+						kc = "N";
+						break;
+				}
+				
+				var sbinse = data["sbinse"];
+				var sbhj04 = data["sbhj04"];
+				
+				var inse = 0;
+				if(sbinse != 0) inse = sbinse ;
+				if(sbhj04 != 0) inse = sbhj04 ;
+				
+				var pgubn1 = "";
+				switch (data["btype"]){
+					case 1:
+						pgubn1 = "신간";
+						break;
+					case 2:
+						pgubn1 = "재판";
+						break;
+					case 3:
+						pgubn1 = "개정";
+						break;
+				}
+				
+				pgubn2 = "";
+				if(inse != 0 && bucode == 0){
+					if(data["sbjjgb"] != 0){
+						pgubn2 = "판매"
+					} else {
+						pgubn2 = "제작";
+					}
+				}
+				
+				var jebon = "";
+				var from = { wccode: data["m3"] }
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					async: false,
+					url: SETTING_URL + "/jpjejak/select_selYakc",
+					data : JSON.stringify(from),
+					success: function (result2) {
+						jebon = result2["wcyakc"];
+					}
+				});
+				
+				var from = { bcode: data["bcode"], uid: data["uid"] }
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					async: false,
+					url: SETTING_URL + "/jpjejak/select_reprint2",
+					data : JSON.stringify(from),
+					success: function (result3) {
+						if(result3["jnum"] == data["uid"]){
+							new_num = result3["pnum"];
+						} else {
+							new_num = result3["pnum"] + 1;
+						}
+					}
+				});
+				
+				htmlString +=
+					'<tr>'+
+		                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+		                	bookcode + '</span></td>'+
+		                '<td height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;">'+
+		                	bookname + '</span></td>'+
+						'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:0pt;">'+
+		                    kc + '</span></td>'+
+		                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+		                    pgubn1 + '</span></td>'+
+		                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+		                    tpanh + '</span></td>'+
+		                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+		                	tjanh + '</span></td>'+
+		                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">'+
+		                    tpage + '</span></td>'+
+		                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+							if(bucode == 0){
+								htmlString += numberWithCommas(data["bprice"]);
+							}
+							htmlString += '</span></td>'+
+		                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+							if(bucode == 0){
+								htmlString += numberWithCommas(data["bnum"]);
+							}
+							htmlString += '</span></td>'+
+		                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+							if(pgubn2 == "제작"){
+								htmlString += new_num;
+							}
+							htmlString += '</span></td>';
+
+							if(bookcode == "329210"){
+								htmlString += '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+								if(inse != 0 && bucode == 0){
+									htmlString += numberWithCommas(inse.toFixed(1));
+								} 
+								htmlString += '<br>15.0</span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;">'+
+			                    pgubn2 + '<br>제작</span></td>';
+							} else {
+								htmlString += '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+								if(inse != 0 && bucode == 0){
+									htmlString += numberWithCommas(inse.toFixed(2));
+								}
+								htmlString += '</span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;">'+
+			                    pgubn2 + '</span></td>';
+							}
+
+				htmlString += '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;">'+
+		                 	jebon + '</span></td>'+
+		                 '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+							if(data["m10"] != "0" && data["m10"] != "N" && bucode == 0){
+								htmlString += "증지";
+							} else {
+								if(data["sbinji"] == 1){
+									htmlString += "인지";
+								}
+							}
+							htmlString += '</span></td></tr>';				
+			}
+		}
+	});
+	
+	var from = { date1: date1, date2: date2 }
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_reprint3",
+		data : JSON.stringify(from),
+		success: function (result3) {
+			logNow(result3);
+			
+			if(result3.length != 0){
+				htmlString += '<tr><td height="10" align="center" valign="middle" bgcolor="white" colspan="14"><span style="font-size:9pt;"></span></td></tr>';
+			}
+			
+			
+			var object_num2 = Object.keys(result3);
+			for(var i in object_num2){
+				var data2 = result3[i]; 
+								
+				var jnji = "";
+				var from = { jbcode: data2["jbcode"] }
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					async: false,
+					url: SETTING_URL + "/jpjejak/select_reprint4",
+					data : JSON.stringify(from),
+					success: function (result4) {
+						
+						if(result4["sbjnji"] != null) jnji = "증지";
+						
+						htmlString +=
+							'<tr>'+
+				                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+				                result4["sbbook"] + '</span></td>'+
+				                '<td height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;">'+
+				                result4["sbname"] + '</span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"></span></td>'+
+				                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"></span></td>'+
+				                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+				                data2["jbpanh"] + '</span></td>'+
+				                '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+				                setTjanh(data2["jbjanh"]) + '</span></td>'+
+				                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">'+
+				                data2["jbpage"] + '</span></td>'+
+				                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;"></span></td>'+
+				                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">'+
+									numberWithCommas(data2["jbamnt"]) + '</span></td>'+
+				                '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;">';
+									if(pgubn2 == "제작"){
+										htmlString += new_num;
+									}
+									htmlString += '</span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:10pt;"></span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;"></span></td>'+
+								'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;"></span></td>'+
+				                 '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+				                 	jnji +'</span></td>'+
+				            '</tr>';
+					}
+				});
+			}
+			$("#table_reprint").html(htmlString);
+		}
+	});
+}
+
+function setTjanh (temp_tjanh){
+	switch (temp_tjanh)
+	{
+		case "1":
+			tjanh = "무선";
+			break;
+		case "2":
+			tjanh = "반양장";
+			break;
+		case "3":
+			tjanh = "절공";
+			break;
+		case "4":
+			tjanh = "양장";
+			break;
+		case "5":
+			tjanh = "중철";
+			break;
+		case "6":
+			tjanh = "중미싱";
+			break;
+		case "7":
+			tjanh = "스프링";
+			break;
+		case "8":
+			tjanh = "PUR";
+			break;
+	}
+	
+	return tjanh;
+}
 
 
 //발주서
