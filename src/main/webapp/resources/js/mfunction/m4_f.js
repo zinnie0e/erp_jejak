@@ -34,9 +34,9 @@ function SelJpBaljuYj(signdate, lm_s, lm_t){
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">정가</span></font></td>'+
 									'<td width="100" bgcolor="white" height="40" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'+ data["bprice"] +'</span></td>'+
 									'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-										'<input type="button" value="발주" onClick="javascript:SendIt();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+													
+										'<input type="button" value="발주" onClick="javascript:SendIt();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+	
 										'<input type="button" value="삭제" onClick="javascript:DelJpBaljuYj('+ data["uid"] +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 별 실 판 매 수 량</span></font></p>'+
-									'</td>'+														
+									'</td>'+
 								'</tr>'+
 								'<tr>'+
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">면수</span></font></td>'+
@@ -1018,7 +1018,14 @@ function SelBalju(code, date1, date2){ //발주서 //제품이랑 잡물이랑 �
 			}
 		});
 		
-		htmlString= "";
+		htmlString = 
+			'<tr>'+
+				'<td width="100" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">년월일</span></td>'+
+				'<td width="440" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">거래처</span></td>'+
+				'<td width="115" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구분</span></td>'+
+				'<td width="120" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">건수</span></td>'+
+			'</tr>';
+		
 		for(var i = 0 ; i < arr_size ; i++){
 			if (cust[i][3] == 0) continue;
 			var full_date = $("select[name=ty]").val() + "-" + $("select[name=tm]").val() + "-" + $("select[name=td]").val();
@@ -1143,37 +1150,29 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 			}
 		});
 		
-		htmlString = "";
+		htmlString =
+			'<tr>'+
+	            '<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="50"><p><span style="font-size:9pt;">도서코드</span></p></td>'+
+				'<td width="165" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>'+
+	            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구분</span></td>'+
+				'<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">판형</span></td>'+
+	            '<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">장형</span></td>'+
+	            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">면수</span></td>'+
+	            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">부수</span></td>';
+		
 		if ((ctype == "코팅") || (ctype == "스티커") || (ctype == "CD")){
 			htmlString +=
-				'<tr>'+
-		            '<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="50"><p><span style="font-size:9pt;">도서코드</span></p></td>'+
-					'<td width="165" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구분</span></td>'+
-					'<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">판형</span></td>'+
-		            '<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">장형</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">면수</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">부수</span></td>'+
 					'<td width="285" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">내용</span></td>'+
 		            '<td width="100" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">입고처</span></td>'+
 		        '</tr>';
 		}else{
 			htmlString +=
-				'<tr>'+
-					'<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="50"><p><span style="font-size:9pt;">도서코드</span></p></td>'+                    
-					'<td width="165" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>'+
-					'<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">구분</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">판형</span></td>'+
-		            '<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">장형</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">면수</span></td>'+
-		            '<td width="35" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">부수</span></td>'+
 					'<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">인쇄<br>완료일</span></td>'+
 		            '<td width="40" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">입고일</span></td>'+
 		            '<td width="50" height="50" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">입고처</span></td>'+
 		            '<td width="250" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">내용</span></td>'+
 		        '</tr>';
 		}
-		$("#jpBalDetailData1").html(htmlString);
 		
 		var from = { bdate1: date1, bdate2: date2 }
 		$.ajax({
@@ -1187,7 +1186,6 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 				logNow(result);
 				
 				var object_num = Object.keys(result);
-				htmlString = "";
 				for(var i in object_num){
 					var data = result[object_num[i]]; // json data
 					
@@ -1212,7 +1210,7 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 									
 									if (data2["btype"] == 1) sin = "신간";
 									else sin = "재판";
-									if ((ccode.toString()).substring(0,1)== "2"){   
+									if ((ccode.toString()).substring(0,1)== "2"){
 									    if (data2["tbigo"]) bigo = data2["tbigo"];
 							            else{
 							                switch(data2["sbcoti"]){
@@ -1225,11 +1223,11 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 												case 4:
 							                        bigo = "홀로그램(크리스탈)"; break;
 							                    case 5:
-							                        bigo = "엠보싱";  break;						
+							                        bigo = "엠보싱";  break;
 												case 7:
 							                        bigo = "무광에폭시"; break;
 												case 8:
-							                        bigo = "유광에폭시"; break;						
+							                        bigo = "유광에폭시"; break;
 							                }
 											switch(data2["sbcoti2"]){
 							                    case 7:
@@ -1264,20 +1262,22 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 									}else{
 										htmlString += 
 											'</tr>'+
-												'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data2["bcode"] +'</span></td>'+                    
+												'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data2["bcode"] +'</span></td>'+
 												'<td height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;">'+ data2["bname"] +'</span></td>'+
 												'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:0pt;">'+ sin +'</span></td>'+
 							                    '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data2["bpanh"] +'</span></td>'+
 							                    '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ janh +'</span></td>'+
 							                    '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(myun) +'</span></td>'+
-							                    '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(data2["bnum"]) +'</span></td>'+					
-												'<td height="30" align="center" valign="middle" bgcolor="white"><INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:36px;" name="pwan" maxlength="4" value="'+ data["pwan"] +'" onKeypress="if(event.keyCode == 13){javascript:chPwan();}"></span></td>'+
-							                    '<td height="30" align="center" valign="middle" bgcolor="white"><INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:36px;" name="iwan" maxlength="4" value="'+ data["iwan"] +'" onKeypress="if(event.keyCode == 13){javascript:chIwan();}"></span></td>'+
+							                    '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(data2["bnum"]) +'</span></td>'+
+												'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							                    	'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:36px;" name="pwan" maxlength="4" value="'+ data["pwan"] +'" onKeypress="if(event.keyCode == 13){javascript:upBaljuDocument(this, '+ data2["uid"] +');}"></span></td>'+
+							                    '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							                    	'<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:36px;" name="iwan" maxlength="4" value="'+ data["iwan"] +'" onKeypress="if(event.keyCode == 13){javascript:upBaljuDocument(this, '+ data2["uid"] +');}"></span></td>'+
 							                    '<td height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
 													if((janh == "중철") && (data["bucode"])){
 														htmlString += 
 															'<select name="ip2[]" size="1" style="width:30pt;">'+
-										                        '<option value="본사">본사</option>'+                        
+										                        '<option value="본사">본사</option>'+
 										                        '<option value="장곡">장곡</option>'+
 																'<option value="민성" selected>민성</option>'+
 										                        '<option value="영글">영글</option>'+
@@ -1287,7 +1287,7 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 													}else{
 														htmlString += 
 															'<select name="ip2[]" size="1" style="width:30pt;">'+
-										                        '<option value="본사"'; if(data2["sbipgo"] == "본사") htmlString += ' selected'; htmlString += '>본사</option>'+                        
+										                        '<option value="본사"'; if(data2["sbipgo"] == "본사") htmlString += ' selected'; htmlString += '>본사</option>'+
 										                        '<option value="장곡"'; if(data2["sbipgo"] == "장곡") htmlString += ' selected'; htmlString += '>장곡</option>'+
 																'<option value="민성"'; if(data2["sbipgo"] == "민성") htmlString += ' selected'; htmlString += '>민성</option>'+
 										                        '<option value="영글"'; if(data2["sbipgo"] == "영글") htmlString += ' selected'; htmlString += '>영글</option>'+
@@ -1301,9 +1301,28 @@ function SelBaljuDetail(code, ccode, ctype, date1, date2){  //발주서 디테�
 							                '</tr>';
 									}
 								}
-								$("#jpBalDetailData2").html(htmlString);
+								$("#jpBalDetailData").html(htmlString);
 							}
 						});
+						
+						var htmlString_button;
+						if ((ctype == "코팅") || (ctype == "스티커") || (ctype == "CD")){
+							htmlString_button =
+								'<center>'+
+								'<input type="button" value=" 인 쇄 " onClick="javascript:PrintIt();">'+
+								'&nbsp;&nbsp;'+
+								'<input type="button" value=" email " onClick="javascript:MailIt();">'+
+							'</center>';
+						} else {
+							htmlString_button =
+								'<center>'+
+								'<input type="button" value=" 인 쇄 " onClick="javascript:PrintIt2();">'+
+								'&nbsp;&nbsp;'+
+								'<input type="button" value=" email " onClick="javascript:MailIt();">'+
+							'</center>';
+						}
+						
+						$("#balju_button").html(htmlString_button);
 					}
 				}
 			}
@@ -1440,6 +1459,31 @@ function CheckJANH(jhcode){ //SelBaljuDetail
 	return t_jan;
 }
 
+//검증필요_ update 포함됨
+function upBaljuDocument(document, uid){
+	var add_url = "";
+	var json_data;
+	
+	if("pwan" == document.name){
+		add_url = "/jpjejak/update_bal_pwan";
+		json_data = { uid: uid, pwan: document.value };
+	} else if("iwan" == document.name){
+		add_url = "/jpjejak/update_bal_iwan";
+		json_data = { uid: uid,  iwan: document.value };
+	}
+	
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		async: false,
+		url: SETTING_URL + add_url,
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+}
+
 //표지작업지시서
 function SelPyoji(code, date1, date2){ //제품이랑 잡물이랑 나누기 code 분리
 	if(code == 1){//제품
@@ -1454,7 +1498,23 @@ function SelPyoji(code, date1, date2){ //제품이랑 잡물이랑 나누기 cod
 				logNow(result);
 					
 				var object_num = Object.keys(result);
-				htmlString = "";
+				htmlString =
+					'<tr>'+
+						'<td width="270" align="center" valign="middle" bgcolor="#F4F4F4" height="50" rowspan="2"><p><span style="font-size:9pt;">건명</span></p></td>'+
+						'<td width="50" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><span style="font-size:9pt;">제작<br>구분</span></td>'+
+						'<td width="50" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><span style="font-size:9pt;">부수</span></td>'+
+						'<td width="50" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><span style="font-size:9pt;">구분</span></td>'+
+						'<td width="180" height="25" align="center" valign="middle" bgcolor="#F4F4F4" colspan="3"><span style="font-size:9pt;">용지사용</span></td>'+
+						'<td width="30" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><p><span style="font-size:9pt;">색도</span></p></td>'+
+						'<td width="50" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><p><span style="font-size:9pt;">작업<br>인계처</span></p></td>'+
+						'<td width="80" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><p><span style="font-size:9pt;">정가</span></p></td>'+
+						'<td width="120" height="50" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2"><p><span style="font-size:9pt;">비고</span></p></td>'+
+					'</tr>'+
+					'<tr>'+
+						'<td width="60" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">지질</span></td>'+
+						'<td width="60" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">정미</span></td>'+
+						'<td width="60" height="25" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">여분</span></td>'+
+					'</tr>';
 				for(var i in object_num){
 					var data = result[object_num[i]]; 
 					var yakc = ""; var comment = "";
@@ -1543,9 +1603,9 @@ function SelPyoji(code, date1, date2){ //제품이랑 잡물이랑 나누기 cod
 							'<td width="50" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["gubn"] +'</span></td>'+
 							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["jname"] +'</span></td>'+
 							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jnum1 + ' R ' + jnum2 +'</span></td>'+
-							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ ynum1 + ' R ' + ynum2 +'</span></td>'+      
+							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ ynum1 + ' R ' + ynum2 +'</span></td>'+
 							'<td width="30" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								'<input type="text" size="1" value="'+ data["colo"] +'"></span>'+
+								'<input type="text" size="1" value="'+ data["colo"] +'" onKeypress="if(event.keyCode == 13){javascript:upPyojiDocument(this.value, '+ data["uid"] +');}"></span>'+
 							'</td>'+
 							'<td width="50" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ yakc +'</span></td>'+
 							'<td width="80" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(data["sbuprc"]) +'&nbsp;'; if (data["btype"] == 3) htmlString += '※'; else htmlString += '&nbsp;&nbsp;&nbsp;'; htmlString += '</span></td>'+
@@ -1620,6 +1680,21 @@ function SelPyoji(code, date1, date2){ //제품이랑 잡물이랑 나누기 cod
 	}
 }
 
+//검증필요_ update 포함됨
+function upPyojiDocument(value, uid){
+	var json_data = { uid: uid,  colo: value };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		async: false,
+		url: SETTING_URL + "/jpjejak/update_jppyo_colo",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+}
+
 //본문작업지시서
 function SelBonmun(code, date1, date2, lm_s, lm_t){ //제품이랑 잡물이랑 나누기 code 분리
 	if(code == 1){//제품제작
@@ -1634,14 +1709,22 @@ function SelBonmun(code, date1, date2, lm_s, lm_t){ //제품이랑 잡물이랑 
 				logNow(result);
 				
 				var object_num = Object.keys(result);
-				htmlString = "";
+				htmlString =
+					'<tr>'+
+						'<td width="60" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><p><span style="font-size:9pt;">번호</span></p></td>'+
+						'<td width="100" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">제작일</span></td>'+
+						'<td width="90" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서코드</span></td>'+
+						'<td width="360" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">도서명</span></td>'+
+						'<td width="84" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">인쇄</span></td>'+
+						'<td width="84" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">제본</span></td>'+
+					'</tr>';
 				for(var i in object_num){
 					var data = result[object_num[i]]; 
 					
 					var full_date = MsToFulldate(data["bdate"]);
 					full_date = full_date.substring(0,4) + "-" + full_date.substring(4,6) + "-" + full_date.substring(6,8);
 						
-					htmlString += 
+					htmlString +=
 						'<tr>'+
 							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ (++i) +'</span></td>'+
 							'<td width="100" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ full_date +'</span></td>'+
@@ -1704,41 +1787,41 @@ function SelBonmunDetail(code, uid){ //본문작업지시서 디테일 //제품�
 			data : JSON.stringify(from),
 			success: function (result) {
 				logNow(result);
-				var object_num = Object.keys(result);
 				
 				htmlString = "";
-				for(var i in object_num){
-					var data = result[object_num[i]]; 
-					
-					var full_date = MsToFulldate(data["bdate"]);
-					full_date = full_date.substring(0,4) + "년 " + full_date.substring(4,6) + "월 " + full_date.substring(6,8) + "일";
-					
-					if (data["btype"] == 1) var typegubn = "신간";
-					else var typegubn = "재판";
-					
-					var tbcode = data["bcode"].substring(0,5);
-					var comment = "";
-					comment = data["t3bigo"];
-					if ((tbcode >= '12471') && (tbcode <= '12479')) comment += "본문 1대 우영테크"; // 음악가 친구 비발디
-					if ((tbcode >= '12481') && (tbcode <= '12490')) comment += "인계처 : 우영테크 \n\n 본문 1대 미싱작업"; // NEW 음악가 친구
-					
-					(document.getElementById("wcname2")).innerHTML = data["wcname2"];
-					(document.getElementById("bdate")).innerHTML = full_date;
-					(document.getElementById("bname")).innerHTML = data["bname"];
-					bucode = data["bucode"];
-					if (data["bucode"] > 0){
-	            		if (data["bucode"] == 5) (document.getElementById("bucode")).innerHTML = "  -  본문2";
-	            		else (document.getElementById("bucode")).innerHTML = "  -  " + data["bucode"];
-	            	}
-					(document.getElementById("jname_jcode")).innerHTML = data["jname"] + " - " + data["jcode"];
-					(document.getElementById("pannum5")).innerHTML = data["pannum5"];
-					(document.getElementById("typegubn")).innerHTML = typegubn;
-					(document.getElementById("bnum")).innerHTML = data["bnum"];
-					(document.getElementById("comment")).innerHTML = comment;
-					if (data["pwan"] == "급") (document.getElementById("pwan")).innerHTML = "급";
-					else (document.getElementById("pwan")).innerHTML = data["pwan"].substring(0,2) + "월 " + data["pwan"].substring(2,4) + "일";
-					(document.getElementById("wcname")).innerHTML = data["wcname"];
-				}
+				
+				var data = result[0]; 
+				
+				$('input[name=uid]').val(uid);
+				
+				var full_date = MsToFulldate(data["bdate"]);
+				full_date = full_date.substring(0,4) + "년 " + full_date.substring(4,6) + "월 " + full_date.substring(6,8) + "일";
+				
+				if (data["btype"] == 1) var typegubn = "신간";
+				else var typegubn = "재판";
+				
+				var tbcode = data["bcode"].substring(0,5);
+				var comment = "";
+				comment = data["t3bigo"];
+				if ((tbcode >= '12471') && (tbcode <= '12479')) comment += "본문 1대 우영테크"; // 음악가 친구 비발디
+				if ((tbcode >= '12481') && (tbcode <= '12490')) comment += "인계처 : 우영테크 \n\n 본문 1대 미싱작업"; // NEW 음악가 친구
+				
+				(document.getElementById("wcname2")).innerHTML = data["wcname2"];
+				(document.getElementById("bdate")).innerHTML = full_date;
+				(document.getElementById("bname")).innerHTML = data["bname"];
+				bucode = data["bucode"];
+				if (data["bucode"] > 0){
+            		if (data["bucode"] == 5) (document.getElementById("bucode")).innerHTML = "  -  본문2";
+            		else (document.getElementById("bucode")).innerHTML = "  -  " + data["bucode"];
+            	}
+				(document.getElementById("jname_jcode")).innerHTML = data["jname"] + " - " + data["jcode"];
+				(document.getElementById("pannum5")).innerHTML = data["pannum5"];
+				(document.getElementById("typegubn")).innerHTML = typegubn;
+				(document.getElementById("bnum")).innerHTML = data["bnum"];
+				(document.getElementById("comment")).innerHTML = comment;
+				if (data["pwan"] == "급") (document.getElementById("pwan")).innerHTML = "급";
+				else (document.getElementById("pwan")).innerHTML = data["pwan"].substring(0,2) + "월 " + data["pwan"].substring(2,4) + "일";
+				(document.getElementById("wcname")).innerHTML = data["wcname"];
 			}
 		});
 		
@@ -1778,7 +1861,8 @@ function SelBonmunDetail(code, uid){ //본문작업지시서 디테일 //제품�
 			                    '<INPUT style="text-align:center; font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:40px;" name="COLO[]" value="'+ data["colo"] +'"></span></td>'+
 			                '<td width="330" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
 			                    '<INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:320px;" name="T4BIGO[]" value="'+ data["t4bigo"] +'"></span></td>'+
-			            '</tr>';
+			            '</tr>'+
+						'<input type="hidden" name="uids[]" value="'+ data["uid"] +'">';
 				}
 				if(rec_num < 20){
 					var t_num = 20 - rec_num;
@@ -1895,7 +1979,7 @@ function SelBonmunDetail(code, uid){ //본문작업지시서 디테일 //제품�
 				var t1 = 0; var t2 = 0; var t3 = 0; var t4 = 0;  var rec_num = 0;
 	 			htmlString = "";
 				for(var i in object_num){
-					var data = result[object_num[i]]; 
+					var data = result[i]; 
 					
 					rec_num++;
 					t1 = Math.floor(data["jm"] / 500);
@@ -1938,6 +2022,191 @@ function SelBonmunDetail(code, uid){ //본문작업지시서 디테일 //제품�
 	}
 }
 
+//검증필요_ update 포함됨
+function upBonmun(){
+	var ins_id = 0;
+	var old_jm = 0;
+	var old_yb = 0;
+	var listid = 0;
+	var jicode = "";
+	
+	var json_data = { uid: $('input[name=uid]').val() };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_jpbon_detail1",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+			
+			ins_id = result["uid"];
+			old_jm = result["jm"];
+			old_yb = result["yb"];
+			listid = result["listid"];
+			jicode = result["jcode"];
+		}
+	});
+	
+	var sum1 = 0;
+	var sum2 = 0;
+	
+	var new_jm = 0;
+	var new_yb = 0;
+	
+	for(var i = 0; i < $('input[name="JM1[]"]').length; i++){
+		new_jm = ($('input[name="JM1[]"]')[i].value * 500) + $('input[name="JM2[]"]')[i].value;
+		new_yb = ($('input[name="YB1[]"]')[i].value * 500) + $('input[name="YB2[]"]')[i].value;
+		sum1 += parseInt(new_jm);
+		sum2 += parseInt(new_yb);
+		
+		var json_data = { jm: new_jm, yb: new_yb, colo: $('input[name="COLO[]"]')[i].value, t4bigo: $('input[name="T4BIGO[]"]')[i].value, uid: $('input[name="uids[]"]')[i].value };
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			async: false,
+			url: SETTING_URL + "/jpjejak/update_jpbon_detail2",
+			data : JSON.stringify(json_data),
+			success: function (result) {
+				logNow(result);
+			}
+		});
+	}
+	
+	var comm = addslashes($('input[name=comm]').val());
+	var new_rnum = Math.floor(sum1 / 500);
+	var new_rnum2 = sum1 % 500;
+	if(new_rnum2 > 0){
+		if(new_rnum2 <= 250){
+			new_rnum += 0.5;
+		} else {
+			new_rnum += 1;
+		}
+	}
+	
+	var json_data = { jm: sum1, yb: sum2, rnum: new_rnum, t3bigo: comm, uid: ins_id };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/update_jpbon_detail3",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+	
+	var crnum = 0;
+	var json_data = { uid: listid };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_jpbon_detail4",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+			
+			crnum = result["crnum"];
+		}
+	});
+	
+	var new_jm = sum1;
+	var new_yb = sum2;
+	var tnum = (-1) * (old_jm * old_yb);
+	
+	var new_id = 0;
+	var jeon_num = 0;
+	var new_date = "";
+	
+	var new_curno = 0;
+	
+	var json_data = { jicode: jicode, jeuid: crnum, num: tnum };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_jpbon_detail5",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+			
+			new_id = result["uid"];
+			jeon_num = result["jeon"];
+			new_date = MsToFulldate(result["date"]).substring(2, 4);
+			
+			new_curno = result["curno"] + old_jm + old_yb - new_jm - new_yb;
+		}
+	});
+	
+	var new_num = new_jm + new_yb;
+	var new_num2 = (new_jm + new_yb) * (-1);
+	
+	var json_data = { num: new_num2, curno: new_curno, uid: new_id };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/update_jpbon_detail6",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+	
+	var json_data = { value: new_date, jnum1: new_jm, jnum2: new_yb, jsum: new_num, uid: jeon_num };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/update_jpbon_detail7",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+	
+	var json_data = { jicode: jicode, uid: new_id };
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_jpbon_detail8",
+		data : JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+			
+			var object_num = Object.keys(result);
+			for(var i in object_num){
+				var data = result[i]; 
+				
+				new_curno += data["num"];
+				var json_data = { curno: new_curno, uid: data["uid"] };
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					async: false,
+					url: SETTING_URL + "/jpjejak/update_jpbon_detail9",
+					data : JSON.stringify(json_data),
+					success: function (result) {
+						logNow(result);
+					}
+				});
+			}
+		}
+	});
+}
+
 //입고대장
 function SelJpWarehousing(bdate1, bdate2){
 	var from = { bdate1: bdate1, bdate2: bdate2 }
@@ -1978,126 +2247,118 @@ function SelJpWarehousing(bdate1, bdate2){
 }
 
 //제작예정리스트 열람
-function SelJpJejakYejung(){
+function SelJpJejakYejung(signdate, lm_s, lm_t){
+	$("#JpYejungData").html("");
+	
+	var xxx = signdate.substring(4,6);
+	full_date = signdate.substring(0,4) + " 년 " + signdate.substring(4,6) + " 월 " + signdate.substring(6,8) + " 일  ";
+	(document.getElementById("time_result")).innerHTML = full_date;
+	
+	var from = {signdate: signdate, lm_s: lm_s, lm_t: lm_t}
 	$.ajax({
 		type: "POST",
+		contentType: "application/json; charset=utf-8;",
 		dataType: "json",
-		url: SETTING_URL + "/jpjejak/select_yejung1",
 		async: false,
-		success: function (result){
-			var signdate = result.toString();
+		url: SETTING_URL + "/jpjejak/select_yejung2",
+		data : JSON.stringify(from),
+		success: function (result) {
+			logNow(result);
+			var object_num = Object.keys(result); 
 			
-			var xxx = signdate.substring(4,6);
-			full_date = signdate.substring(0,4) + " 년" + signdate.substring(4,6) + " 월" + signdate.substring(6,8) + " 일  ";
-			(document.getElementById("time_result")).innerHTML = full_date;
-			
-			var from = {signdate: signdate}
-			$.ajax({
-				type: "POST",
-				contentType: "application/json; charset=utf-8;",
-				dataType: "json",
-				async: false,
-				url: SETTING_URL + "/jpjejak/select_yejung2",
-				data : JSON.stringify(from),
-				success: function (result) {
-					logNow(result);
-					var object_num = Object.keys(result); 
-					
-					htmlString = "";
-					for(var i in object_num){
-						var data = result[object_num[i]];
-						
-						var nprice = 0;
-						if (data["ncode"]) var tcode = data["ncode"];
-						if (data["nprice"]) nprice = data["nprice"];
-						
-						htmlString += 
-							'<tr>'+
-								'<td width="1410">'+
-									'<table border="0" cellpadding="5" cellspacing="0" width="1410" bgcolor="#CCCCCC">'+
-										'<tr>'+
-											'<td width="1410">'+
-												'<table border="0" cellspacing="1" width="1400" bgcolor="#CCCCCC" bordercolorlight="#CCCCCC" bordercolordark="white" cellpadding="0">'+
-													'<tr>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">순번</span></font></td>'+
-														'<td width="50" bgcolor="white" height="40" align="center" valign="middle"><span style="font-size:9pt;">'+ (++i) +'</span></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">도서명</span></font></td>'+
-														'<td width="300" bgcolor="white" height="40" align="left" valign="middle" colspan="3">'+
-															'<table border="0" width="300">'+
-																'<tr>'+
-																	'<td width="270" align="left"><p style="margin-left:3px;"><span style="font-size:9pt;">'+ data["bname"] +'</span></p></td>'+
-																	'<td width="30" align="right">&nbsp;</td>'+
-																'</tr>'+
-															'</table>'+
-														'</td>'+
-														'<td width="50" height="40" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;"><font color="#666666">코드</font></span></td>'+
-														'<td width="50" height="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(nprice) htmlString += tcode; else htmlString += data["bcode"]; htmlString += '</span></td>'+														
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">정가</span></font></td>'+
-														'<td width="100" bgcolor="white" height="40" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'; if(nprice) htmlString += '<b><font color="red"> ' + data["bprice"] + ' </font></b>(' + nprice + ')'; else htmlString += data["bprice"]; htmlString += '</span></td>'+
-														'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+																											
-															'<input type="button" value="삭제" onClick="javascript:DelJpJejakYejung('+ data["uid"] +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 별 실 판 매 수 량</span></font></p>'+
-														'</td>'+													
-													'</tr>'+
-													'<tr>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">면수</span></font></td>'+
-														'<td width="100" bgcolor="#F6F6F6" colspan="2" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">발주점 수량</span></font></td>'+
-														'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">현 재고 수량</span></font></td>'+
-														'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">판매<br>여유일</span></font></td>'+
-														'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">발주 수량</span></font></td>'+
-														'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle" colspan="2"><font color="#666666"><span style="font-size:9pt;">최초발행</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">연간<br>증감율</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">월 평균 판매</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">색도</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">년간<br>실판매</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">년간<br>총반입</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">01</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">02</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">03</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">04</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">05</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">06</span></font></td>'+														
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">07</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">08</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">09</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">10</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">11</span></font></td>'+
-														'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">12</span></font></td>'+
-													'</tr>'+
-													'<tr>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bmyun"] +'</span></td>'+
-														'<td width="100" bgcolor="white" colspan="2" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pnum1"] +'</span></td>'+
-														'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pnum2"] +'</span></td>'+
-														'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pdate"] +'</span></td>'+
-														'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bnum"] +'</span></td>'+
-														'<td width="100" bgcolor="white" height="30" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'+ data["pfirst"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["yinc"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["ppan"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bcolor"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["ypan"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["yban"] +'</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p1"]; if(xxx == "01") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p2"]; if(xxx == "02") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p3"]; if(xxx == "03") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p4"]; if(xxx == "04") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p5"]; if(xxx == "05") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p6"]; if(xxx == "06") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p7"]; if(xxx == "07") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p8"]; if(xxx == "08") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p9"]; if(xxx == "09") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p10"]; if(xxx == "10") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+															
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p11"]; if(xxx == "11") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-														'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p12"]; if(xxx == "12") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
-													'</tr>'+
-												'</table>'+
-											'</td>'+
-										'</tr>'+    
-									'</table>'+
-								'</td>'+
-							'</tr>';
-					}
-					$("#JpYejungData").html(htmlString);
-				}
-			});
+			for(var i in object_num){
+				var data = result[object_num[i]];
+				
+				var nprice = 0;
+				if (data["ncode"]) var tcode = data["ncode"];
+				if (data["nprice"]) nprice = data["nprice"];
+				
+				htmlString =
+					'<tr>'+
+						'<td width="1410">'+
+							'<table border="0" cellpadding="5" cellspacing="0" width="1410" bgcolor="#CCCCCC">'+
+								'<tr>'+
+									'<td width="1410">'+
+										'<table border="0" cellspacing="1" width="1400" bgcolor="#CCCCCC" bordercolorlight="#CCCCCC" bordercolordark="white" cellpadding="0">'+
+											'<tr>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">순번</span></font></td>'+
+												'<td width="50" bgcolor="white" height="40" align="center" valign="middle"><span style="font-size:9pt;">'+ (++i) +'</span></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">도서명</span></font></td>'+
+												'<td width="300" bgcolor="white" height="40" align="left" valign="middle" colspan="3">'+
+													'<table border="0" width="300">'+
+														'<tr>'+
+															'<td width="270" align="left"><p style="margin-left:3px;"><span style="font-size:9pt;">'+ data["bname"] +'</span></p></td>'+
+															'<td width="30" align="right">&nbsp;</td>'+
+														'</tr>'+
+													'</table>'+
+												'</td>'+
+												'<td width="50" height="40" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;"><font color="#666666">코드</font></span></td>'+
+												'<td width="50" height="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(nprice) htmlString += tcode; else htmlString += data["bcode"]; htmlString += '</span></td>'+														
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">정가</span></font></td>'+
+												'<td width="100" bgcolor="white" height="40" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'; if(nprice) htmlString += '<b><font color="red"> ' + data["bprice"] + ' </font></b>(' + nprice + ')'; else htmlString += data["bprice"]; htmlString += '</span></td>'+
+												'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+																											
+													'<input type="button" value="삭제" onClick="javascript:DelJpJejakYejung('+ data["uid"] +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 별 실 판 매 수 량</span></font></p>'+
+												'</td>'+													
+											'</tr>'+
+											'<tr>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">면수</span></font></td>'+
+												'<td width="100" bgcolor="#F6F6F6" colspan="2" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">발주점 수량</span></font></td>'+
+												'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">현 재고 수량</span></font></td>'+
+												'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">판매<br>여유일</span></font></td>'+
+												'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">발주 수량</span></font></td>'+
+												'<td width="100" bgcolor="#F6F6F6" height="40" align="center" valign="middle" colspan="2"><font color="#666666"><span style="font-size:9pt;">최초발행</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">연간<br>증감율</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">월 평균 판매</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">색도</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">년간<br>실판매</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">년간<br>총반입</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">01</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">02</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">03</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">04</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">05</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">06</span></font></td>'+														
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">07</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">08</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">09</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">10</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">11</span></font></td>'+
+												'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">12</span></font></td>'+
+											'</tr>'+
+											'<tr>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bmyun"] +'</span></td>'+
+												'<td width="100" bgcolor="white" colspan="2" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pnum1"] +'</span></td>'+
+												'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pnum2"] +'</span></td>'+
+												'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["pdate"] +'</span></td>'+
+												'<td width="100" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bnum"] +'</span></td>'+
+												'<td width="100" bgcolor="white" height="30" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'+ data["pfirst"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["yinc"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["ppan"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["bcolor"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["ypan"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["yban"] +'</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p1"]; if(xxx == "01") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p2"]; if(xxx == "02") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p3"]; if(xxx == "03") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p4"]; if(xxx == "04") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p5"]; if(xxx == "05") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p6"]; if(xxx == "06") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p7"]; if(xxx == "07") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p8"]; if(xxx == "08") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p9"]; if(xxx == "09") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p10"]; if(xxx == "10") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+															
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p11"]; if(xxx == "11") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+												'<td width="50" bgcolor="white" height="30" align="center" valign="middle"><span style="font-size:9pt;">'+ data["p12"]; if(xxx == "12") htmlString += '&nbsp;('+ data["p13"]+ ')'; htmlString += '</span></td>'+
+											'</tr>'+
+										'</table>'+
+									'</td>'+
+								'</tr>'+    
+							'</table>'+
+						'</td>'+
+					'</tr>';
+				
+				$("#JpYejungData").append(htmlString);
+			}
 		}
 	});
 }
