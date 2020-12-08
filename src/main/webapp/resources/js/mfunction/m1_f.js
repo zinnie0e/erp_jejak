@@ -103,7 +103,7 @@ function ModiCuList(uid){
 		async: false,
 		data : JSON.stringify(from),
 		success: function (result) {
-			var data = result[0];
+			var data = result;
 			$("input[name=wccode]").val(data["wccode"]);
 			$("select[name=wcjob]").val(data["wcjob"]);
 			$("input[name=wcdeap]").val(data["wcdeap"]);

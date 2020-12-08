@@ -34,8 +34,8 @@ function selBookList(lm_s, lm_t){
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbbook"] + '</font></span></td>' +
 							'<td width="430" height="25" bgcolor="white" align="left" valign="middle"><p style="line-height:16px; margin-left:5px;"><span style="font-size:9pt;"><font face="돋움" >' + data["sbname"] + '</a></font></span></p></td>' +
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' +
-								'<a href="javascript:ModiBookList(' + data["uid"] + ');" class="n">수정</a>&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;' +
-								'<a href="javascript:DelBookList(' + data["uid"] + ');" class="n">삭제</a></font></span>' +
+								'<a href="javascript:selBook(' + data["uid"] + ');" class="n">수정</a>&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;' +
+								'<a href="javascript:delBook(' + data["uid"] + ');" class="n">삭제</a></font></span>' +
 							'</td>' +
 						'</tr>';
 				} else if(menuTitle == "제품제작진행"){
@@ -54,8 +54,16 @@ function selBookList(lm_s, lm_t){
 	});
 }
 
-function ModiBookList(uid){
-	var from = {uid: uid}
+function selBook(uid){
+	$("img[name=btn_deasu]").click(function(){
+		SelBookDeasu(data["uid"], data["sbname"], data["sbbook"]);
+	});
+	
+	$("img[name=btn_yong]").click(function(){
+		SelBookYongji(data["uid"], data["sbname"], data["sbbook"]);
+	});
+	
+	var json_data = {uid: uid}
 	
 	$('#jejak_detail_view').html(jmenu2("0-수정"));
 	$.ajax({
@@ -64,9 +72,9 @@ function ModiBookList(uid){
 		dataType: "json",
 		url: SETTING_URL + "/books/select_detail",
 		async: false,
-		data: JSON.stringify(from),
+		data: JSON.stringify(json_data),
 		success: function (result) {
-			var data = result[0];
+			var data = result;
 			
 			//구현_세션이 추가되어 권한을 파싱해야 함
 			var json_data = { id : "ajk" };
@@ -86,24 +94,15 @@ function ModiBookList(uid){
 						'<tr>'+
 							'<td align="center">'+
 								'<input type="text" size="6" name="bnum">부&nbsp;'+
-								//검증필요_안쓰는 기능
+								//구현
 								'<input type="button" value="잡물제작" onClick="javascript:JabBal();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-								//검증필요_안쓰는 기능
-								'<input type="button" value="임시도서코드변경" onClick="javascript:ChgCode(<?=$row[uid]?>);">'+
+								'<input type="button" value="임시도서코드변경" onClick="javascript:upBookTempSbbook(' + uid + ');">'+
 							'</td>'+
 						'</tr>';
 						
 						(document.getElementById("u_table")).innerHTML = htmlString;
 					}
 				}
-			});
-			
-			$("img[name=btn_deasu]").click(function(){
-				SelBookDeasu(data["uid"], data["sbname"], data["sbbook"]);
-			});
-			
-			$("img[name=btn_yong]").click(function(){
-				SelBookYongji(data["uid"], data["sbname"], data["sbbook"]);
 			});
 			
 			(document.getElementById("SBNAME")).innerHTML = data["sbname"];
@@ -208,225 +207,268 @@ function ModiBookList(uid){
 			$("select[name=SBJABJI]").val(data["sbjabji"]); //잡지
 		}
 	});
+}
+
+//검증필요_ update 포함됨
+function upBook(){ //도서정보
+	var SBGUBN = $("input[name=SBGUBN]").val(); //보류구분
+	var SBJLSU = $("input[name=SBJLSU]").val(); //절수
+	var SBDSPG = $("input[name=SBDSPG]").val(); //대수당페이지
+	var SBBUSE = $("input[name=SBBUSE]").val(); //편집부서
+	var SBJUJA = $("input[name=SBJUJA]").val(); //저자
+	var SBYKJA = $("input[name=SBYKJA]").val(); //역자
+	var SBPNJA = $("input[name=SBPNJA]").val(); //편자
+	var SBPNKN = $("input[name=SBPNKN]").val(); //판권
+	var SBWONS = $("input[name=SBWONS]").val(); //사용원서
+	var SBWNNA = $("input[name=SBWNNA]").val(); //원저자
+	var SBKOMC = $("input[name=SBKOMC]").val(); //승인번호
+	var SBISBN = $("input[name=SBISBN]").val(); //국제표준도서코드
+	var SBPANH = $("select[name=SBPANH]").val(); //본서판형
+	var SBJANH = $("select[name=SBJANH]").val(); //본서장형
+	var SBSBPH1 = $("select[name=SBSBPH1]").val(); //부록 1 판형
+	var SBSBJH1 = $("select[name=SBSBJH1]").val(); //부록 1 장형
+	var SBPAGE = $("input[name=SBPAGE]").val(); //본서 페이지
+	var SBSBPG1 = $("input[name=SBSBPG1]").val(); //부록 1 페이지
+	var SBSBPG2 = $("input[name=SBSBPG2]").val(); //부록 2 페이지
+	var SBSBPG3 = $("input[name=SBSBPG3]").val(); //부록 3 페이지
+	var SBSBPG4 = $("input[name=SBSBPG4]").val(); //부록 4 페이지
+//	var SBCASE = $("input[name=SBCASE]").val(); //객체 없음
+	var SBWING2 = $("input[name=SBWING2]").val(); //오리꼬미
+	var SBTIGI = $("input[name=SBTIGI]").val(); //띠지
+//	var SBVAT0 = $("input[name=SBVAT0]").val(); //객체 없음
+//	var SBINSE = 0; //인세(국내)
+//	var SBMUNG = $("input[name=SBMUNG]").val(); //객체 없음
+//	var SBSBMG = $("input[name=SBSBMG]").val(); //객체 없음
+//	var SBHJ04 = 0; //인세(국외)
+	var SBUPRC = $("input[name=SBUPRC]").val(); //정가
+	var SBGUME = $("input[name=SBGUME]").val(); //구매처
+	var SBAPDT = $("input[name=SBAPDT]").val(); //등록일자
+	var SBLOCA = $("input[name=SBLOCA]").val(); //위치
+	var SBPEGI = $("input[name=SBPEGI]").val(); //폐간구분
+	var SBPEGA = $("input[name=SBPEGA]").val(); //폐간일자
+	var SBCPBH = $("input[name=SBCPBH]").val(); //초판일자
+	var SBCPSR = $("input[name=SBCPSR]").val(); //초판제작부수
+	var SBCPDN = $("input[name=SBCPDN]").val(); //초판단가
+	var SBCJBH = $("input[name=SBCJBH]").val(); //최종발행일자
+	var SBCJPN = $("input[name=SBCJPN]").val(); //최종판수
+	var SBPJFR = $("input[name=SBPJFR]").val(); //편집기간(FROM)
+	var SBPJTO = $("input[name=SBPJTO]").val(); //편집기간(TO)
+	var SBSOG1 = $("input[name=SBSOG1]").val(); //송고일(본문)
+	var SBSOG2 = $("input[name=SBSOG2]").val(); //송고일(표지)
+	var SBIPIL = $("input[name=SBIPIL]").val(); //초판입고일
+	var SBCOST = $("input[name=SBCOST]").val(); //구매단가
+	var SBWEIT = $("input[name=SBWEIT]").val(); //중량
+	var SBGEO1 = $("input[name=SBGEO1]").val(); //사식(거래처)
+	var SBAMT1 = $("input[name=SBAMT1]").val(); //사식(금액)
+	var SBREM1 = $("input[name=SBREM1]").val(); //사식(내역)
+	var SBGEO2 = $("input[name=SBGEO2]").val(); //사보(거래처)
+	var SBAMT2 = $("input[name=SBAMT2]").val(); //사보(금액)
+	var SBREM2 = $("input[name=SBREM2]").val(); //사보(내역)
+	var SBGEO3 = $("input[name=SBGEO3]").val(); //원색(거래처)
+	var SBAMT3 = $("input[name=SBAMT3]").val(); //원색(금액)
+	var SBREM3 = $("input[name=SBREM3]").val(); //원색(내역)
+//	var SBRANK = $("input[name=SBRANK]").val(); //객체 없음
+	var SBJEGO = $("input[name=SBJEGO]").val(); //현재고
+	var SBBIGO = $("input[name=SBBIGO]").val(); //기타사항
+	var SBSBPH2 = $("select[name=SBSBPH2]").val(); //부록 2 판형
+	var SBSBJH2 = $("select[name=SBSBJH2]").val(); //부록 2 장형
+	var SBSBPH3 = $("select[name=SBSBPH3]").val(); //부록 3 판형
+	var SBSBJH3 = $("select[name=SBSBJH3]").val(); //부록 3 장형
+	var SBSBPH4 = $("select[name=SBSBPH4]").val(); //부록 4 판형
+	var SBSBJH4 = $("select[name=SBSBJH4]").val(); //부록 4 장형
+	var SBJNJI = $("input[name=SBJNJI]").val(); //증지
+	var SBINJI = $("input[name=SBINJI]").val(); //인지
+	var SBSTIC = $("input[name=SBSTIC]").val(); //스티커
+	var SBCOTI = $("select[name=SBCOTI]").val(); //코팅
+	var SBCOTI2 = $("select[name=SBCOTI2]").val(); //추가코팅
+	var SBCD = $("input[name=SBCD]").val(); //CD
+	var SBMYUN = $("input[name=SBMYUN]").val(); //면지
+	var SBBYUL = $("input[name=SBBYUL]").val(); //별지
+	var SBHWBO = $("input[name=SBHWBO]").val(); //화보
+	var SBPANH2 = $("select[name=SBPANH2]").val(); //본서2 판형
+	var SBPAGE2 = $("input[name=SBPAGE2]").val(); //본서2 페이지
+	var SBBINB = $("input[name=SBBINB]").val(); //책속의 책
+//	var SBJJGB = $("select[name=in_gu3]").val(); //인세
+	var SBIPGO = $("select[name=SBIPGO]").val(); //입고처
+	var SBDUNG = $("input[name=SBDUNG]").val(); //등급
+//	var SBHJGB = $("select[name=in_gu2]").val(); //인세
+	var SBSACH = $("select[name=SBSACH]").val(); //상철제본
+	var SBTPAGE = $("input[name=SBTPAGE]").val(); //전체지면수
+	var SBMPAGE = $("input[name=SBMPAGE]").val(); //음악지면수
+	var SBSONGN = $("input[name=SBSONGN]").val(); //총수록곡수
+	var SBSONGI = $("input[name=SBSONGI]").val(); //국내승인곡
+	var SBSONGO = $("input[name=SBSONGO]").val(); //해외승인곡
+	var SBBOOKP = $("input[name=SBBOOKP]").val(); //도서판매가
+	var SBCDP = $("input[name=SBCDP]").val(); //CD판매가
+	var SBJABJI = $("select[name=SBJABJI]").val(); //잡지
+	var MEMO_JB = $("input[name=MEMO_JB]").val(); //기타(제본)
+	var MEMO_CD = $("input[name=MEMO_CD]").val(); //기타(CD)
+	var MEMO_CS = $("input[name=MEMO_CS]").val(); //기타(케이스)
+	var MEMO_ST = $("input[name=MEMO_ST]").val(); //기타(스티커)
+	var SBKC = $("select[name=SBKC]").val(); //KC
 	
-	document.getElementById("btn_UpIt").onclick = function() { //수정하기 버튼 클릭
-		var SBBOOK = $("input[name=SBBOOK]").val(); //도서코드
-		var SBNAME = $("input[name=SBNAME]").val(); //도서명
-		var SBUPRC = $("input[name=SBUPRC]").val(); //정가
-		var SBGUME = $("input[name=SBGUME]").val(); //구매처
-		var SBAPDT = $("input[name=SBAPDT]").val(); //등록일자
-		var SBLOCA = $("input[name=SBLOCA]").val(); //위치
-		var SBPEGI = $("input[name=SBPEGI]").val(); //폐간구분
-		var SBPEGA = $("input[name=SBPEGA]").val(); //폐간일자
-		var SBGUBN = $("input[name=SBGUBN]").val(); //보류구분
-		var SBCPBH = $("input[name=SBCPBH]").val(); //초판일자
-		var SBCPSR = $("input[name=SBCPSR]").val(); //초판제작부수
-		var SBCPDN = $("input[name=SBCPDN]").val(); //초판단가
-		var SBCJBH = $("input[name=SBCJBH]").val(); //최종발행일자
-		var SBCJPN = $("input[name=SBCJPN]").val(); //최종판수
-		var SBBUSE = $("input[name=SBBUSE]").val(); //편집부서
-		var SBJUJA = $("input[name=SBJUJA]").val(); //저자
-		var SBYKJA = $("input[name=SBYKJA]").val(); //역자
-		var SBPNJA = $("input[name=SBPNJA]").val(); //편자
-		var SBPJFR = $("input[name=SBPJFR]").val(); //편집기간(FROM)
-		var SBPJTO = $("input[name=SBPJTO]").val(); //편집기간(TO)
-		var SBDUNG = $("input[name=SBDUNG]").val(); //등급
-		var SBSOG1 = $("input[name=SBSOG1]").val(); //송고일(본문)
-		var SBSOG2 = $("input[name=SBSOG2]").val(); //송고일(표지)
-		var SBIPIL = $("input[name=SBIPIL]").val(); //초판입고일
-		var SBCOST = $("input[name=SBCOST]").val(); //구매단가
-		var SBWEIT = $("input[name=SBWEIT]").val(); //중량
-		var SBGEO1 = $("input[name=SBGEO1]").val(); //사식(거래처)
-		var SBAMT1 = $("input[name=SBAMT1]").val(); //사식(금액)
-		var SBREM1 = $("input[name=SBREM1]").val(); //사식(내역)
-		var SBGEO2 = $("input[name=SBGEO2]").val(); //사보(거래처)
-		var SBAMT2 = $("input[name=SBAMT2]").val(); //사보(금액)
-		var SBREM2 = $("input[name=SBREM2]").val(); //사보(내역)
-		var SBGEO3 = $("input[name=SBGEO3]").val(); //원색(거래처)
-		var SBAMT3 = $("input[name=SBAMT3]").val(); //원색(금액)
-		var SBREM3 = $("input[name=SBREM3]").val(); //원색(내역)
-		var SBPNKN = $("input[name=SBPNKN]").val(); //판권
-		var SBWONS = $("input[name=SBWONS]").val(); //사용원서
-		var SBWNNA = $("input[name=SBWNNA]").val(); //원저자
-		var SBKOMC = $("input[name=SBKOMC]").val(); //승인번호
-		var SBISBN = $("input[name=SBISBN]").val(); //국제표준도서코드
-		var SBPANH = $("select[name=SBPANH]").val(); //본서판형
-		var SBJANH = $("select[name=SBJANH]").val(); //본서장형
-		var SBPAGE = $("input[name=SBPAGE]").val(); //본서 페이지
-		var SBPANH2 = $("select[name=SBPANH2]").val(); //본서2 판형
-		var SBPAGE2 = $("input[name=SBPAGE2]").val(); //본서2 페이지
-		var SBSBPH1 = $("select[name=SBSBPH1]").val(); //부록 1 판형
-		var SBSBJH1 = $("select[name=SBSBJH1]").val(); //부록 1 장형
-		var SBSBPG1 = $("input[name=SBSBPG1]").val(); //부록 1 페이지
-		var SBSBPH2 = $("select[name=SBSBPH2]").val(); //부록 2 판형
-		var SBSBJH2 = $("select[name=SBSBJH2]").val(); //부록 2 장형
-		var SBSBPG2 = $("input[name=SBSBPG2]").val(); //부록 2 페이지
-		var SBSBPH3 = $("select[name=SBSBPH3]").val(); //부록 3 판형
-		var SBSBJH3 = $("select[name=SBSBJH3]").val(); //부록 3 장형
-		var SBSBPG3 = $("input[name=SBSBPG3]").val(); //부록 3 페이지
-		var SBSBPH4 = $("select[name=SBSBPH4]").val(); //부록 4 판형
-		var SBSBJH4 = $("select[name=SBSBJH4]").val(); //부록 4 장형
-		var SBSBPG4 = $("input[name=SBSBPG4]").val(); //부록 4 페이지
-		var SBCASE2 = $("input[name=SBCASE2]").val(); //케이스
-		var SBWING2 = $("input[name=SBWING2]").val(); //오리꼬미
-		var SBTIGI = $("input[name=SBTIGI]").val(); //띠지
-		var SBJNJI = $("input[name=SBJNJI]").val(); //증지
-		var SBINJI = $("input[name=SBINJI]").val(); //인지
-		var SBSTIC = $("input[name=SBSTIC]").val(); //스티커
-		var SBCD = $("input[name=SBCD]").val(); //CD
-		var SBBINB = $("input[name=SBBINB]").val(); //책속의 책
-		var SBIPGO = $("select[name=SBIPGO]").val(); //입고처
-		var SBJLSU = $("input[name=SBJLSU]").val(); //절수
-		var SBDSPG = $("input[name=SBDSPG]").val(); //대수당페이지
-		var SBCOTI = $("select[name=SBCOTI]").val(); //코팅
-		var SBSACH = $("select[name=SBSACH]").val(); //상철제본
-		var SBJEGO = $("input[name=SBJEGO]").val(); //현재고
-		var SBCOTI2 = $("select[name=SBCOTI2]").val(); //추가코팅
-		var SBMYUN = $("input[name=SBMYUN]").val(); //면지
-		var SBBYUL = $("input[name=SBBYUL]").val(); //별지
-		var SBHWBO = $("input[name=SBHWBO]").val(); //화보
-		var in_gu = $("select[name=in_gu]").val(); //인세
-		var SBINSE = $("input[name=SBINSE]").val(); //인세
-		
-		var SBHJGB = $("select[name=in_gu2]").val(); //인세
-		SBHJGB = SBHJGB == null ? "" : SBHJGB;
-		
-		var in_gu3 = $("select[name=in_gu3]").val(); //인세
-		var SBKC = $("select[name=SBKC]").val(); //KC
-		var SBBIGO = $("input[name=SBBIGO]").val(); //기타사항
-		var MEMO_JB = $("input[name=MEMO_JB]").val(); //기타(제본)
-		var MEMO_CD = $("input[name=MEMO_CD]").val(); //기타(CD)
-		var MEMO_CS = $("input[name=MEMO_CS]").val(); //기타(케이스)
-		var MEMO_ST = $("input[name=MEMO_ST]").val(); //기타(스티커)
-		var SBTPAGE = $("input[name=SBTPAGE]").val(); //전체지면수
-		var SBMPAGE = $("input[name=SBMPAGE]").val(); //음악지면수
-		var SBSONGN = $("input[name=SBSONGN]").val(); //총수록곡수
-		var SBSONGI = $("input[name=SBSONGI]").val(); //국내승인곡
-		var SBSONGO = $("input[name=SBSONGO]").val(); //해외승인곡
-		var SBBOOKP = $("input[name=SBBOOKP]").val(); //도서판매가
-		var SBCDP = $("input[name=SBCDP]").val(); //CD판매가
-		var SBJABJI = $("select[name=SBJABJI]").val(); //잡지
-
-		if (SBBOOK == "") return $("input[name=SBBOOK]").focus();
-		if (SBNAME == "") return $("input[name=SBNAME]").focus();
-		if (SBUPRC == "") return $("input[name=SBUPRC]").focus();
-		if (SBPANH == "") return $("select[name=SBPANH]").focus();
-		if (SBJANH == "") return $("select[name=SBJANH]").focus();
-		if (SBPAGE == "") return $("input[name=SBPAGE]").focus();
-		if (SBCOTI == "") return $("input[name=SBCOTI]").focus();
-
-		var from = {
-			uid: uid,
-			sbbook: SBBOOK,
-			sbname: SBNAME,
-			sbuprc: SBUPRC,
-			sbgume: SBGUME,
-			sbapdt: SBAPDT,
-			sbloca: SBLOCA,
-			sbpegi: SBPEGI,
-			sbpega: SBPEGA,
-			sbgubn: SBGUBN,
-			sbcpbh: SBCPBH,
-			sbcpsr: SBCPSR,
-			sbcpdn: SBCPDN,
-			sbcjbh: SBCJBH,
-			sbcjpn: SBCJPN,
-			sbbuse: SBBUSE,
-			sbjuja: SBJUJA,
-			sbykja: SBYKJA,
-			sbpnja: SBPNJA,
-			sbpjfr: SBPJFR,
-			sbpjto: SBPJTO,
-			sbdung: SBDUNG,
-			sbsog1: SBSOG1,
-			sbsog2: SBSOG2,
-			sbipil: SBIPIL,
-			sbcost: SBCOST,
-			sbweit: SBWEIT,
-			sbgeo1: SBGEO1,
-			sbamt1: SBAMT1,
-			sbrem1: SBREM1,
-			sbgeo2: SBGEO2,
-			sbamt2: SBAMT2,
-			sbrem2: SBREM2,
-			sbgeo3: SBGEO3,
-			sbamt3: SBAMT3,
-			sbrem3: SBREM3,
-			sbpnkn: SBPNKN,
-			sbwons: SBWONS,
-			sbwnna: SBWNNA,
-			sbkomc: SBKOMC,
-			sbisbn: SBISBN,
-			sbpanh: SBPANH,
-			sbjanh: SBJANH,
-			sbpage: SBPAGE,
-			sbpanh2: SBPANH2,
-			sbpage2: SBPAGE2,
-			sbsbph1: SBSBPH1,
-			sbsbjh1: SBSBJH1,
-			sbsbpg1: SBSBPG1,
-			sbsbph2: SBSBPH2,
-			sbsbjh2: SBSBJH2,
-			sbsbpg2: SBSBPG2,
-			sbsbph3: SBSBPH3,
-			sbsbjh3: SBSBJH3,
-			sbsbpg3: SBSBPG3,
-			sbsbph4: SBSBPH4,
-			sbsbjh4: SBSBJH4,
-			sbsbpg4: SBSBPG4,
-			sbcase2: SBCASE2,
-			sbwing2: SBWING2,
-			sbtigi: SBTIGI,
-			sbjnji: SBJNJI,
-			sbinji: SBINJI,
-			sbstic: SBSTIC,
-			sbcd: SBCD,
-			sbbinb: SBBINB,
-			sbipgo: SBIPGO,
-			sbjlsu: SBJLSU,
-			sbdspg: SBDSPG,
-			sbcoti: SBCOTI,
-			sbsach: SBSACH,
-			sbjego: SBJEGO,
-			sbcoti2: SBCOTI2,
-			sbmyun: SBMYUN,
-			sbbyul: SBBYUL,
-			sbhwbo: SBHWBO,
-			//in_gu: in_gu,
-			sbinse: SBINSE,
-			sbhj04: SBINSE,
-			sbhjgb: SBHJGB,
-			//in_gu3: in_gu3,
-			sbkc: SBKC,
-			sbbigo: SBBIGO,
-			memo_jb: "MEMO_JB",
-			memo_cd: MEMO_CD,
-			memo_cs: MEMO_CS,
-			memo_st: MEMO_ST,
-			sbtpage: SBTPAGE,
-			sbmpage: SBMPAGE,
-			sbsongn: SBSONGN,
-			sbsongi: SBSONGI,
-			sbsongo: SBSONGO,
-			sbbookp: SBBOOKP,
-			sbcdp: SBCDP,
-			sbjabji: SBJABJI
-		}
-
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			dataType: "json",
-			url: SETTING_URL + "/books/update",
-			async: false,
-			data: JSON.stringify(from),
-			success: function (result) {
-				alert("데이터 수정 완료");
-			},
-			error: function () {
-			}
-		});
+	var SBINSE = 0; //인세(국내)
+	var SBHJ04 = 0; //인세(국외)
+	if($("select[name=in_gu]").val() == 1) {
+		SBINSE = $("input[name=SBINSE]").val();
+	} else {
+		SBHJ04 = $("input[name=SBINSE]").val();
 	}
+	
+	var SBHJGB = $("select[name=in_gu2]").val(); //인세
+	SBHJGB = SBHJGB == null ? "" : SBHJGB;
+	
+	var SBJJGB = $("select[name=in_gu3]").val(); //인세
+
+//	if (SBBOOK == "") return $("input[name=SBBOOK]").focus();
+//	if (SBNAME == "") return $("input[name=SBNAME]").focus();
+//	if (SBUPRC == "") return $("input[name=SBUPRC]").focus();
+//	if (SBPANH == "") return $("select[name=SBPANH]").focus();
+//	if (SBJANH == "") return $("select[name=SBJANH]").focus();
+//	if (SBPAGE == "") return $("input[name=SBPAGE]").focus();
+//	if (SBCOTI == "") return $("input[name=SBCOTI]").focus();
+
+	var json_data = {
+		uid: uid,
+		sbgubn: SBGUBN,
+		sbjlsu: SBJLSU,
+		sbdspg: SBDSPG,
+		sbbuse: SBBUSE,
+		sbjuja: SBJUJA,
+		sbykja: SBYKJA,
+		sbpnja: SBPNJA,
+		sbpnkn: SBPNKN,
+		sbwons: SBWONS,
+		sbwnna: SBWNNA,
+		sbkomc: SBKOMC,
+		sbisbn: SBISBN,
+		sbpanh: SBPANH,
+		sbjanh: SBJANH,
+		sbsbph1: SBSBPH1,
+		sbsbjh1: SBSBJH1,
+		sbpage: SBPAGE,
+		sbsbpg1: SBSBPG1,
+		sbsbpg2: SBSBPG2,
+		sbsbpg3: SBSBPG3,
+		sbsbpg4: SBSBPG4,
+//		sbcase: SBCASE,
+		sbwing2: SBWING2,
+		sbtigi: SBTIGI,
+//		sbvat0: SBVAT0,
+		sbinse: SBINSE,
+//		sbmung: SBMUNG,
+//		sbsbmg: SBSBMG,
+		sbhj04: SBHJ04,
+		sbuprc: SBUPRC,
+		sbgume: SBGUME,
+		sbapdt: SBAPDT,
+		sbloca: SBLOCA,
+		sbpegi: SBPEGI,
+		sbpega: SBPEGA,
+		sbcpbh: SBCPBH,
+		sbcpsr: SBCPSR,
+		sbcpdn: SBCPDN,
+		sbcjbh: SBCJBH,
+		sbcjpn: SBCJPN,
+		sbpjfr: SBPJFR,
+		sbpjto: SBPJTO,
+		sbsog1: SBSOG1,
+		sbsog2: SBSOG2,
+		sbipil: SBIPIL,
+		sbcost: SBCOST,
+		sbweit: SBWEIT,
+		sbgeo1: SBGEO1,
+		sbamt1: SBAMT1,
+		sbrem1: SBREM1,
+		sbgeo2: SBGEO2,
+		sbamt2: SBAMT2,
+		sbrem2: SBREM2,
+		sbgeo3: SBGEO3,
+		sbamt3: SBAMT3,
+		sbrem3: SBREM3,
+//		sbrank: SBRANK,
+		sbjego: SBJEGO,
+		sbbigo: SBBIGO,
+		sbsbph2: SBSBPH2,
+		sbsbjh2: SBSBJH2,
+		sbsbph3: SBSBPH3,
+		sbsbjh3: SBSBJH3,
+		sbsbph4: SBSBPH4,
+		sbsbjh4: SBSBJH4,
+		sbjnji: SBJNJI,
+		sbinji: SBINJI,
+		sbstic: SBSTIC,
+		sbcoti: SBCOTI,
+		sbcoti2: SBCOTI2,
+		sbcd: SBCD,
+		sbmyun: SBMYUN,
+		sbbyul: SBBYUL,
+		sbhwbo: SBHWBO,
+		sbpanh2: SBPANH2,
+		sbpage2: SBPAGE2,
+		sbbinb: SBBINB,
+		sbjjgb: SBJJGB,
+		sbipgo: SBIPGO,
+		sbdung: SBDUNG,
+		sbhjgb: SBHJGB,
+		sbsach: SBSACH,
+		sbtpage: SBTPAGE,
+		sbmpage: SBMPAGE,
+		sbsongn: SBSONGN,
+		sbsongi: SBSONGI,
+		sbsongo: SBSONGO,
+		sbbookp: SBBOOKP,
+		sbcdp: SBCDP,
+		sbjabji: SBJABJI,
+		memo_jb: MEMO_JB,
+		memo_cd: MEMO_CD,
+		memo_cs: MEMO_CS,
+		memo_st: MEMO_ST
+	}
+
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/books/update_book",
+		async: false,
+		data: JSON.stringify(json_data),
+		success: function (result) {
+			alert("데이터 수정 완료");
+		}
+	});
+}
+
+//검증필요_ insert, update 포함됨
+function upBookInsang(){
+	var json_data = {sbbook: $("input[name=SBBOOK]").val(), sbuprc: $("input[name=SBUPRC]").val()};
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url: SETTING_URL + "/books/update_book_insang",
+		async: false,
+		data: JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+}
+
+//검증필요_ update 포함됨
+function upBookTempSbbook(uid){
+	var json_data = {sbbook: $("input[name=SBBOOK]").val(), sbname: $("input[name=SBNAME]").val(), uid: uid};
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url: SETTING_URL + "/books/update_temp_sbbook",
+		async: false,
+		data: JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+			
+			if(result == "overlab") alert('코드 중복');
+		}
+	});
 }
 
 function SelBookDeasu(uid, sbname, sbbook){ //대수정보
@@ -435,7 +477,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 	$("input[name=sbbook]").val(sbbook);
 	
 	$("img[name=btn_book]").click(function(){
-		ModiBookList(uid);
+		selBook(uid);
 	});
 	$("img[name=btn_yong]").click(function(){
 		SelBookYongji(uid, sbname, sbbook);
@@ -450,7 +492,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 	}
 	
 	logNow(tmpcode + "/" + dbname);
-	var from = {tmpcode: tmpcode, dbname: dbname}
+	var from = {tmpcode: tmpcode}
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
@@ -461,7 +503,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 		success: function (result) {
 			var total_record = result[0]["count"];
 			if(total_record){ 
-				var from = {tmpcode: tmpcode, dbname: dbname}
+				var from = {tmpcode: tmpcode}
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8;",
@@ -554,8 +596,87 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 	});
 }
 
-function booksDaesuModify(){
-	//검증필요_delBooksDaesu, selBooksKswdesu0MaxUid, inBooksDaesu를 만들어뒀으나 $check 값을 못찾아서 작업 중단
+//검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
+function upDaesu(){
+	var bcode =  $("input[name=sbbook]").val().substring(0,5);
+	var json_data = {wdbook: bcode};
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url: SETTING_URL + "/books/delete_daesu1",
+		async: false,
+		data: JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+	
+	var new_uid = 0;
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url: SETTING_URL + "/books/select_daesu2",
+		async: false,
+		success: function (result) {
+			logNow(result);
+			
+			new_uid = result + 1;
+		}
+	});
+	
+	var t_0 = 1;
+	var t_1 = 1;
+	var t_2 = 1;
+	var t_3 = 1;
+	var t_4 = 1;
+	
+	var tmp_no = 0;
+	var wdboo9 = $('input[name="WDBOO9[]"]');
+	for(var i = 0; i < $('input[name="check[]"]').length; i++){
+		
+		switch(wdboo9[i].value){
+			case 0 :
+				tmp_no = t_0;
+				t_0++;
+				break;
+			case 1 :
+				tmp_no = t_1;
+				t_1++;
+				break;
+			case 2 :
+				tmp_no = t_2;
+				t_2++;
+				break;
+			case 3 :
+				tmp_no = t_3;
+				t_3++;
+				break;
+			case 4 :
+				tmp_no = t_4;
+				t_4++;
+				break;
+				
+		}
+		
+		var json_data = {uid: new_uid,
+				wdbook: bcode.
+				wdboo9: wdboo9[i].value,
+				wdsuns: tmp_no,
+				wddesu: $('input[name="WDDESU[]"]')[i].value,
+				wdpage: $('input[name="WDPAGE[]"]')[i].value,
+				wdcolo: $('input[name="WDCOLO[]"]')[i].value,
+				wdqnty: $('input[name="WDQNTY[]"]')[i].value,};
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			url: SETTING_URL + "/books/insert_daesu3",
+			async: false,
+			data: JSON.stringify(json_data),
+			success: function (result) {
+				logNow(result);
+			}
+		});
+	}
 }
 
 function SelBookYongji(uid, sbname, sbbook){//용지정보
@@ -564,7 +685,7 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 	(document.getElementById("sbbook")).innerHTML = sbbook;
 	
 	$("img[name=btn_book]").click(function(){
-		ModiBookList(uid);
+		selBook(uid);
 	});
 	$("img[name=btn_deasu]").click(function(){
 		SelBookDeasu(uid, sbname, sbbook);
@@ -804,11 +925,76 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 	});
 }
 
-function booksYongjiModify(){
-	//검증필요_delBooksYongji, inBooksYongji를 만들어뒀으나 $check 값을 못찾아서 작업 중단
+//검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
+function upYongji(){
+	var bcode =  $("input[name=sbbook]").val().substring(0,5);
+	var json_data = {wybook: bcode};
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		url: SETTING_URL + "/books/delete_yongji1",
+		async: false,
+		data: JSON.stringify(json_data),
+		success: function (result) {
+			logNow(result);
+		}
+	});
+	
+	var t_0 = 1;
+	var t_1 = 1;
+	var t_2 = 1;
+	var t_3 = 1;
+	var t_4 = 1;
+	
+	var tmp_no = 0;
+	var wyboo9 = $('input[name="WYBOO9[]"]');
+	for(var i = 0; i < $('input[name="check[]"]').length; i++){
+		
+		switch(wyboo9[i].value){
+			case 0 :
+				tmp_no = t_0;
+				t_0++;
+				break;
+			case 1 :
+				tmp_no = t_1;
+				t_1++;
+				break;
+			case 2 :
+				tmp_no = t_2;
+				t_2++;
+				break;
+			case 3 :
+				tmp_no = t_3;
+				t_3++;
+				break;
+			case 4 :
+				tmp_no = t_4;
+				t_4++;
+				break;
+				
+		}
+		
+		var json_data = {wybook: bcode.
+				wyboo9: wyboo9[i].value,
+				wysuns: tmp_no,
+				wygubn: $('input[name="$WYGUBN[]"]')[i].value,
+				wyjijl: $('input[name="WYJIJL[]"]')[i].value.substring(0, 6),
+				wycolo: $('input[name="colo[]"]')[i].value,
+				wypage: $('input[name="page[]"]')[i].value,};
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			url: SETTING_URL + "/books/insert_yongji2",
+			async: false,
+			data: JSON.stringify(json_data),
+			success: function (result) {
+				logNow(result);
+			}
+		});
+	}
 }
 
-function DelBookList(uid){
+function delBook(uid){
 	var delcheck = confirm("삭제하시겠습니까?");
 	if(delcheck){
 		var from = {uid: uid};
@@ -816,7 +1002,7 @@ function DelBookList(uid){
 			type: "POST",
 			contentType: "application/json; charset=utf-8;",
 			dataType: "json",
-			url : SETTING_URL + "/books/delete",
+			url : SETTING_URL + "/books/delete_book",
 			async: false,
 			data : JSON.stringify(from),
 			success : function(result) {
@@ -873,8 +1059,8 @@ function SelSearchBook(lm_s, lm_t){ //도서검색결과 (m4_제작예정리스�
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbbook"] + '</font></span></td>' +
 							'<td width="430" height="25" bgcolor="white" align="left" valign="middle"><p style="line-height:16px; margin-left:5px;"><span style="font-size:9pt;"><font face="돋움" >' + data["sbname"] + '</a></font></span></p></td>' +
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' +
-								'<a href="javascript:ModiBookList(' + data["uid"] + ');" class="n">수정</a>&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;' +
-								'<a href="javascript:DelBookList(' + data["uid"] + ');" class="n">삭제</a></font></span>' +
+								'<a href="javascript:selBook(' + data["uid"] + ');" class="n">수정</a>&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;' +
+								'<a href="javascript:delBook(' + data["uid"] + ');" class="n">삭제</a></font></span>' +
 							'</td>' +
 						'</tr>';
 				}
@@ -1023,7 +1209,7 @@ function InBookList(){
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
 		dataType: "json",
-		url: SETTING_URL + "/books/insert",
+		url: SETTING_URL + "/books/insert_book",
 		async: false,
 		data: JSON.stringify(from),
 		success: function (result) {
