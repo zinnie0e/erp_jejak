@@ -27,15 +27,18 @@ function MsToFulldate(milisecond){
 	return full_date;
 }
 
+function addslashes(str) { 
+	return (str+'').replace(/([\\"'])/g, "\\$1").replace(/\0/g, "\\0");  
+}
+
 function Enter_Check(code){
     // 엔터키의 코드는 13입니다.
-	if(code == 0){
-		if(event.keyCode == 13){
+	if(event.keyCode == 13){
+		if(code == 0){
 			login();
+		}else if(code == 1 || code == 2){
+			SearchBook(code);
 		}
-	}
-	else{
-		if(event.keyCode == 13) SearchBook(code);
 	}
 }
 
@@ -100,8 +103,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	if(page_code == "전체도서검색"){
+	}else if(page_code == "전체도서검색"){
 		$("#data2").html("");
 		
 		$.ajax({
@@ -117,9 +119,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "m2_도서검색"){
+	}else if(page_code == "m2_도서검색"){
 		$("#data2").html("");
 		
 		var from = {key: $("input[name=key]").val()}
@@ -139,9 +139,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "m4_도서검색"){
+	}else if(page_code == "m4_도서검색"){
 		$("#data2").html("");
 		
 		var from = {keyfield: $("select[name=keyfield]").val(), key: $("input[name=key]").val()}
@@ -160,13 +158,11 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	if(page_code == "용지전표"){
+	}else if(page_code == "용지전표"){
 		$("#data5").html("");
 		
 		SearchYjjp(current_page);
-	}
-	if(page_code == "용지등록"){
+	}else if(page_code == "용지등록"){
 		$("#data3").html("");
 		
 		$.ajax({
@@ -182,14 +178,35 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	if(page_code == "용지현재고"){
+	}else if(page_code == "용지현재고"){
 		$("#data8").html("");
 		
 		yjpresent("", "", current_page);
-	}
-	//도서별원가계산서
-	if(page_code == "도서별원가계산서"){
+	}else if(page_code == "제작예정리스트"){
+		$.ajax({
+			type: "POST",
+			url: SETTING_URL + "/jpjejak/select_yejung1",
+			async: false,
+			success: function (result){
+				var json_data = {signdate: result};
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					async: false,
+					url: SETTING_URL + "/jpjejak/select_yejung2_count",
+					data : JSON.stringify(json_data),
+					success: function (result2) {
+						var lm_t = 15;
+						var lm_s = (current_page - 1) * lm_t;
+						SelJpJejakYejung(result, lm_s, lm_t);
+						pasing(result2, current_page, lm_t);
+					}
+				});
+			}
+		});
+		
+		
+	}else if(page_code == "도서별원가계산서"){
 		$("#mcBookCostStatementData").html(""); 
 
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
@@ -213,10 +230,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	//잡물원가계산서
-	if(page_code == "잡물원가계산서"){
+	}else if(page_code == "잡물원가계산서"){
 		$("#mcJMCostStatementData").html(""); 
 
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
@@ -240,8 +254,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	if(page_code == "제품_본문작업지시서"){
+	}else if(page_code == "제품_본문작업지시서"){
 		$("#jpBonData").html("");
 		
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
@@ -265,9 +278,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "잡물_본문작업지시서"){
+	}else if(page_code == "잡물_본문작업지시서"){
 		$("#jmBonData").html("");
 		
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
@@ -291,9 +302,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "발주예정제품리스트"){
+	}else if(page_code == "발주예정제품리스트"){
 		$("#jpBalYjData").html("");
 		
 		var signdate = $("select[name=ty]").val() + $("select[name=tm]").val() + $("select[name=td]").val();
@@ -314,9 +323,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "제품_제작계획표"){
+	}else if(page_code == "제품_제작계획표"){
 		$("#jpJejakplanData").html("");
 		
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
@@ -340,9 +347,7 @@ function goToPage(current_page){
 				pasing(total_record, current_page, lm_t);
 			}
 		});
-	}
-	
-	if(page_code == "잡물_제작계획표"){
+	}else if(page_code == "잡물_제작계획표"){
 		$("#jmJejakplanData").html("");
 		
 		var date1 = new Date($("select[name=ty]").val() + "/" + $("select[name=tm]").val() + "/" + $("select[name=td]").val()).getTime()/1000;
