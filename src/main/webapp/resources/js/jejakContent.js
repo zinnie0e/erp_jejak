@@ -126,22 +126,18 @@ function m4(e) {
 					+ d.getSeconds();
 			(document.getElementById("time_result")).innerHTML = d;
 		}
-	}
-	if (val == "8")
-		SelJpJejakYejung(); 
-	if (val == "9") {
+	} else if (val == "8") {
+		page_code = "제작예정리스트";
+		goToPage(1);
+	} else if (val == "9") {
 		menuTitle = "제품제작진행";
 		page_code = "전체도서검색";
 		goToPage(1);
 	}
-	if (val == "11")
-		SelJpPriceupList(8); // 제품정가인상리스트
-	if (val == "12")
-		SelJpHoldList(7); // 제품보류리스트
-	if (val == "13")
-		SelJpCloseList(9); // 제품폐간리스트
-	if (val == "14")
-		SelJpNewstockList(10); // 신간적정재고관리
+	else if (val == "11") SelJpPriceupList(8); // 제품정가인상리스트
+	else if (val == "12") SelJpHoldList(7); // 제품보류리스트
+	else if (val == "13") SelJpCloseList(9); // 제품폐간리스트
+	else if (val == "14") SelJpNewstockList(10); // 신간적정재고관리
 }
 
 function m5(e) {
@@ -220,7 +216,7 @@ function m8(e) {
 		$("#jejak_middle").css('padding-left', 'calc((100% - 1000px) / 2)');
 	}
 	
-	if (val == "6" || val == "7" || val == "12" || val == "13") {
+	if (val == "6" || val == "7" || val == "12" || val == "13" || val == "14") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(
