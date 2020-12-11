@@ -190,7 +190,7 @@ function m6(e) {
 function m7(e) {
 	val = $(e).attr('value');
 	$('#jejak_detail_view').html(jmenu7(val));
-	if (val == "0" || val == "1" || val == "2" || val == "3" || val == "4" || val == "6" || val == "7" || val == "8" || val == "14") {
+	if (val == "0" || val == "1" || val == "2" || val == "3" || val == "4" || "5" || val == "6" || val == "7" || val == "8" || val == "14") {
 		var d = new Date();
 		for (var i = 2008; i <= d.getFullYear(); i++) {
 			$("select[name=ty]").append(

@@ -13,6 +13,7 @@ function SelBookCostStatement(lm_s, lm_t) {
 	day = day >= 10 ? day : '0' + day;
 	var date2 = new Date($("select[name=ty]").val() + "/"
 			+ $("select[name=tm]").val() + "/" + day).getTime() / 1000;
+
 	var from = {
 		date1 : date1,
 		date2 : date2,
@@ -60,7 +61,6 @@ function SelBookCostStatement(lm_s, lm_t) {
 						full_date = full_date.substring(0, 4) + "-"
 								+ full_date.substring(4, 6) + "-"
 								+ full_date.substring(6, 8);
-
 						htmlString += 
 							'<tr>'+
 							'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ 
@@ -68,7 +68,7 @@ function SelBookCostStatement(lm_s, lm_t) {
 							'</span></td>'+
 							'<td width="90" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ full_date +'</span></td>'+
 							'<td width="90" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["bcode"]+ '-' + data["bucode"] + '</span></td>'+
-							'<td width="320" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;"><a href="javascript:SelBookCostStatementDetail('+ data["uid"] + ',' + full_date.substring(0, 4) + ',' + full_date.substring(5, 7) + ',' + full_date.substring(8, 10)+');" class="n">'+data["bname"]+'</a></span></td>'+
+							'<td width="320" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:5pt;"><a href="javascript:SelBookCostStatementDetail('+ data["uid"] + ',' + full_date.substring(0, 4) + ',' + full_date.substring(5, 7) + ',' + full_date.substring(8, 10) + ',' + lm_s + ',' + lm_t +');" class="n">'+data["bname"]+'</a></span></td>'+
 							'<td width="80" height="30" align="right" style="padding-right:15pt" valign="middle" bgcolor="white"><span style="font-size:9pt;">' + numberWithCommas(data["bnum"]) + '</span></td>'+
 							'<td width="137" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
 						
@@ -1084,7 +1084,7 @@ function SelBookCostStatement(lm_s, lm_t) {
 	
 }
 
-//도서별 원가계산서 용지대 계산
+// 도서별 원가계산서 용지대 계산
 function CalcYJ(uid, yea, mon, dat)
 {
 	logNow("용지대2");
@@ -1130,7 +1130,7 @@ function CalcYJ(uid, yea, mon, dat)
 							type : "POST",
 							contentType : "application/json; charset=utf-8;",
 							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_bookcost_statement35",
+							url : SETTING_URL + "/monthclosing/update_bookcost_statement35",
 							async : false,
 							data : JSON.stringify(from),
 							success : function(result) {
@@ -1241,7 +1241,7 @@ function CalcYJ(uid, yea, mon, dat)
 	});
 }
 
-//도서별 원가계산서 전체 용지대 계산
+// 도서별 원가계산서 전체 용지대 계산
 function CalcYJ2(yea, mon, dat)
 {
 	logNow("용지대1");
@@ -1276,6 +1276,7 @@ function CalcYJ2(yea, mon, dat)
 					async : false,
 					data : JSON.stringify(from),
 					success : function(result) {
+						logNow("--");
 						logNow(result);
 						var object_num = Object.keys(result);
 						for(var j=0; j < Object.keys(result).length; j++)
@@ -1316,7 +1317,7 @@ function CalcYJ2(yea, mon, dat)
 										type : "POST",
 										contentType : "application/json; charset=utf-8;",
 										dataType : "json",
-										url : SETTING_URL + "/monthclosing/select_bookcost_statement35",
+										url : SETTING_URL + "/monthclosing/update_bookcost_statement35",
 										async : false,
 										data : JSON.stringify(from),
 										success : function(result) {
@@ -1340,9 +1341,27 @@ function CalcYJ2(yea, mon, dat)
 	});
 }
 
-//도서별 상세 원가계산서  //lwhee
-function SelBookCostStatementDetail(uid, ty, tm, td, page) {
+// 도서별 상세 원가계산서 부가메뉴
+function ShowLay(objname)
+{
+	logNow(objname);
+	var addLayer = document.getElementById(objname);
+	if (addLayer.style.display == 'none')
+        addLayer.style.display ='block';
+    else
+        addLayer.style.display ='none';
+}
+// 도서별 상세 원가계산서 자동 콤마
+function auto_comma(o) {
+	  var s = o.value.toString(); 
+	  var s2 = s.replace(/(,|\s)+/g,''); 
+	  o.value = s2.replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,'); 
+}
+// 도서별 상세 원가계산서  //lwhee
+function SelBookCostStatementDetail(uid, ty, tm, td, page, lm_s, lm_t) {
 	$('#jejak_detail_view').html(jmenu7("0_상세계산"));
+	logNow(lm_s);
+	logNow(lm_t);
 	var sum_1 = 0; // 필름
     var sum_2 = 0; // 용지
     var sum_3 = 0; // 인쇄
@@ -1472,6 +1491,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		            var t_janh_b4 = CheckJANH(data["sbsbjh4"]);
 		            var t_page_b4 = data["sbsbpg4"];
 		        }
+		        logNow("burok : " + burok);
 
 		        var btype2;
 
@@ -1660,14 +1680,17 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                logNow(result);
 		                                var object_num = Object.keys(result);
 		                                
-		                                for (var i in object_num) {
+		                                for (var i=0; i < object_num.length; i++) {
 		                                    var data = result[object_num[i]];
 		                                    if (!data["sum5"])
 		                                        continue;
-		                                    
+		                                    logNow("필름5 : ");
+		                                    logNow(data);
+		                                    logNow("필름5 : ");
 		                                    sum_1 += data["sum5"];
 		                                    //javascript:SelBookCostStatementSobuModify()
 		                                    htmlString +=
+		                                    	'<form name="cform" method="post" action="ex_view_m1.php">'+
 		                                    	'<input type="hidden" name="uid1" value="'+ uid +'">'+
 		                                        '<input type="hidden" name="ty1" value="'+ ty +'">'+
 		                                        '<input type="hidden" name="tm1" value="'+ tm +'">'+
@@ -1677,7 +1700,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                        '<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+ data["gubn5"] +'</span></td>'+
 		                                        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+ data["panst5"] +'</span></td>'+
 		                                        '<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+
-		                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:center; padding-right:5pt; border-width:1px; border-color:white; width:45px;" name="pannum51" value="';
+		                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:center; padding-right:5pt; border-width:1px; border-color:white; width:45px;" name="pannum" value="';
 		                                    if (data["pannum5"])
 		                                        htmlString += data["pannum5"];
 		                                    htmlString += '"></span></td>' +
@@ -1699,22 +1722,18 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                        htmlString += '&nbsp';
 		                                    htmlString += '</span></td>' +
 		                                        '<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+
-		                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:40px;" name="daeji5[]" value="'; if (data["daeji5"]) { htmlString += data["daeji5"]; } htmlString += '">'+'</span></td>'+
+		                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:40px;" name="daeji5" value="'; if (data["daeji5"]) { htmlString += data["daeji5"]; } htmlString += '">'+'</span></td>'+
 		                                        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">' + data["sobudan5"] + '</span></td>'+
 		                                        '<td width="60" name="sobu" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(data["sobu5"]) + '</span></td>'+
 		                                        '<td width="75" height="25" align="right" valign="middle"style="padding-right:10;" width="66" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;"><span style="font-size:9pt;">'+ numberWithCommas(data["sum5"])+ '</span></td>'+
-	                                        '</tr>' + '<input type="hidden" name="daeid1" value="'+ data["uid"] + '">'+
+	                                        '</tr>' + '<input type="hidden" name="daeid" value="'+ data["uid"] + '">'+
+	                                        '<input type="hidden" name="pannum1" value="'+ data["pannum5"] + '">'+
 	                                        '<input type="hidden" name="sobusum1" value="'+ data["sobu5"] +'">';
-		                                        var input = $("input[name=pannum51]").val()
-        		                                json = {
-        		                                		data : input
-        		                                }
-                                                logNow("json : " + json); 
 		                                }
 		                                
 		                                if (burok) {
 		                                    for (var i = 1; i <= burok; i++) {
-		                                        var bur_uid = uid + i;
+		                                        var bur_uid = Number(uid) + Number(i);
 		                                        logNow(uid + "유아디");
 		                                        logNow(bur_uid + "비유알");
 		                                        var from = {
@@ -1735,16 +1754,17 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                                    if (data["sum5"])
 		                                                        sum_1 += burdata["sum5"];
 
-		                                                    htmlString += '<tr>'
+		                                                    htmlString += '<tr>'+
 		                                                        '<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+ burdata["gubn5"] +'</span></td>'+
 		                                                        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+ burdata["panst5"] +'</span></td>'+
 		                                                        '<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+
-		                                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:center; padding-right:5pt; border-width:1px; border-color:white; width:45px;" name="pannum51" value="';
-		                                                    if (burdata["pannum5"])
+		                                                        '<INPUT style="font-family:굴림; font-size:9pt; text-align:center; padding-right:5pt; border-width:1px; border-color:white; width:45px;" name="pannum" value="';
+		                                                    if (burdata["pannum5"]){
 		                                                        htmlString += 
 		                                                        	burdata["pannum5"] +'">' + '</span></td>'+
 		                                                            '<td width="50" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+
 		                                                            '<INPUT style="font-family:굴림; font-size:9pt; text-align:center; padding-right:5pt; border-width:1px; border-color:white; width:45px;" name="filmnum5[]" value="';
+		                                                    }
 		                                                    if (burdata["filmnum5"])
 		                                                        htmlString += burdata["filmnum5"];
 		                                                    htmlString +=
@@ -1773,22 +1793,14 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                                        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'+ data["sobudan5"] +'</span></td>'+
 		                                                        '<td width="60" name="sobu" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(burdata["sobu5"]) +'</span></td>'+
 		                                                        '<td width="75" height="25" align="right" valign="middle"style="padding-right:10;" width="66" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;"><span style="font-size:9pt;">'+ numberWithCommas(burdata["sum5"]) +'</span></td>'+
-		                                                        '<input type="hidden" name="daeid1" value="'+ burdata["uid"] +'">'+
+		                                                        '<input type="hidden" name="daeid" value="'+ burdata["uid"] +'">'+
+		                                                        '<input type="hidden" name="pannum1" value="'+ burdata["pannum5"] + '">'+
 		                                                        '<input type="hidden" name="daesum1" value="'+ burdata["sum5"] +'">'+
 		                                                        '</tr>';
-		                                                    logNow("니 좀 보자");
-		                                                    logNow(burdata);
-		                                                    logNow("니 좀 보자");
 		                                                }
 		                                            });
 		                                    }
 		                                }
-		                                var input = $("input[name=pannum51]").val()
-                                        logNow("input : " + input);
-		                                json = {
-		                                		data : input
-		                                }
-                                        logNow("json : " + json);
 		                                htmlString += 
 		                                	'<tr>'+
 		                                	'<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="30" align="center" valign="middle"><span style="font-size:9pt;">계</span></td>'+
@@ -1801,8 +1813,9 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                	'</tr>'+
 		                                	'<tr>'+
 		                                	'<td width="580" colspan="2" height="20" align="right">'+
-		                                	'<input type="submit" onclick="javascript:SelBookCostStatementSobuModify('+ object_num.length +');" value="소부.대지 수정"></td>'+
+		                                	'<input type="submit" onclick="javascript:SobuModify('+ object_num.length +');" value="소부.대지 수정"></td>'+
 		                                	'</tr>'+
+		                                	'</form>'+
 		                                	'</form>'+
 		                                	'<tr>'+
 		                                	'<td width="580" colspan="2" height="20"></td>'+
@@ -1884,10 +1897,10 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 	                                                '<td width="84" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'; if (data["ycost"]) htmlString += numberWithCommas(data["ycost"]); else htmlString += numberWithCommas(ytotcost); htmlString += '</span></td>' +
 	                                                '<td width="34" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += t_colo + ' ˚'; else htmlString += '&nbsp;'; htmlString += '</span></td>' +
 	                                                '<td width="60" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">' +
-	                                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="pdanga[]" value="'; if (t_colo) htmlString += data["pdanga"]; else htmlString += '&nbsp;'; htmlString += '"></span></td>' +
+	                                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="pdanga" value="'; if (t_colo) htmlString += data["pdanga"]; else htmlString += '&nbsp;'; htmlString += '"></span></td>' +
 	                                                '<td width="53" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="25" align="right" valign="middle"><span style="font-size:9pt;">' +
-	                                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="rnum[]" value="'; if (t_colo) htmlString += data["rnum"]; else htmlString += '&nbsp;'; htmlString += '">' +
-	                                                	'<input type="hidden" name="uids[]" value="' + data["uid"] + '"></span></td>' +
+	                                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="rnum" value="'; if (t_colo) htmlString += data["rnum"]; else htmlString += '&nbsp;'; htmlString += '">' +
+	                                                	'<input type="hidden" name="uids" value="' + data["uid"] + '"></span></td>' +
 	                                                '<td style="padding-right:10;" width="97" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += numberWithCommas(data["pcost"]); else htmlString += '&nbsp'; htmlString += '</span></td>' +
                                                 '</tr>';
 		                                }
@@ -1908,8 +1921,8 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                                success: function (result) {
 		                                                    logNow(result);
 		                                                    var object_num = Object.keys(result);
-
-		                                                    for (var i in object_num) {
+		                                                    
+		                                                    for (var i=0; i < object_num.length; i++) {
 		                                                        var data = result[object_num[i]];
 		                                                        t_jm1 = Math.floor(data["jm"] / 500);
 		                                                        t_jm2 = data["jm"] % 500;
@@ -1922,6 +1935,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                                            t_colo += 1;
 		                                                        sum_3 += data["pcost"];
 		                                                        sum_2 += data["ycost"];
+		                                                        
 
 		                                                        htmlString +=
 		                                                            '<tr>' +
@@ -1956,7 +1970,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                    '</tr>' +
 		                                    '<tr>' +
 		                                    	'<td width="580" colspan="2" height="20" align="right">' +
-		                                    		'<span style="font-size:8pt;">* 정미,여분은 본문작업지시서 에서 수정</span>&nbsp;&nbsp;&nbsp;<input type="submit" value="인쇄비 수정"></td>' +
+		                                    		'<span style="font-size:8pt;">* 정미,여분은 본문작업지시서 에서 수정</span>&nbsp;&nbsp;&nbsp;<input type="submit" onclick="javascript:SelBookCostStatementPrintModify('+ object_num.length +');" value="인쇄비 수정"></td>' +
 		                                    '</tr>' +
 		                                    '</form>' +
 		                                    '<tr>' +
@@ -1967,7 +1981,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                    '</tr>' +
 		                                    '<tr>' +
 		                                    	'<td width="580" align="center" valign="top" colspan="2">' +
-				                                    '<table border="0" cellpadding="0" cellspacing="0" width="580">' +
+				                                    '<table border="0" name="here" cellpadding="0" cellspacing="0" width="580">' +
 				                                    '<tr>' +
 					                                    '<td width="77" style="border-width:1px; border-color:black; border-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">장형</span></td>' +
 					                                    '<td width="77" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="20" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">면수</span></td>' +
@@ -2028,21 +2042,21 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                        '<tr>' +
 			                        '<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-right-width:1px; border-bottom-color:black; border-left-color:black; border-right-color:black; border-bottom-style:solid; border-left-style:solid; border-right-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+ t_janh + '</span></td>' +
 			                        '<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' +
-			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cpage[]" value="' + result[0]["cpage7"] + '"></span></td>' +
+			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cpage" value="' + result[0]["cpage7"] + '"></span></td>' +
 			                        '<td width="77" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' +
-			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice1[]" value="' + result[0]["cprice17"] + '"></span></td>' +
+			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice1" value="' + result[0]["cprice17"] + '"></span></td>' +
 			                        '<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' +
-			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="pdanga[]" value="' + result[0]["pdanga7"] + '"></span></td>' +
+			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="jebonPdanga" value="' + result[0]["pdanga7"] + '"></span></td>' +
 			                        '<td width="60" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' + numberWithCommas(result[0]["cnum7"]) + '</span></td>' +
 			                        '<td width="70" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' +
-			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice2[]" value="' + result[0] ["cprice27"] + '"></span></td>' +
-			                        '<td style="padding-right:10;" width="106" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="right" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' + numberWithCommas(sum_4) + '<input type="hidden" name="uids[]" value="' + result[0]["uid"] + '"></span></td>' +
+			                        	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice2" value="' + result[0] ["cprice27"] + '"></span></td>' +
+			                        '<td style="padding-right:10;" width="106" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="right" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' + numberWithCommas(sum_4) + '<input type="hidden" name="jebonUids" value="' + result[0]["uid"] + '"></span></td>' +
 		                        '</tr>';
 		                }
 		            });
 		        if (burok) {
 		            sum_41 = 0;
-		            bur_uid = uid + 1;
+		            bur_uid = Number(uid) + Number(1);
 		            logNow(bur_uid);
 		            from = {
 		                bur_uid: bur_uid
@@ -2100,16 +2114,16 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                '<tr>' +
 			                                '<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-right-width:1px; border-bottom-color:black; border-left-color:black; border-right-color:black; border-bottom-style:solid; border-left-style:solid; border-right-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">'+bu_janh+'</span></td>' +
 			                                '<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt;">' +
-			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cpage[]" value="' + biData["cpage7"] + '"></span></td>' +
+			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cpage" value="' + biData["cpage7"] + '"></span></td>' +
 			                                '<td width="77" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">' +
-			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice1[]" value="' + biData["cprice17"] + '"></span></td>' +
+			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice1" value="' + biData["cprice17"] + '"></span></td>' +
 			                                '<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt;">' +
-			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="pdanga[]" value="' + biData["pdanga7"] + '"></span></td>' +
+			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="jebonPdanga" value="' + biData["pdanga7"] + '"></span></td>' +
 			                                '<td width="60" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="25" align="center" valign="middle"><span style="font-size:9pt;">' + numberWithCommas(biData["cnum7"]) + '</span></td>' +
 			                                '<td width="70" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="center" valign="middle"><span style="font-size:9pt;">' +
-			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice2[]" value="' + biData["cprice27"] + '"></span></td>' +
+			                                	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice2" value="' + biData["cprice27"] + '"></span></td>' +
 			                                '<td style="padding-right:10;" width="106" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="25" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_4b) +
-			                                	'<input type="hidden" name="uids[]" value="' + biData["uid"] + '"></span></td>' +
+			                                	'<input type="hidden" name="jebonUids" value="' + biData["uid"] + '"></span></td>' +
 		                                '</tr>';
 		                        }
 		                    });
@@ -2138,7 +2152,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		            '</tr>' +
 		            '<tr>' +
 		            	'<td width="580" colspan="2" height="20" align="right">' +
-		            		'<span style="font-size:8pt;"><input type="submit" value="제본비 수정"></td>' +
+		            		'<span style="font-size:8pt;"><input type="submit" onclick="javascript:SelBookCostStatementJebonModify();" value="제본비 수정"></td>' +
 		            '</tr>' +
 		            '</form>' +
 		            '<tr>' +
@@ -2178,40 +2192,41 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                            	if (q == 0) htmlString += '<b> 4. 코팅비 (비닐코팅)</b>'; htmlString +='</span></td>' +
 			                            '<td width="80" height="30" align="center" valign="middle"><span style="font-size:9pt;"></span></td>' +
 			                            '<td width="279" height="30" align="center" valign="middle"><span style="font-size:9pt;">' +
-			                            	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cnum[]" value="' + biksData["cnum8"] + '">' + 'R  ×  ' +
-			                            	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice[]" value="' + biksData["cprice8"] + '">' + '원  ×  1.1   <a href="javascript:DelCoat(\'' + biksData["uid"] + '\');">( ' + biksData["wcname"] + ' )</a></span></td>' +
-		                            	'<td width="81" height="30" align="right" style="padding-right:10;" valign="middle"><span style="font-size:9pt;">' + numberWithCommas(t_sum5) + '<input type="hidden" name="uids[]" value="' + biksData["uid"] + '"></span></td>' + '</tr>';
+			                            	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cnum" value="' + biksData["cnum8"] + '">' + 'R  ×  ' +
+			                            	'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name="cprice" value="' + biksData["cprice8"] + '">' + '원  ×  1.1   <a href="javascript:SelBookCostStatementCCDelete(\'' + biksData["uid"] + '\');">( ' + biksData["wcname"] + ' )</a></span></td>' +
+		                            	'<td width="81" height="30" align="right" style="padding-right:10;" valign="middle"><span style="font-size:9pt;">' + numberWithCommas(t_sum5) + '<input type="hidden" name="coatingUids" value="' + biksData["uid"] + '"></span></td>' + '</tr>';
 		                    }
 		                    
 		                    htmlString +=
-		                        '</table>' +
+		                    	'</table>'+
 		                        '</td>' +
 		                        '</tr>' +
 		                        '<tr>' +
 			                        '<td width="580" colspan="2" height="20" align="right">' +
-			                        	'<span style="font-size:9pt;"><a href="javascript:ShowLay(\'coatin\');">| 코팅비 추가 |</a></span>&nbsp;&nbsp;' +
-			                        	'<span style="font-size:8pt;"><input type="submit" value="코팅비 수정"></td>' +
+			                        	'<span style="font-size:9pt;"><a href="javascript:this.ShowLay(\'coatin\');">| 코팅비 추가 |</a></span>&nbsp;&nbsp;' +
+			                        	'<span style="font-size:8pt;"><input type="submit" onclick="SelBookCostStatementCCModify();" value="코팅비 수정"></td>' +
 		                        '</tr>' +
 		                        '</form>' +
 		                        '<tr style="display:none;" id="coatin">' +
 		                        	'<form name="coatform" method="post" action="ex_view_m4a.php" target="tFrm">' +
-		                        		'<input type="hidden" name="uid" value="<?=$uid?>">' +
+		                        		'<input type="hidden" name="coatuid" value="'+ uid +'">' +
 		                        		'<td width="580" colspan="2" height="20" align="center"><span style="font-size:9pt;">' +
-		                        		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'cnum\'> R &nbsp;&nbsp;&nbsp;' +
-		                        		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'cprice\'> 원 &nbsp;&nbsp;&nbsp;' +
-		                        		'<input type="submit" value="추가"></span></td>' +
+		                        		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'coatcnum\'> R &nbsp;&nbsp;&nbsp;' +
+		                        		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'coatcprice\'> 원 &nbsp;&nbsp;&nbsp;' +
+		                        		'<input type="submit" onclick="javascript:SelBookCostStatementCCInsert();"  value="추가"></span></td>' +
 	                        		'</form>' +
 		                        '</tr>' +
 
 		                        '<form name="gform" method="post" action="ex_view_m5.php">' +
-		                        	'<input type="hidden" name="uid" value="<?=$uid?>">' +
-		                        	'<input type="hidden" name="ty" value="<?=$ty?>">' +
-		                        	'<input type="hidden" name="tm" value="<?=$tm?>">' +
-		                        	'<input type="hidden" name="td" value="<?=$td?>">' +
-		                        	'<input type="hidden" name="page" value="<?=$page?>">';
+		                        	'<input type="hidden" name="uid" value="'+ uid +'">' +
+		                        	'<input type="hidden" name="ty" value="'+ ty +'">' +
+		                        	'<input type="hidden" name="tm" value="'+ tm +'">' +
+		                        	'<input type="hidden" name="td" value="'+ td +'">' +
+		                        	'<input type="hidden" name="page" value="'+ page +'">';
 		                }
 		            });
 		        var cust6 = "";
+		        logNow("uid : " + uid);
 		        var from = {
 		            uid: uid
 		        }
@@ -2221,16 +2236,18 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                dataType: "json",
 		                url: SETTING_URL+ "/monthclosing/select_bookcost_statement16",
 		                async: false,
-		                data: JSON
-		                    .stringify(from),
+		                data: JSON.stringify(from),
 		                success: function (result) {
 		                    var object_num = Object.keys(result);
 		                    var data = result[object_num];    
 		                    if (Object.keys(result).length>0) {
-		                    	logNow(result);
+		                    	logNow("qqqqqqqqqqqq");
+		                    	logNow(data);
 		                        var bi9Data = result[object_num];
 		                        sum_6 += bi9Data["cprice9"];
 		                        var uid9 = bi9Data["uid"];
+		                        logNow("asdsdgadg");
+		                        logNow(bi9Data["ccode9"]);
 		                        from = {
 		                            ccode9: bi9Data["ccode9"]
 		                        }
@@ -2245,8 +2262,8 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                                    .stringify(from),
 		                                success: function (result) {
 		                                    var object_num = Object.keys(result);
-		                                    var wcname = result[object_num];
-		                                    cust6 = wcname["wcname"];
+		                                    var row5 = result[object_num];
+		                                    cust6 = row5["wcname"];
 		                                }
 		                            });
 		                    }
@@ -2278,10 +2295,10 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                    	'</form>'+
 	                    		'<tr style="display:none;" id="vyn">'+
 		                    		'<form name="vynform" method="post" action="ex_view_m5a.php" target="tFrm">'+
-	                    			'<input type="hidden" name="uid" value="'+ uid +'">'+
-		                    		'<td width="580" colspan="2" height="20" align="center"><span style="font-size:9pt;">                        	'+
-		                    		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'cprice\'> 원 &nbsp;&nbsp;&nbsp;'+
-		                    		'<input type="submit" value="추가"></span></td>'+
+	                    			'<input type="hidden" name="buid" value="'+ uid +'">'+
+		                    		'<td width="580" colspan="2" height="20" align="center"><span style="font-size:9pt;">'+
+		                    		'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:50px;" name=\'bprice\'> 원 &nbsp;&nbsp;&nbsp;'+
+		                    		'<input type="submit" onclick="javascript:SelBookCostStatementVinylInsert();" value="추가"></span></td>'+
 		                    		'</form>'+
 		                    	'</tr>'+
 	                    		'<tr>'+
@@ -2312,7 +2329,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 						                type: "POST",
 						                contentType: "application/json; charset=utf-8;",
 						                dataType: "json",
-						                url: SETTING_URL+ "/monthclosing/select_bookcost_statement19",
+						                url: SETTING_URL+ "/monthclosing/insert_bookcost_statement19",
 						                async: false,
 						                data: JSON.stringify(from),
 						                success: function (result) {
@@ -2362,7 +2379,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		        			                type: "POST",
 		        			                contentType: "application/json; charset=utf-8;",
 		        			                dataType: "json",
-		        			                url: SETTING_URL+ "/monthclosing/select_bookcost_statement20",
+		        			                url: SETTING_URL+ "/monthclosing/update_bookcost_statement20",
 		        			                async: false,
 		        			                data: JSON.stringify(from),
 		        			                success: function (result) {
@@ -2407,7 +2424,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 			                			'<td width="10" height="30" align="center" valign="middle">:</td>'+
 			                			'<td width="90" height="30" align="right" style="padding-right:10pt">'+
 				                			'<p style="margin-left:5px;"><span style="font-size:9pt;">'+
-				                			'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:80px;" name=\'w6\' onkeyup=\'auto_comma(this);\' value="'; if (data["w6"]) numberWithCommas(data["w6"]); htmlString+='">'+
+				                			'<INPUT style="font-family:굴림; font-size:9pt; text-align:right; padding-right:5pt; border-width:1px; border-color:white; width:80px;" name=\'w6\' onkeyup=\'auto_comma(this);\' value="'; if (data["w6"]) htmlString += numberWithCommas(data["w6"]); htmlString+='">'+
 				                			'</span></p>'+
 			                			'</td>'+
 			                			'<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
@@ -2448,7 +2465,7 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 		                			'</tr>'+
 		                			'<tr>'+
 		                				'<td width="580" colspan="8" height="30" align="right"><span style="font-size:9pt;">'+
-		                				'<input type="submit" value="기타 수정"></span></td>'+
+		                				'<input type="submit" onclick="SelBookCostStatementEtc('+ uid +');" value="기타 수정"></span></td>'+
 		                			'</tr>'+
 		                			'</form>'+
 		                			'</table>'+
@@ -2569,16 +2586,20 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 			    				'<table border="0" cellpadding="20" cellspacing="1" width="580" bgcolor="#FFFFFF">'+
 			    					'<tr>'+
 			    						'<td align="center" width="620" height="20">'+
-			    							'<input type="button" value="목록으로" onClick="javascript:goToPage(2);">&nbsp;&nbsp;'+ 
-			    							'<input type="button" id="btnBookCostStatementPrint" value="인 쇄">&nbsp;&nbsp;'+
-			    							'<input type="button" value="거래처변경" onClick="javascript:ChComm('+ uid + ');">&nbsp;&nbsp;'+
-			    							'<input type="button" value="신코드 변경" onClick="javascript:ChPrice('+ uid + ');">'+
+			    						'<form>'+
+			    							//'<input type="submit" value="목록으로" onclick="javascript:SelBookCostStatement('+lm_s+','+ lm_t +');">&nbsp;&nbsp;'+
+			    							//'<input type="button" value="목록으로" onclick="javascript:m7(0);">&nbsp;&nbsp;'+
+			    							'<input type="button" value="목록으로" onclick="javascript:test('+ ty + ',' + tm + ',' + td +');">&nbsp;&nbsp;'+
+			    							'<input type="button" id="btnBookCostStatementDetailPrint" value="인 쇄">&nbsp;&nbsp;'+
+			    							'<input type="button" id="btnChangeAccountModify" value="거래처변경" >&nbsp;&nbsp;'+
+			    							'<input type="button" value="신코드 변경" onClick="javascript:btnNewCodeModify('+ uid +');">'+
+			    						'</form>'+
 					    				'</td></tr>'+
 			    				'<form name="frmChk" method="post" action="inse_pr5.php">'+
-			    					'<input type="hidden" name="uid" value="<'+ uid + '>">';
+			    					'<input type="hidden" name="pruid" value="'+ uid + '">';
 			    				if (chk_jg)  htmlString +=
 			    					'<tr><td align="center" width="620" height="20"><span style="font-size:9pt;">'+
-			    						'지불예정일 : <input type="text" size="5" name="pdate" maxlength="4">&nbsp;&nbsp;<input type="button" value="지출결의서 인쇄" onClick="javascript:Pr_1();">'+
+			    						'지불예정일 : <input type="text" size="5" name="pdate" maxlength="4">&nbsp;&nbsp;<input type="button" value="지출결의서 인쇄" id="btnPr_1Print">'+
 			    						'</span></td></tr>';
 			    				
 			    				htmlString += '</form>'+
@@ -2590,93 +2611,3846 @@ function SelBookCostStatementDetail(uid, ty, tm, td, page) {
 			    	$("#mcBookCostStatementDetailData2").html(htmlString);
 		    }
 		});
+	document.getElementById("btnBookCostStatementDetailPrint").onclick = function() {// 인쇄 //lwhee
+		var t_URL = "/popup?print";
+		if (popUp && !popUp.closed) {
+			popUp.close();
+		}
+		popUp = window
+				.open(
+						t_URL,
+						"PopUpPrintjejakplan",
+						'left=0,top=0,width=820,height=500,toolbar=no,menubar=no,status=no,scrollbars=yes,resizable=yes');// DATEW
+		popUp.document.write(jmenu7("0_상세계산인쇄"));		
+		htmlString = "";
+		
+		//전역 변수
+		var ppp = 0;
+		var bur_uid;
+		var ytotcost = 0;
+		var totcost7 = 0;
+		var sum_41 = 0;
+		var rec_num=0;
+		var total_record=0;
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement58",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				total_record = object_num.length;
+				for(i in object_num){
+					var row10 = result[object_num[i]];
+					logNow(row10);
+					var btype2;
+					var burok = 0;
+					var t_panh_b1 = 0;
+					var t_panh_b2 = 0;
+					var t_panh_b3 = 0;
+					var t_panh_b4 = 0;
+					var t_janh_b1 = 0;
+					var t_janh_b2 = 0;
+					var t_janh_b3 = 0;
+					var t_janh_b4 = 0;
+					var t_page_b1 = 0;
+					var t_page_b2 = 0;
+					var t_page_b3 = 0;
+					var t_page_b4 = 0;
+					if (row10["sbsbph1"])
+					{
+						burok += 1;
+						t_panh_b1 = row10["sbsbph1"];
+						t_janh_b1 = CheckJANH(row10["sbsbjh1"]);
+						t_page_b1 = row10["sbsbpg1"];
+						}
+					if (row10["sbsbph2"])
+					{
+						burok += 1;
+						t_panh_b2 = row10["sbsbph2"];
+						t_janh_b2 = CheckJANH(row10["sbsbjh2"]);
+						t_page_b2 = row10["sbsbpg2"];
+						}
+					if (row10["sbsbph3"])
+					{
+						burok += 1;
+						t_panh_b3 = row10["sbsbph3"];
+						t_janh_b3 = CheckJANH(row10["sbsbjh3"]);
+						t_page_b3 = row10["sbsbpg3"];
+						}
+					if (row10["sbsbph4"])
+					{
+						burok += 1;
+						t_panh_b4 = row10["sbsbph4"];
+						t_janh_b4 = CheckJANH(row10["sbsbjh4"]);
+						t_page_b4 = row10["sbsbpg4"];
+						}
+					switch (row10["btype"])
+					{
+					case 1:
+						btype2 = "신간";
+						break;
+					case 2:
+						btype2 = "재판";
+						break;
+					case 3:
+						btype2 = "개정";
+						break;
+						}
+					rec_num++;
+					uid = row10["uid"];
+				htmlString +=
+					'<table border="0" cellpadding="20" cellspacing="1" width="620" bgcolor="white">'+
+						'<tr>'+
+							'<td bgcolor="white" width="100%" height="10"></td>'+
+						'</tr>'+
+					'</table>'+
+					'<table border="0" cellpadding="20" cellspacing="1" width="620" bgcolor="#333333">'+
+						'<tr>'+
+						'<td width="620" bgcolor="white" align="center" valign="top">'+
+							'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+								'<tr>'+
+									'<td width="580" align="center" valign="top" colspan="2">'+
+										'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+											'<tr>'+
+												'<td width="260" align="left" valign="middle">'+
+													'<p align="right"><b><span style="font-size:18pt;">원 가 계 산 서</span></b></p>'+
+													'</td>'+                                
+												'<td width="44"></td>'+
+												'<td width="276" align="right" valign="middle">'+
+													'<table border="0" cellpadding="2" cellspacing="1" width="270" bgcolor="black" height="50">'+
+														'<tr>'+
+															'<td width="50" bgcolor="white" height="50" align="center" valign="middle">&nbsp;</td>'+
+															'<td width="50" height="50" align="center" valign="middle" bgcolor="white">&nbsp;</td>'+
+															'<td width="50" height="50" align="center" valign="middle" bgcolor="white">&nbsp;</td>'+
+															'<td width="50" height="50" align="center" valign="middle" bgcolor="white">&nbsp;</td>'+
+															'<td width="50" height="50" align="center" valign="middle" bgcolor="white">&nbsp;</td>'+
+															'<td width="30" height="50" align="center" valign="middle" bgcolor="white">'+
+																'<p style="line-height:18px;"><span style="font-size:9pt;">결<br>제</span></p>'+
+															'</td>'+
+														'</tr>'+
+													'</table>'+
+												'</td>'+
+											'</tr>'+
+										'</table>'+
+									'</td>';
+				var sbuprc = row10["sbuprc"];
+				
+				var t_panh = row10["sbpanh"];
+				var t_janh2 = row10["sbjanh"];
+				var bookcode = row10["bcode"];
+				var mknum = row10["bnum"];
+
+				var m1_name = row10["wcname"];
+				var m2 = row10["m2"];
+				var m3 = row10["m3"];
+				var m4 = row10["m4"];
+				var m5 = row10["m5"];
+				var m6 = row10["m6"];
+				var m7 = row10["m7"];
+				var m8 = row10["m8"];
+				var m9 = row10["m9"];
+				switch (row10["sbpanh"])
+				{
+					case "A3" :
+						ppp = 8;
+						break;
+					case "A4" :
+						ppp = 16;
+						break;
+					case "A5" :
+						ppp = 32;
+						break;
+					case "A6" :
+						ppp = 64;
+						break;
+					case "B4" :
+						//ppp = 16;
+						ppp = 8;
+						break;
+					case "B5" :
+						//ppp = 32;
+						ppp = 16;
+						break;
+					case "B6" :
+						//ppp = 64;
+						ppp = 32;
+						break;		
+					default :
+						ppp = 16;
+						break;
+				}
+				
+				var t_janh = CheckJANH(row10["sbjanh"]);
+				htmlString +=
+					'</tr>'+
+                    '<tr>'+
+                    	'<td width="290" align="left" valign="middle" height="30"><span style="font-size:9pt;"><font color="black"> 제작번호 : '+ row10["crnum"] +' / ' + row10["bcode"] + '</font></span></td>'+
+                    	'<td width="290" height="30" align="right" valign="middle"><span style="font-size:9pt;"><font color="black">' + ty + ' 년 ' + ("0" + tm).slice(-2) + ' 월 ' + ("0" + td).slice(-2) + ' 일' + '</font></span></td>'+
+                    '</tr>'+
+                    '<tr>'+
+                        '<td width="580" align="center" valign="top" colspan="2">'+
+                            '<table border="0" cellpadding="2" cellspacing="1" width="580" bgcolor="black">'+
+                                '<tr>'+
+                                    '<td width="220" align="center" valign="middle" bgcolor="#F4F4F4" height="25">'+
+                                        '<p><span style="font-size:9pt; letter-spacing:33pt;">도서명</span></p>'+
+                                    '</td>'+
+                                    '<td width="50" align="center" valign="middle" bgcolor="#F4F4F4" height="22"><span style="font-size:9pt; letter-spacing:7pt;">구분</span></td>'+
+                                    '<td width="80" align="center" valign="middle" bgcolor="#F4F4F4" height="22"><span style="font-size:9pt; letter-spacing:12pt;">판형</span></td>'+
+                                    '<td width="80" align="center" valign="middle" bgcolor="#F4F4F4" height="22"><span style="font-size:9pt; letter-spacing:12pt;">장형</span></td>'+
+                                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="22"><span style="font-size:9pt; letter-spacing:10pt;">면수</span></td>'+
+                                    '<td width="90" align="center" valign="middle" bgcolor="#F4F4F4" height="22"><span style="font-size:9pt; letter-spacing:6pt;">제작부수</span></td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<td width="220" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">' + row10["bname"] +' - '+ row10["bcode"] +'</span></td>'+
+                                    '<td width="50" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">'+ btype2 +'</span></td>' +
+                                    '<td width="80" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">'+
+                                    row10["sbpanh"];
+									if (t_panh_b1)
+										htmlString += ' / ' + t_panh_b1;
+									if (t_panh_b2)
+										htmlString += ' / ' + t_panh_b2;
+									if (t_panh_b3)
+										htmlString += ' / ' + t_panh_b3;
+									if (t_panh_b4)
+										htmlString += ' / ' + t_panh_b4;
+                                    htmlString += '<td width="80" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">'+ t_janh;
+                                    if (t_janh_b1)
+        		                        htmlString += ' / ' + t_janh_b1;
+        		                    if (t_janh_b2)
+        		                        htmlString += ' / ' + t_janh_b2;
+        		                    if (t_janh_b3)
+        		                        htmlString += ' / ' + t_janh_b3;
+        		                    if (t_janh_b4)
+        		                        htmlString += ' / ' + t_janh_b4;
+        		                    htmlString += '</span></td>'+
+                                    '<td width="60" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">' + row10["bmyun"];
+                                    if (t_page_b1)
+        		                        htmlString += ' / ' + t_page_b1;
+        		                    if (t_page_b2)
+        		                        htmlString += ' / ' + t_page_b2;
+        		                    if (t_page_b3)
+        		                        htmlString += ' / ' + t_page_b3;
+        		                    if (t_page_b4)
+        		                        htmlString += ' / ' + t_page_b4;
+        		                    htmlString += '</span></td>'+
+                                    '<td width="90" align="center" valign="middle" bgcolor="white" height="22"><span style="font-size:9pt;">'+ numberWithCommas(row10["bnum"]) +'</span></td>'+
+                                '</tr>'+
+                                '</table>'+
+                                '</td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                	'<td width="580" colspan="2" height="10"></td>'+
+                            	'</tr>'+
+                        		'<tr>'+
+                        			'<td width="580" align="left" valign="middle" colspan="2" height="25"><span style="font-size:9pt;"><b>1. 필름 대지 소부비</b></span></td>'+
+                    			'</tr>'+
+                    			'<tr>'+
+                    				'<td width="580" align="center" valign="top" colspan="2">'+
+                    					'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+                    						'<tr>'+
+										        '<td width="54" style="border-width:1px; border-color:black; border-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">구분</span></td>'+
+										        '<td width="55" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">판종</span></td>'+
+										        '<td width="50" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">판수</span></td>'+
+										        '<td width="50" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">필름량</span></td>'+
+										        '<td width="55" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">필 름<br>단 가</span></td>'+
+										        '<td width="65" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">필 름<br>금 액</span></td>'+
+										        '<td width="50" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:1pt;">대지비</span></td>'+
+										        '<td width="55" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">소 부<br>단 가</span></td>'+
+										        '<td width="60" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:3pt;">소부비</span></td>'+
+										        '<td width="75" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">(*1.1)  계</span></td>'+
+										    '</tr>';
+        		var t_myun = row10["bmyun"];
+        		
+        		var sum_1 = 0; // 필름
+        		var sum_2 = 0; // 용지
+        		var sum_3 = 0; // 인쇄
+        		var sum_4 = 0; // 제본
+        		var sum_5 = 0; // 코팅
+        		var sum_6 = 0; // 비닐
+        		var sum_7 = 0; // 원고
+        		var sum_8 = 0; // 저작
+        		var sum_9 = 0; // 출력
+        		var sum_10 = 0; // 사보
+        		var sum_11 = 0; // 증지
+        		var sum_12 = 0; // 케이스
+        		var sum_13 = 0; // 기타
+        		from = {
+        				uid : uid
+        		}
+        		$.ajax({
+        			type : "POST",
+        			contentType : "application/json; charset=utf-8;",
+        			dataType : "json",
+        			url : SETTING_URL + "/monthclosing/select_bookcost_statement26",
+        			async : false,
+        			data : JSON.stringify(from),
+        			success : function(result) {
+        				logNow(result);
+        				var object_num = Object.keys(result);
+        				for( i in object_num){
+        					row = result[object_num[i]];
+        					if (!row["sum5"])
+        						continue;
+        					sum_1 += row["sum5"];
+        					htmlString +=
+        						'<tr>'+
+							        '<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'+ row["gubn5"] +'</span></td>'+
+							        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'+ row["panst5"] +'</span></td>'+
+							        '<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ row["pannum5"] +'</span></td>'+
+							        '<td width="50" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (row["filmnum5"]) htmlString += row["filmnum5"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+							        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (row["filmnum5"]) htmlString += numberWithCommas(row["filmdan5"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+							        '<td width="65" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; 
+						        if (row["filmnum5"])
+						        	htmlString += numberWithCommas(row["filmdan5"]);
+                                else
+                                    htmlString += '&nbsp;'; htmlString += '</span></td>'+
+							        '<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (row["filmnum5"]) htmlString += numberWithCommas(row["filmcost5"]); else htmlString += '&nbsp'; htmlString += '</span></td>'+
+							        '<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ row["sobudan5"] +'</span></td>'+
+							        '<td width="60" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(row["sobu5"]) +'</span></td>'+
+							        '<td width="75" height="22" align="right" valign="middle" width="66" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;"><span style="font-size:9pt;">'+ numberWithCommas(row["sum5"]) +'</span></td>'+
+						        '</tr>';
+						        }
+        				if (burok)
+        				{	
+        					for (var i = 1 ; i <= burok ; i++)
+        					{
+        						bur_uid = uid + i;
+        						from = {
+        								bur_uid
+        						};
+        						$.ajax({
+        							type : "POST",
+        							contentType : "application/json; charset=utf-8;",
+        							dataType : "json",
+        							url : SETTING_URL + "/monthclosing/select_bookcost_statement27",
+        							async : false,
+        							data : JSON.stringify(from),
+        							success : function(result) {
+        								logNow(result);
+        								var object_num = Object.keys(result);
+        								row = result[object_num];
+        									if (!result[0]["sum5"])
+            								{}
+            								else {
+            									sum_1 += result[0]["sum5"];
+            									htmlString += 
+            										'<tr>'+
+	            										'<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'+ result[0]["gubn5"] +'</span></td>'+
+	            										'<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;"><?=$row[panst5]?></span></td>'+
+	            										'<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ result[0]["pannum5"] +'</span></td>'+
+	            										'<td width="50" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if(result[0]["filmnum5"]) htmlString += result[0]["filmnum5"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	            										'<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (result[0]["filmnum5"]) htmlString += numberWithCommas(result[0]["filmdan5"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	            										'<td width="65" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (result[0]["filmnum5"]) htmlString += numberWithCommas(result[0]["filmcost5"]); else htmlString += '&nbsp'; htmlString += '</span></td>'+
+	            										'<td width="50" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (result[0]["daeji5"]) htmlString += numberWithCommas(result[0]["daeji5"]); else htmlString += '&nbsp'; htmlString += '</span></td>'+
+	            										'<td width="55" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ result[0]["sobudan5"] + '</span></td>'+
+	            										'<td width="60" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(result[0]["sobu5"]) +'</span></td>'+
+	            										'<td width="75" height="22" align="right" valign="middle"style="padding-right:10;" width="66" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;"><span style="font-size:9pt;">'+ numberWithCommas(result[0]["sum5"]) +'</span></td>'+
+            										'</tr>';
+            								}
+        							}
+        						});
+        				}}
+        				htmlString +=
+        					'<tr>'+
+        						'<td width="54" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="30" align="center" valign="middle"><span style="font-size:9pt;">계</span></td>'+
+        						'<td width="325" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="30" colspan="6" align="left" valign="middle"><span style="font-size:9pt;">&nbsp;</span></td>'+
+        						'<td width="115" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="30" colspan="2" align="center" valign="middle"><span style="font-size:9pt;">('+ m1_name+')</span></td>'+
+        						'<td width="75" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="30" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_1) +'</span></td>'+
+        					'</tr>'+
+        					'</table>'+
+        					'</td>'+
+        					'</tr>'+
+        					'<tr>'+
+        						'<td width="580" colspan="2" height="10"></td>'+
+        					'</tr>'+
+        					'<tr>'+
+        						'<td width="580" align="left" valign="middle" colspan="2" height="25"><span style="font-size:9pt;"><b>2. 용지대, 인쇄비</b></span></td>'+
+        					'</tr>'+
+        					'<tr>'+
+        						'<td width="580" align="center" valign="top" colspan="2">'+
+        							'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+        								'<tr>'+
+        									'<td width="40" style="border-width:1px; border-color:black; border-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">구분</span></td>'+
+        									'<td width="145" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">지질</span></td>'+
+        									'<td width="60" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">정미</span></td>'+
+        									'<td width="60" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">여분</span></td>'+
+        									'<td width="60" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:12pt;">금액</span></td>'+
+        									'<td width="34" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">색도</span></td>'+
+        									'<td width="55" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">인 쇄<br>단 가</span></td>'+
+        									'<td width="46" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">R수</span></td>'+
+        									'<td width="70" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">(*1.1)<br>인쇄비 계</span></td>'+
+        								'</tr>';
+        				from = {
+        						uid : uid
+        				}
+        				$.ajax({
+        					type : "POST",
+        					contentType : "application/json; charset=utf-8;",
+        					dataType : "json",
+        					url : SETTING_URL + "/monthclosing/select_bookcost_statement8",
+        					async : false,
+        					data : JSON.stringify(from),
+        					success : function(result) {
+        						logNow(result);
+
+        						var object_num = Object.keys(result);
+        						for(i in object_num)
+                				{
+        							var row = result[object_num[i]];
+                					var t_jm1 = Math.floor(row["jm"] / 500);
+                					var t_jm2 = row["jm"] % 500;
+                					var t_yb1 = Math.floor(row["yb"] / 500);
+                					var t_yb2 = row["yb"] % 500;
+                					var t_colo = row["colo"];
+                					if ((row["gubn"] == '표지') && (bookcode.substring(0, 3) == '393')) // 전집류는 1도 더 추가 (총 2도 추가)
+                						t_colo++;
+                					if ((row["gubn"] == '표지') || (row["gubn"] == '속표지') || (row["gubn"] == '화보') || (row["gubn"] == '별지') || (row["gubn"] == '케이스') || (row["gubn"] == '면지'))
+                						t_colo += 1;
+                					if ((row["gubn"] == '면지') || row["gubn"] == '도비라')
+                					{
+                						//selBookCostStatement28
+                						from = {
+                								uid : uid
+                						}
+                						$.ajax({
+                							type : "POST",
+                							contentType : "application/json; charset=utf-8;",
+                							dataType : "json",
+                							url : SETTING_URL + "/monthclosing/select_bookcost_statement28",
+                							async : false,
+                							data : JSON.stringify(from),
+                							success : function(result) {
+                								logNow(result);
+                								var object_num = Object.keys(result);
+                								
+                							}
+                						});
+                					}	
+                					sum_3 += row["pcost"];
+                					sum_2 += row["ycost"];
+                					
+                					htmlString += 
+                                        '<tr>'+
+        						        	'<td style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += row["gubn"]; else htmlString += '&nbsp;'; htmlString +='</span></td>'+
+        						        	'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += row["jname"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        	'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt; width:60;">'; if ((row["jm"]) || (row["yb"])) htmlString +=  t_jm1 +' R ' + t_jm2 ; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        	'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10; width:60;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += t_yb1 + ' R ' + t_yb2; else htmlString += '&nbsp;'; htmlString +='</span></td>'+
+        						        	'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (row["ycost"]) htmlString += numberWithCommas(row["ycost"]); else htmlString += numberWithCommas(ytotcost); htmlString += '</span></td>'+
+        						        	'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; 
+        						        	if (t_colo) htmlString += t_colo +' ˚'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        	'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; 
+        						        	if (t_colo) htmlString += numberWithCommas(row["pdanga"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        	'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += row["rnum"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        	'<td style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += numberWithCommas(row["pcost"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+        						        '</tr>';
+                				}
+        						if (burok)
+        						{	
+        							for (var i = 1 ; i <= burok ; i++)
+        							{
+        								bur_uid = uid + i;
+        								//selBookCostStatement29
+        								from = {
+        										bur_uid : bur_uid
+        								};
+        								$.ajax({
+        									type : "POST",
+        									contentType : "application/json; charset=utf-8;",
+        									dataType : "json",
+        									url : SETTING_URL + "/monthclosing/select_bookcost_statement29",
+        									async : false,
+        									data : JSON.stringify(from),
+        									success : function(result) {
+        										logNow(result);
+        										var object_num = Object.keys(result);
+        										for(j in object_num)
+                								{
+        											row = result[object_num[j]];
+                									t_jm1 = Math.floor(row["jm"] / 500);
+                									t_jm2 = row["jm"] % 500;
+                									t_yb1 = Math.floor(row["yb"] / 500);
+                									t_yb2 = row["yb"] % 500;
+                									t_colo = row["colo"];
+                									if ((row["gubn"] == '표지') && (bookcode.substring(0,3) == '393')) // 전집류는 1도 더 추가 (총 2도 추가)
+                										t_colo++;
+                									if ((row["gubn"] == '표지') || (row["gubn"] == '화보') || (row["gubn"] == '별지') || (row["gubn"] == '케이스'))
+                										t_colo += 1;
+                									sum_3 += row["pcost"];
+                									sum_2 += row["ycost"];
+                									logNow("----------------------------");
+                									logNow(sum_2);
+                									htmlString += 
+                										'<tr>'+
+            								        		'<td style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += row["gubn"] + '&nbsp;(부록' + row["bucode"]+')'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += row["jname"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += '(' + t_jm1 + ' R ' + t_jm2 + ')'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if ((row["jm"]) || (row["yb"])) htmlString += '(' + t_yb1 + ' R ' + t_yb2 + ')'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (row["ycost"]) numberWithCommas(row["ycost"]); else htmlString += numberWithCommas(ytotcost); htmlString += '</span></td>'+
+            								        		'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += t_colo+' ˚'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += numberWithCommas(row["pdanga"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid; padding-right:10;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += row["rnum"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        		'<td style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'; if (t_colo) htmlString += numberWithCommas(row["pcost"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+            								        	'</tr>';
+                								}
+        									}
+        								});
+        							}
+        						}
+        						htmlString +=
+        							'<tr>'+
+							        	'<td style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="30" align="center" valign="middle"><span style="font-size:9pt;">계</span></td>'+
+							        	'<td style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="30" colspan="3" align="left" valign="middle"><span style="font-size:9pt;">&nbsp;</span></td>'+
+							        	'<td style="padding-right:10; border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="30" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_2) +'</span></td>'+
+							        	'<td style="padding-right:10; border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="30" colspan="3" align="right" valign="middle"><span style="font-size:9pt;">(' + m1_name + ')</span></td>'+
+							        	'<td style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="30" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_3) +'</span></td>'+
+							        	'</tr>'+
+							        '</table>'+
+							        '</td>'+
+							        '</tr>'+
+							        '<tr>'+
+							        	'<td width="580" colspan="2" height="10"></td>'+
+							        '</tr>'+
+							        '<tr>'+
+							        	'<td width="580" align="left" valign="middle" colspan="2" height="25"><span style="font-size:9pt;"><b>3. 제본비</b></span></td>'+
+							        '</tr>'+
+							        '<tr>'+
+							        	'<td width="580" align="center" valign="top" colspan="2">'+
+							        		'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+							        			'<tr>'+
+							        				'<td width="77" style="border-width:1px; border-color:black; border-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:10pt;">장형</span></td>'+
+							        				'<td width="77" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:10pt;">면수</span></td>'+
+							        				'<td width="77" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:3pt;">면당단가</span></td>'+
+							        				'<td width="77" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:3pt;">권당단가</span></td>'+
+							        				'<td width="60" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">부수</span></td>'+
+							        				'<td width="70" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; letter-spacing:5pt;">기타</span></td>'+
+							        				'<td width="106" style="border-top-width:1px; border-right-width:1px; border-bottom-width:1px; border-top-color:black; border-right-color:black; border-bottom-color:black; border-top-style:solid; border-right-style:solid; border-bottom-style:solid;" height="40" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">(*1.1) 제본금액</span></td>'+
+							        			'</tr>';
+        						from = {
+        								m3 : m3
+        						}
+        						$.ajax({
+        							type : "POST",
+        							contentType : "application/json; charset=utf-8;",
+        							dataType : "json",
+        							url : SETTING_URL + "/monthclosing/select_bookcost_statement10",
+        							async : false,
+        							data : JSON.stringify(from),
+        							success : function(result) {
+        								logNow(result);
+        								var object_num = Object.keys(result);
+        								var row2 = result[object_num]
+        								var m3_name = row2["wcname"];
+        								
+        								from = {
+        										uid : uid
+        								}
+        								$.ajax({
+        									type : "POST",
+        									contentType : "application/json; charset=utf-8;",
+        									dataType : "json",
+        									url : SETTING_URL + "/monthclosing/select_bookcost_statement11",
+        									async : false,
+        									data : JSON.stringify(from),
+        									success : function(result) {
+        										logNow(result);
+
+        										var object_num = Object.keys(result);
+        										var row = result[object_num];
+                								var jebuid = result[0]["uid"];
+                								sum_4 = result[0]["totcost7"];
+                								htmlString += 
+                									'<tr>'+
+                    						        	'<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-right-width:1px; border-bottom-color:black; border-left-color:black; border-right-color:black; border-bottom-style:solid; border-left-style:solid; border-right-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">'+ t_janh +'</span></td>'+
+                    						        	'<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">'; if (result[0]["cgubn7"] <= 4) htmlString += result[0]["cpage7"]; htmlString += '</span></td>'+
+                    						        	'<td width="77" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">'; if (result[0]["cgubn7"] <= 4) htmlString += result[0]["cprice17"]; htmlString += '</span></td>'+
+                    						        	'<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">'+ result[0]["pdanga7"] +'</span></td>'+
+                    						        	'<td width="60" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' + numberWithCommas(result[0]["cnum7"]) +'</span></td>'+
+                    						        	'<td width="70" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt; padding-left:0pt;">'; if (result[0]["cprice27"]) htmlString += result[0]["cprice27"]; htmlString += '</span></td>'+
+                    						        	'<td width="106" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt; padding-left:0pt;">' + numberWithCommas(sum_4) + '</span></td>'+
+                    						        '</tr>';
+                    						        	if (burok)
+                            						    {
+                            						    	sum_41 = 0;
+                            						    	bur_uid = uid + 1;
+                            						    	//selBookCostStatement12
+                            								from = {
+                            										bur_uid : bur_uid
+                            								};
+                            								$.ajax({
+                            									type : "POST",
+                            									contentType : "application/json; charset=utf-8;",
+                            									dataType : "json",
+                            									url : SETTING_URL + "/monthclosing/select_bookcost_statement12",
+                            									async : false,
+                            									data : JSON.stringify(from),
+                            									success : function(result) {
+                            										logNow(result);
+                            										var object_num = Object.keys(result);
+                            										var row2 = result[object_num];
+                            										from = {
+                            												jebon: row2["m3"]	
+                            										}
+                            										$.ajax({
+                            											type : "POST",
+                            											contentType : "application/json; charset=utf-8;",
+                            											dataType : "json",
+                            											url : SETTING_URL + "/monthclosing/select_bookcost_statement13",
+                            											async : false,
+                            											data : JSON.stringify(from),
+                            											success : function(result) {
+                            												logNow(result);
+                            												var object_num = Object.keys(result);
+                            												var row2 = result[object_num];
+                            												m3b_name = row2["wcname"];
+                            												
+                            											}
+                            										});
+                            									}
+                            								});
+                            						    	for (var i = 1 ; i <= burok ; i++)
+                            						    	{
+                            						    		bur_uid = jebuid + i;
+                            						    		//selBookCostStatement14
+                            						    		from = {
+                            						    				bur_uid : bur_uid
+                            						    		};
+                            						    		$.ajax({
+                            						    			type : "POST",
+                            						    			contentType : "application/json; charset=utf-8;",
+                            						    			dataType : "json",
+                            						    			url : SETTING_URL + "/monthclosing/select_bookcost_statement14",
+                            						    			async : false,
+                            						    			data : JSON.stringify(from),
+                            						    			success : function(result) {
+                            						    				logNow(result);
+                            						    				var object_num = Object.keys(result);
+                            						    				row = result[object_num];
+                            						    				bu_janh = CheckJANH(row["cgubn7"]);
+                                    						    		sum_4b = row["totcost7"];
+                                    						    		//sum_4 += sum_4b;
+                                    						    		sum_41 += sum_4b;
+                                    						    		htmlString +=
+                                    						    			'<tr>'+
+                                    						    				'<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-right-width:1px; border-bottom-color:black; border-left-color:black; border-right-color:black; border-bottom-style:solid; border-left-style:solid; border-right-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'+ bu_janh+'</span></td>'+
+                	                    						    			'<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (row["cgubn7"] > 4) htmlString += '&nbsp;'; else htmlString += row["cpage7"]; htmlString += '</span></td>'+
+                	                    						    			'<td width="77" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (row["cgubn7"] > 4) htmlString += '&nbsp;'; else htmlString += row["cprice17"]; htmlString += '</span></td>'+
+                	                    						    			'<td width="77" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; row["pdanga7"] + '</span></td>'+
+                	                    						    			'<td width="60" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid; border-right-style:solid; border-right-color:black; border-right-width:1px;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(row["cnum7"]) + '</span></td>'+
+                	                    						    			'<td width="70" style="border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">'; if (row["cprice27"]) htmlString += row["cprice27"]; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+                	                    						    			'<td width="106" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_4b) +'</span></td>'+
+                                    						    			'</tr>';
+                            						    			}
+                            						    		});                  						    		
+                            						    	}}
+                            						    htmlString +=
+                            							    '<tr>'+
+                        							        	'<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">계</span></td>'+
+                        							        	'<td width="291" colspan="4" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">&nbsp;</span></td>'+
+                        							        	'<td width="70" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">(' + m3_name +')</span></td>'+
+                        							        	'<td width="106" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_4) +'</span></td>'+
+                        							        '</tr>';
+                            						    if (burok) {
+                            						    	htmlString +=
+                            						    		'<tr>'+
+                            						    			'<td width="77" style="border-bottom-width:1px; border-left-width:1px; border-bottom-color:black; border-left-color:black; border-bottom-style:solid; border-left-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">&nbsp;</span></td>'+
+                            						    			'<td width="291" colspan="4" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">&nbsp;</span></td>'+
+                            						    			'<td width="70" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;" height="22" align="center" valign="middle"><span style="font-size:9pt;">('+m3b_name+')</span></td>'+
+                            						    			'<td width="106" style="padding-right:10; border-right-width:1px; border-bottom-width:1px; border-right-color:black; border-bottom-color:black; border-right-style:solid; border-bottom-style:solid;" height="22" align="right" valign="middle"><span style="font-size:9pt;">'+ numberWithCommas(sum_41)+'</span></td>'+
+                            						    		'</tr>'+
+                            		                            '</table>'+
+                            			                        '</td>'+
+                            			                        '</tr>'+
+                            			                        '<tr>'+
+                            			                        	'<td width="580" colspan="2" height="10"></td>'+
+                            			                        '</tr>'+
+                            			                        '<tr>'+
+                            			                        	'<td width="580" align="center" valign="top" colspan="2">'+
+                            			                        		'<table border="0" cellpadding="0" cellspacing="0" width="580" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;"></table>';
+                            						    }
+                            							from = {
+                            									uid : uid
+                            							}
+                            							$.ajax({
+                            								type : "POST",
+                            								contentType : "application/json; charset=utf-8;",
+                            								dataType : "json",
+                            								url : SETTING_URL + "/monthclosing/select_bookcost_statement15",
+                            								async : false,
+                            								data : JSON.stringify(from),
+                            								success : function(result) {
+                            									logNow(result);
+                            									var object_num = Object.keys(result);
+                            									for (j in object_num)
+                            									{
+                            										row = result[object_num[j]];
+                            										var t_sum5 = Math.floor(row["totcost8"] * 1.1);
+                            										sum_5 += t_sum5;
+                            										htmlString +=
+                            											'<table style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;">'+
+                            											'<tr>'+
+                            		                                    	'<td width="140" height="30" align="left" valign="middle"><span style="font-size:9pt;">'; if (j == 0) htmlString += '<b> 4. 코팅비 (비닐코팅)</b>'; else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+                            		                                    	'<td width="80" height="30" align="center" valign="middle"><span style="font-size:9pt;"></span></td>'+
+                            		                                    	'<td width="279" height="30" align="center" valign="middle"><span style="font-size:9pt;">' + row["cnum8"] + ' R  ×  ' + numberWithCommas(row["cprice8"]) + ' 원  ×  1.1   ( ' + row["wcname"] + ' )</span></td>'+
+                            		                                    	'<td width="81" height="30" align="right" style="padding-right:10;" valign="middle"><span style="font-size:9pt;">' + numberWithCommas(t_sum5) + '</span></td>'+
+                            		                                    '</tr>';
+                            									}
+                            									htmlString +='</table></td></tr>';
+                            									var cust6 = "";
+                            									logNow("uid : " + uid);
+                            									from = {
+                            											uid : uid
+                            									}
+                            									$.ajax({
+                            										type : "POST",
+                            										contentType : "application/json; charset=utf-8;",
+                            										dataType : "json",
+                            										url : SETTING_URL + "/monthclosing/select_bookcost_statement16",
+                            										async : false,
+                            										data : JSON.stringify(from),
+                            										success : function(result) {
+                            											logNow("안에")
+                            											logNow(result);
+                            											var object_num = Object.keys(result);
+                            											logNow(object_num);
+                            											if (Object.keys(result).length>0)
+                            											{
+                            												
+                            												row = result[object_num];
+                            												sum_6 += row["cprice9"];
+                            												from = {
+                            														ccode9 : row["ccode9"]
+                            												};
+                            												$.ajax({
+                            													type : "POST",
+                            													contentType : "application/json; charset=utf-8;",
+                            													dataType : "json",
+                            													url : SETTING_URL + "/monthclosing/select_bookcost_statement17",
+                            													async : false,
+                            													data : JSON.stringify(from),
+                            													success : function(result) {
+                            														logNow(result);
+                            														var object_num = Object.keys(result);
+                            														var row = result[object_num];
+                            														cust6 = row["wcname"];
+                            														logNow("cust6 :  " + cust6);
+                            													}
+                            												});
+                            											}
+                            											htmlString +=
+                            												'<tr>'+
+                            						                        	'<td width="580" align="center" valign="top" colspan="2">'+
+                            						                            	'<table border="0" cellpadding="0" cellspacing="0" width="580" style="border-bottom-width:1px; border-bottom-color:black; border-bottom-style:solid;">'+
+                            						                                	'<tr>'+
+                            						                                    	'<td width="140" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b> 5. 비닐카바비</b></span></td>'+
+                            						                                    	'<td width="80" height="30" align="center" valign="middle"><span style="font-size:9pt;"></span></td>'+
+                            						                                    	'<td width="279" height="30" align="center" valign="middle"><span style="font-size:9pt;">'; if (cust6) htmlString += '(' + cust6 +')'; htmlString += '</span></td>'+
+                            						                                    	'<td width="81" height="30" align="right" valign="middle"><span style="font-size:9pt; padding-right:10;">'; if (sum_6) htmlString += numberWithCommas(sum_6); htmlString += '</span></td>'+
+                            						                                    '</tr>'+
+                            						                                '</table>'+
+                            						                            '</td>'+
+                            						                        '</tr>';
+                            						            		from = {
+                            						            				uid : uid
+                            						            		};
+                            						            		$.ajax({
+                            						            			type : "POST",
+                            						            			contentType : "application/json; charset=utf-8;",
+                            						            			dataType : "json",
+                            						            			url : SETTING_URL + "/monthclosing/select_bookcost_statement31",
+                            						            			async : false,
+                            						            			data : JSON.stringify(from),
+                            						            			success : function(result) {
+                            						            				logNow(result);
+                            						            				var object_num = Object.keys(result);
+                            						            				var row = result[object_num];
+                            						            				var stic = result[0]["w7"] + result[0]["w11"];
+                            						            				htmlString +=
+                            						            	                '<tr>'+
+                            						    	                        	'<td width="580" align="center" valign="top" colspan="2">'+
+                            						    	                            	'<table border="0" cellpadding="0" cellspacing="0" width="580">'+
+                            						    	                            		'<tr>'+
+                            						    	                                    	'<td width="70" height="30"><span style="font-size:9pt;"><b> 6. 원고료</b></span></td>'+
+                            						    	                                    	'<td width="10" height="30" align="center" valign="middle"><span style="font-size:9pt;">:</span></td>'+
+                            						    	                                    	'<td width="90" height="30" align="right" style="padding-right:10pt" valign="middle">'+
+                            						    	                                        	'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w1"]) htmlString += numberWithCommas(result[0]["w1"]); htmlString += '</span></p>'+
+                            						    	                                        '</td>'+
+                            						    	                                        '<td width="120" height="30"><span style="font-size:9pt;"></span></td>'+
+                            						    	                                        '<td width="100" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b> 7. 저작권료</b></span></td>'+
+                            						    	                                        '<td width="10" height="30" align="center" valign="middle">:</td>'+
+                            						    	                                        '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            						    	                                        	'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w2"]) htmlString += numberWithCommas(result[0]["w2"]);
+                            						    	                    if ((bookcode == "329210") || (bookcode == "329220"))
+                            						    	                    {
+                            						    	                    	htmlString += '<br>';
+                            						    	                    	htmlString += numberWithCommas(row["w21"]);
+                            						    	                    }
+                            						    	                    htmlString += 
+                            						    	                    	'</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                    '<td width="70" height="30"><span style="font-size:9pt;"><b> 8. 출력비</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle"><span style="font-size:9pt;">:</span></td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt" valign="middle">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w3"]) htmlString += numberWithCommas(result[0]["w3"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="120" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                    '<td width="100" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b> 9. 사보료</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle">:</td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w4"]) htmlString += numberWithCommas(result[0]["w4"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                    '<td width="70" height="30"><span style="font-size:9pt;"><b>10. 증지대 </b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle"><span style="font-size:9pt;">:</span></td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt" valign="middle">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w5"]) htmlString += numberWithCommas(result[0]["w5"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="120" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                    '<td width="100" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b>11. 케이스</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle">:</td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w6"]) htmlString += numberWithCommas(result[0]["w6"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                    '<td width="70" height="30"><span style="font-size:9pt;"><b>12. 스티커</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle"><span style="font-size:9pt;">:</span></td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (stic) htmlString += numberWithCommas(stic); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="120" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                    '<td width="100" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b>13. CD</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle">:</td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w8"]) htmlString += numberWithCommas(result[0]["w8"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                    '<td width="70" height="30"><span style="font-size:9pt;"><b>14. 기타</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle"><span style="font-size:9pt;">:</span></td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w9"]) htmlString += numberWithCommas(result[0]["w9"]); htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="120" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                    '<td width="100" height="30" align="left" valign="middle"><span style="font-size:9pt;"><b>15. 목형</b></span></td>'+
+                            					                                    '<td width="10" height="30" align="center" valign="middle">:</td>'+
+                            					                                    '<td width="90" height="30" align="right" style="padding-right:10pt">'+
+                            															'<p style="margin-left:5px;"><span style="font-size:9pt;">'; if (result[0]["w11"]) htmlString += result[0]["w11"]; htmlString += '</span></p>'+
+                            					                                    '</td>'+
+                            					                                    '<td width="90" height="30"><span style="font-size:9pt;"></span></td>'+
+                            					                                '</tr>'+
+                            					                                '</table>'+
+                            					                                '</td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                '<td width="580" colspan="2" height="10"></td>'+
+                            					                                '</tr>'+
+                            					                                '<tr>'+
+                            					                                '<td width="580" align="center" valign="top" colspan="2">'+
+                            					                                '<table border="0" cellpadding="2" cellspacing="1" width="580" bgcolor="black">'+
+                            					                                '<tr>'+
+                            					                                    '<td width="190" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><p><span style="font-size:9pt; letter-spacing:30pt;">총계</span></p></td>'+
+                            					                                    '<td width="130" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt; letter-spacing:20pt;">단가</span></td>'+
+                            					                                    '<td width="130" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt; letter-spacing:10pt;">판매가</span></td>'+
+                            					                                    '<td width="130" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt; letter-spacing:20pt;">정가</span></td>'+
+                            					                                '</tr>';
+                            													
+                            													var total_cost = sum_1 + sum_2 + sum_3 + sum_4 + sum_41 + sum_5 + sum_6 + result[0]["w1"] + result[0]["w2"] + result[0]["w3"] + result[0]["w4"] + result[0]["w5"] + result[0]["w6"] + result[0]["w7"] + result[0]["w8"] + result[0]["w9"] + result[0]["w11"] + result[0]["w21"];;
+                            													
+                            													var total_danga = Math.round(total_cost/mknum);
+                            													
+                            													from = {
+                            															bookcode : bookcode
+                            													}
+                            													$.ajax({
+                            														type : "POST",
+                            														contentType : "application/json; charset=utf-8;",
+                            														dataType : "json",
+                            														url : SETTING_URL + "/monthclosing/select_bookcost_statement30",
+                            														async : false,
+                            														data : JSON.stringify(from),
+                            														success : function(result) {
+                            															logNow(result);
+                            															var object_num = Object.keys(result);
+                            															var row = result[object_num];
+                            															var total_panga = 0;
+                            															if ((bookcode >= '123110') && (bookcode <= '123389'))
+                            															{
+                            																total_panga = sbuprc * 93 / 100;
+                            															}
+                            															else
+                            															{
+                            																//selBookCostStatement22
+                            																from = {
+                            																		sthaly : row["sbdung"]
+                            																}
+                            																$.ajax({
+                            																	type : "POST",
+                            																	contentType : "application/json; charset=utf-8;",
+                            																	dataType : "json",
+                            																	url : SETTING_URL + "/monthclosing/select_bookcost_statement22",
+                            																	async : false,
+                            																	data : JSON.stringify(from),
+                            																	success : function(result) {
+                            																		logNow(result);
+                            																		var object_num = Object.keys(result);
+                            																		row = result[object_num];
+                            																		total_panga = sbuprc * row["sthaly"] / 100;
+                            																	}
+                            																});
+                            															}
+                            															htmlString +=
+                            																'<tr>'+
+                            							                                    '<td width="190" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"> '+ numberWithCommas(total_cost) + '</span></td>'+
+                            							                                    '<td width="130" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"> '+ numberWithCommas(total_danga) + '</span></td>'+
+                            							                                    '<td width="130" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"> '+ numberWithCommas(total_panga) +' </span></td>'+
+                            							                                    '<td width="130" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"> '+ numberWithCommas(sbuprc) +' </span></td>'+
+                            							                                '</tr>'+
+                            							                            '</table>'+
+                            							                        '</td>'+
+                            							                '</tr>'+
+                            							                '<tr>'+
+                            							                        '<td width="580" align="right" valign="middle" colspan="2" height="1">'+
+                            							'<p><span style="font-size:9pt;"></span></p>'+
+                            							                        '</td>'+
+                            							                '</tr>'+
+                            							                '</table></td>'+
+                            							    '</tr>'+
+                            							    
+                            							    /*'<tr>'+
+                            							    	'<td width="620" bgcolor="white" align="center" valign="top">aaa<div align="left"><span style="font-size:9pt; padding-left:45pt; padding-top:0pt"><b>' + com_name + '</b></span></div></td>'+ 
+                            							    '</tr>'+*/
+                            															
+                            							'</table>';
+                            															htmlString += '<div align="left">'+
+                            															'<span style="font-size:9pt; padding-left:65pt;"><b>' + com_name + '</b></span>'+
+                            															'</div>';
+                            															if (rec_num < total_record)
+                            															{
+                            																htmlString += '<p style="page-break-before:always">';
+                            																}
+                            															
+                            							}
+                            													});
+                            													}
+                            						            		});
+                            						            		}
+                            									});
+                            									}
+                            							});
+                            							}        								
+        								});
+        								}
+        						});
+        						}
+        				});        				
+        				}
+        		});
+        		
+        		}
+				}// 첫 쿼리		
+		});		
 	
-		//$("#mcBookCostStatementDetailData").html(htmlString);
+		(popUp.document.getElementById("popdata")).innerHTML = htmlString;
+	}
+	
+	document.getElementById("btnChangeAccountModify").onclick = function() {// 인쇄 //lwhee
+		var t_URL = "/popup?print";
+		if (popUp && !popUp.closed) {
+			popUp.close();
+		}
+		popUp = window
+				.open(
+						t_URL,
+						"PopUpPrintjejakplan",
+						'left=0,top=0,width=820,height=500,toolbar=no,menubar=no,status=no,scrollbars=yes,resizable=yes');// DATEW
+		popUp.document.write(jmenu7("0_상세계산거래처변경"));		
+		htmlString = "";
+		
+		var popupData;
+		var compare;
+		var selData;
+		
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement59",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				
+				htmlString += 
+					'<table width="500" border="0" cellpadding="0" cellspacing="2">'+
+						'<tr>'+
+							'<td width="500" colspan="2" height="50" align="center"><span style="font-size:13pt;"><b>"'+ row["bname"] +'" 제작 거래처 변경</b></span></td>'+
+						'</tr>'+
+					'<form name="frm1" method="post" action="ch_m1.php">'+
+					'<input type="hidden" name="uid" value="'+ uid +'">'+
+						'<tr>'+
+							'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>인쇄</b></span></td>'+
+							'<td width="300" height="40">'+
+								'<select name="m1" size="1" style="width:200pt;">'+
+									'<option value="N">---------------------------------</option>';
+				
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement60",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+						htmlString +=
+							'</select></td>'+
+							'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+							'<input type="submit" id="btnChangeAccountModify1"  value=" 변 경 "></span></td>'+
+						'</tr>'+
+					'</form>'+
+					
+					'<form name="frm2" method="post" action="ch_m2.php">'+
+					'<input type="hidden" name="uid" value="<?=$uid?>">'+
+						'<tr>'+
+							'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>코팅</b></span></td>'+
+							'<td width="300" height="40">'+
+								'<select name="m2" size="1" style="width:200pt;">'+
+									'<option value="N">---------------------------------</option>';
+					}
+				});
+				
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement61",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify2" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm3" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>제본</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m3" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement62",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify3" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm4" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>스티커</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m4" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement63",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify4" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm5" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>CD</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m5" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement64",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify5" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm6" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>케이스</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m6" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement65",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify6" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm7" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>비닐</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m7" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement66",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify7" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm8" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>기타</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m8" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement67",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify8" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm9" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>목형</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select name="m9" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement68",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+				
+				htmlString +=
+					'</select></td>'+
+					'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify9" value=" 변 경 "></span></td>'+
+				'</tr>'+
+			'</form>'+
+			
+			'<form name="frm10" method="post" action="ch_m2.php">'+
+			'<input type="hidden" name="uid" value="<?=$uid?>">'+
+				'<tr>'+
+					'<td width="100" align="center" bgcolor="#F1F1F1" height="40"><span style="font-size:10pt;"><b>증지</b></span></td>'+
+					'<td width="300" height="40">'+
+						'<select id="mm10" name="m10" size="1" style="width:200pt;">'+
+							'<option value="N">---------------------------------</option>';
+				from = {
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement69",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							var row = result[i];
+							htmlString += '<option value="'+ row["wccode"] +'">'+ row["wcname"] +'</option>';
+						}
+					}
+				});
+			}
+		});
+		htmlString +=
+			'</select></td>'+
+				'<td width="100" align="center" height="40"><span style="font-size:10pt;">'+
+					'<input type="submit" id="btnChangeAccountModify10" value=" 변 경 "></span></td>'+
+			'</tr>'+
+			'</form>'+
+			'</table>';
+		
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement70",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				popupData = result[object_num];
+			}
+		});
+		
+		(popUp.document.getElementById("popdata")).innerHTML = htmlString;
+		
+		logNow(popupData["m4"]);
+		
+		popUp.document.getElementsByName('m1')[0].value=popupData["m1"];
+		popUp.document.getElementsByName('m2')[0].value=popupData["m2"];
+		popUp.document.getElementsByName('m3')[0].value=popupData["m3"];
+		popUp.document.getElementsByName('m4')[0].value=popupData["m5"];
+		popUp.document.getElementsByName('m5')[0].value=popupData["m6"];
+		popUp.document.getElementsByName('m6')[0].value=popupData["m7"];
+		popUp.document.getElementsByName('m7')[0].value=popupData["m8"];
+		popUp.document.getElementsByName('m8')[0].value=popupData["m9"];
+		popUp.document.getElementsByName('m9')[0].value=popupData["m10"];
+		popUp.document.getElementsByName('m10')[0].value=popupData["m11"];
+		
+		if(popUp.document.getElementsByName('m1')[0].value == "")
+			popUp.document.getElementsByName('m1')[0].value = "N";
+		if(popUp.document.getElementsByName('m2')[0].value == "")
+			popUp.document.getElementsByName('m2')[0].value = "N";
+		if(popUp.document.getElementsByName('m3')[0].value == "")
+			popUp.document.getElementsByName('m3')[0].value = "N";
+		if(popUp.document.getElementsByName('m4')[0].value == "")
+			popUp.document.getElementsByName('m4')[0].value = "N";
+		if(popUp.document.getElementsByName('m5')[0].value == "")
+			popUp.document.getElementsByName('m5')[0].value = "N";
+		if(popUp.document.getElementsByName('m6')[0].value == "")
+			popUp.document.getElementsByName('m6')[0].value = "N";
+		if(popUp.document.getElementsByName('m7')[0].value == "")
+			popUp.document.getElementsByName('m7')[0].value = "N";
+		if(popUp.document.getElementsByName('m8')[0].value == "")
+			popUp.document.getElementsByName('m8')[0].value = "N";
+		if(popUp.document.getElementsByName('m9')[0].value == "")
+			popUp.document.getElementsByName('m9')[0].value = "N";
+		if(popUp.document.getElementsByName('m10')[0].value == "")
+			popUp.document.getElementsByName('m10')[0].value = "N";
+
+		// 인쇄 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify1").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m1')[0].value;
+			logNow(uid);
+			from = {
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					logNow(new_comm);
+					logNow(row["ccode8"]);
+					from = {
+							m1 : new_comm,
+							listid : row["listid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement5",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);							
+						}
+					});
+				}
+			});
+		}
+		
+		// 코팅 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify2").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m2')[0].value;
+			logNow(uid);
+			from = {
+					ccode8 : new_comm,
+					crnum8 : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement6",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			from = {
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					
+					from = {
+							m2 : new_comm,
+							listid : row["listid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement7",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);							
+						}
+					});
+					
+				}
+			});
+		}		
+		
+		// 제본비 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify3").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m3')[0].value;
+			
+			// 제본비
+			from = {
+					ccode : new_comm,
+					crnum : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement8",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			// 입고테이블
+			from = {
+					m3 : new_comm,
+					ccode : new_comm,
+					juid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement9",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			// 제작정보
+			from = {
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					
+					from = {
+							m3 : new_comm,
+							listid : row["listid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement10",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+						}
+					});
+				}
+			});
+		}
+		
+		// 스티커 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify4").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m4')[0].value;
+			logNow(popUp.document.getElementsByName('m4')[0].value);
+			logNow(uid);
+			from = {
+					ccode : new_comm,
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement11",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			from = {
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					
+					from = {
+							m5 : new_comm,
+							listid : row["listid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement12",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow("성공맞아?");
+							logNow(new_comm);
+							logNow(row["listid"]);
+							logNow(result);
+						}
+					});
+				}
+			});
+		}
+		
+		// CD 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify5").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m5')[0].value;
+			
+			from = {
+					ccode : new_comm,
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement13",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			from = {
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					
+					from = {
+							m6 : new_comm,
+							listid : row["listid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement14",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+						}
+					});
+				}
+			});
+		}
+		
+		// 케이스비 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify6").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m6')[0].value;
+			
+			from = {
+					ccode : new_comm,
+					uid : uid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement15",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+				}
+			});
+			
+			from = {
+					uid : uid	
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						from = {
+								m7 : new_comm,
+								listid : row["listid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_bookcost_statement16",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+					}
+				});
+		}
+		
+		// 비닐비 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify7").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m7')[0].value;
+			
+			from = {
+					ccode : new_comm,
+					uid : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement17",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+			
+			from = {
+					uid : uid	
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						
+						from = {
+								m8 : new_comm,
+								listid : row["listid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_bookcost_statement18",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+					}
+				});
+		}
+		
+		// 기타 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify8").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m8')[0].value;
+			logNow(new_comm);
+			logNow(uid);
+			from = {
+					ccode : new_comm,
+					uid : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement19",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+			
+			from = {
+					uid : uid	
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						
+						from = {
+								m9 : new_comm,
+								listid : row["listid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_bookcost_statement21",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+					}
+				});
+		
+		}
+		
+		// 목형 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify9").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m9')[0].value;
+			
+			from = {
+					ccode : new_comm,
+					uid : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement22",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						from = {
+								uid : uid	
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									var object_num = Object.keys(result);
+									row = result[object_num];
+									
+									from = {
+											m10 : new_comm,
+											listid : row["listid"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/update_bookcost_statement23",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+											}
+										});
+								}
+							});
+					}
+				});
+		}
+		
+		// 증지 거래처 변경
+		popUp.document.getElementById("btnChangeAccountModify10").onclick = function() {
+			
+			var new_comm = popUp.document.getElementsByName('m10')[0].value;
+			
+			from = {
+					ccode : new_comm,
+					uid : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement24",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+			
+			from = {
+					uid : uid	
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement71",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						logNow("바뀌자");
+						logNow(new_comm);
+						logNow(row["listid"]);
+						from = {
+								m11 : new_comm,
+								listid : row["listid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_bookcost_statement25",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+					}
+				});
+		}
+		
+	}
+	
+	// 도서별 상세 원가 계산서 지출결의서 인쇄
+	if (chk_jg){
+		document.getElementById("btnPr_1Print").onclick = function() {
+			// //lwhee
+			var t_URL = "/popup?print";
+			if (popUp && !popUp.closed) {
+				popUp.close();		
+				}
+			popUp = window.open(t_URL,"PopUpPrintjejakplan",'left=0,top=0,width=820,height=500,toolbar=no,menubar=no,status=no,scrollbars=yes,resizable=yes');// DATEW
+			
+			pdate = document.getElementsByName('pdate')[0].value;
+			uid = document.getElementsByName('pruid')[0].value;
+			logNow(pdate);
+			logNow(uid);
+			
+			popUp.document.write(jmenu7("1_인쇄지출팝업"));
+	
+			
+			
+			function Installed()
+			{
+				try
+				{
+					return (new ActiveXObject('IEPageSetupX.IEPageSetup'));
+				}
+				catch (e)
+				{
+					return false;
+				}
+			}
+	
+			function PrintTest()
+			{
+				if (!Installed())
+					alert("컨트롤이 설치되지 않았습니다. 정상적으로 인쇄되지 않을 수 있습니다.")
+				else
+					alert("정상적으로 설치되었습니다.");
+			}
+			
+			function read_korean(num) 
+			 { 
+			  var return_val = ""; 
+			  if(!is_numeric(num)) 
+			  { 
+			  htmlString += '<script>window.alert(\'유효한 숫자가 아닙니다\')</script>'; 
+			  return 0; 
+			  } 
+			  
+			  var arr_number = strrev(num); 
+			  for(i =strlen(arr_number)-1; i>=0; i--) 
+			  { 
+			  ///////////////////////////////////////////////// 
+			  // 현재 자리를 구함 
+			  var digit = arr_number.substring(i, i+1); 
+	
+			  
+	
+			  /////////////////////////////////////////////////////////// 
+			  // 각 자리 명칭 
+			  switch(digit) 
+			  { 
+			    case '-' : return_val += "(-) "; 
+			        break; 
+			    case '0' : return_val += ""; 
+			        break; 
+			    case '1' : return_val += "일"; 
+			        break;    
+			    case '2' : return_val += "이"; 
+			        break;    
+			    case '3' : return_val += "삼"; 
+			        break;    
+			    case '4' : return_val += "사"; 
+			        break;    
+			    case '5' : return_val += "오"; 
+			        break;   
+			    case '6' : return_val += "육"; 
+			        break;    
+			    case '7' : return_val += "칠"; 
+			        break;    
+			    case '8' : return_val += "팔"; 
+			        break;    
+			    case '9' : return_val += "구"; 
+			        break;    
+			  } 
+	
+	
+			    if(digit=="-")continue; 
+	
+			  
+	
+			    /////////////////////////////////////////////////////////// 
+			    // 4자리 표기법 공통부분 
+			    if(digit != 0) 
+			    { 
+			    if(i % 4 == 1)return_val += "십"; 
+			    else if(i % 4 == 2)return_val += "백"; 
+			    else if(i % 4 == 3)return_val += "천"; 
+			    } 
+			    
+			    /////////////////////////////////////////////////////////// 
+			    // 4자리 한자 표기법 단위 
+			    if(i % 4 == 0) 
+			    { 
+			    if( Math.floor(i/ 4) ==0)return_val += ""; 
+			    else if(Math.floor(i / 4)==1)return_val += "만"; 
+			    else if(Math.floor(i / 4)==2)return_val += "억"; }
+			  }
+	
+			  return return_val;
+			 } 
+			
+			htmlString = "";
+			/*htmlString += 
+				'<SCRIPT language="JavaScript" for="IEPageSetupX" event="OnError(ErrCode, ErrMsg)">'+
+					'alert(\'에러 코드: \' + ErrCode + "\n에러 메시지: " + ErrMsg);'+
+				'</SCRIPT>'+
+				'<OBJECT id=IEPageSetupX classid="clsid:41C5BC45-1BE8-42C5-AD9F-495D6C8D7586" codebase="./IEPageSetupX.cab#version=1,3,0,2" width=0 height=0>'+	
+				'<param name="copyright" value="http://isulnara.com">'+
+				'<div style="position:absolute;top:276;left:320;width:300;height:68;border:solid 1 #99B3A0;background:#D8D7C4;overflow:hidden;z-index:1;visibility:visible;"><FONT style=\'font-family: "굴림", "Verdana"; font-size: 9pt; font-style: normal;\'>'+
+				'<BR>  인쇄 여백제어 컨트롤이 설치되지 않았습니다.  <BR>  <a href="../IEPageSetupX.exe"><font color=red>이곳</font></a>을 클릭하여 수동으로 설치하시기 바랍니다.  </FONT>'+
+				'</div>'+
+				'</OBJECT>';*/
+				
+				pmonth = pdate.substring(0,2);
+				pday = pdate.substring(2,4);
+				date = new Date();
+				pyear = Number(date.getFullYear());
+				tyear = Number(date.getFullYear());
+				tmonth = Number(date.getMonth()+1);
+				tday = Number(date.getDate());
+				logNow(tmonth);
+				logNow(tday);
+				
+				from = {
+						uid : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_bookcost_statement75",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						var num = Number(row["bdate"]+"000");
+						var jejak_date = new Date(num);
+						var new_bcode = row["bcode"].substring(0,5);
+						
+						from = {
+								bcode : new_bcode
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_bookcost_statement76",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								trow = result[object_num];
+								if(trow["jnum"] == row["uid"])
+								{
+									var jpnum = trow["pnum"];
+								}
+								else
+								{
+									var new_num = Number(trow["pnum"]) + 1;
+									from = {
+											bcode : new_bcode,
+											dbname2 : new_num,
+											dbname3 : row["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/insert_bookcost_statement2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+										}
+									});
+									var jpnum = new_num;
+								}
+								from = {
+										sbbook : row["bcode"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_bookcost_statement77",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										brow = result[object_num];
+										var sum_a = 0;
+										var inse = 0;
+										
+										inse = brow["sbinse"];
+										juja = brow["sbjuja"];
+										sum_a = (inse * brow["sbuprc"] * row["bnum"]) / 100;
+										
+										var jjarray = juja.split(",");
+										logNow("jjarray : " + jjarray);
+										if(jjarray.length > 1)
+										{
+											for(var kk = 0; kk < jjarray.length; kk++)
+											{
+												var jname = jjarray[kk];
+												var jinse = (10 / jjarray.length);
+												/* 출판사
+												if ((substr($row[bcode],0,5) == "12321") || (substr($row[bcode],0,5) == "12322")) // 중학 교사 지도서 (4명)
+												{
+													switch ($jname)
+													{
+														case "허화병" :
+															$jinse = 3;
+															break;
+														case "이희원" :
+															$jinse = 2.5;
+															break;
+														case "오병태" :
+															$jinse = 2.5;
+															break;
+														case "장주연" :
+															$jinse = 2;
+															break;
+													}
+												}
+												*/
+												if ((row["bcode"].substring(0,5) == "41431") || (row["bcode"].substring(0,5) == "41432") || (row["bcode"].substring(0,5) == "41433")) // 보르노프 1~3권 (2명)
+												{
+													switch (jname)
+													{
+														case "김홍열" :
+															jinse = 3;
+															break;
+														case "노영숙" :
+															jinse = 7;
+															break;
+													}
+												}
+												if (row["bcode"].substring(0,5) == "04101") // 어드밴스드 기타리스트 (2명)
+												{
+													switch (jname)
+													{
+														case "오정수" :
+															jinse = 5;
+															break;
+														case "남주희" :
+															jinse = 3;
+															break;
+													}
+												}
+												if (row["bcode"].substring(0,5) == "04114") // 류주석의 통기타 때려잡기 (2명)
+												{
+													switch (jname)
+													{
+														case "류주석" :
+															jinse = 4;
+															break;
+														case "남주희" :
+															jinse = 3;
+															break;
+													}
+												}
+												if (row["bcode"].substring(0,5) == "04104") // 실용음악 시창청음 (2명)
+												{
+													switch (jname)
+													{
+														case "강유미" :
+															jinse = 4;
+															break;
+														case "남주희" :
+															jinse = 2;
+															break;
+													}
+												}
+												if (row["bcode"].substring(0,5) == "04115") // 음악통할통론 (2명)
+												{
+													switch (jname)
+													{
+														case "박정란" :
+															jinse = 4;
+															break;
+														case "남주희" :
+															jinse = 2;
+															break;
+													}
+												}
+												sum_a = (jinse * brow["sbuprc"] * row["bnum"]) / 100;
+												htmlString +=
+													'<table border="0" width="720" id="table1" cellspacing="0" cellpadding="0">'+
+													'<tr>'+
+														'<td height="40" colspan="3">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3">'+
+														'<p align="center">'+
+														'<img border="0" src="logo.jpg" width="181" height="112"></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td height="40" colspan="3">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td width="240">'+
+														'　</td>'+
+														'<td style="border-bottom-style: double; border-bottom-width: 5px" bordercolor="#000000">'+
+														'<p align="center"><span style="letter-spacing: 3px"><b>'+
+														'<font face="굴림" size="5">'+ jname +' 귀하</font></b></span></td>'+
+														'<td width="240">'+
+														'　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="text-align: justify; text-indent: 0; line-height: 150%; margin-left: 20">'+
+														'<b><font size="4">안녕하세요!<br>선생님의 도서가 다음과 같이 진행되어 입고되었습니다.<br>'+
+														'인세는 &nbsp;'+ pmonth +'월 &nbsp;'+ pday +'일을 전후하여 지급할 예정입니다. 감사합니다.</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="30">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="letter-spacing: 10">'+
+														'<p align="center"><b><font size="4">-다음-</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="10">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3">'+
+														'<table border="1" width="100%" id="table2" cellspacing="0" cellpadding="2" bordercolor="#000000">'+
+															'<tr>'+
+																'<td height="30" align="center" width="270"><b>도서명</b></td>'+
+																'<td height="30" align="center" width="50"><b>중쇄</b></td>'+
+																'<td height="30" align="center" width="70"><b>정가</b></td>'+
+																'<td height="30" align="center" width="80"><b>발행부수</b></td>'+
+																'<td height="30" align="center" width="60"><b>인세율</b></td>'+
+																'<td height="30" align="center" width="120"><b>인세</b></td>'+
+																'<td height="30" align="center" width="70"><b>비고</b></td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="30" style="text-align: left; text-indent: 5; margin-left: 0; letter-spacing:-1pt;">'+ brow["sbname"] +'</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">'+ jpnum +'쇄</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">'+ numberWithCommas(brow["sbuprc"]) +'원</td>'+
+																'<td height="30" width="80" style="text-align: right; margin-right: 5">'+ numberWithCommas(row["bnum"]) +'부</td>';
+																if (row["bcode"].substring(0,5) == "11613") {
+																	htmlString += 
+																		'<td height="30" width="60" style="text-align: center; margin-right: 0">인세 '+ inse +'% 의<br>1/3</td>';
+																} else {
+																	htmlString +=
+																		'<td height="30" width="60" style="text-align: center; margin-right: 0">인세 '+ inse +'% 의<br>'+ jinse +'/'+ inse +'</td>';
+																}
+												htmlString +=
+														'<td height="30" width="120" style="text-align: right; margin-right: 5">'+ numberWithCommas(sum_a) +'원</td>'+
+														'<td width="70" align="center" rowspan="2">인세는 세전</td>	'+
+													'</tr>'+
+													'</table>'+
+													'</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="letter-spacing: 2">'+
+														'<p align="right"><b><font size="4">이가영(714-0048)</font></b></td>'+
+														'</tr>'+
+														'<table border="0" width="720" id="table1" cellspacing="0" cellpadding="0">'+
+															'<tr>'+
+																'<td height="40" colspan="3">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td colspan="3">'+
+																'<p align="center">'+
+																'<img border="0" src="logo.jpg" width="181" height="112"></td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="40" colspan="3">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td width="240">'+
+																'</td>'+
+														'<td style="border-bottom-style: double; border-bottom-width: 5px" bordercolor="#000000">'+
+														'<p align="center"><span style="letter-spacing: 3px"><b>'+
+														'<font face="굴림" size="5">'+ jname +' 귀하</font></b></span></td>'+
+														'<td width="240">'+
+														'　</td>'+
+													'</tr>'+
+														'<tr>'+
+														'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="text-align: justify; text-indent: 0; line-height: 150%; margin-left: 20">'+
+														'<b><font size="4">안녕하세요!<br>선생님의 도서가 다음과 같이 진행되어 입고되었습니다.<br>'+
+														'인세는 &nbsp;'+ pmonth +'월 &nbsp;'+ pday +'일을 전후하여 지급할 예정입니다. 감사합니다.</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="30">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="letter-spacing: 10">'+
+														'<p align="center"><b><font size="4">-다음-</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="10">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3">'+
+														'<table border="1" width="100%" id="table2" cellspacing="0" cellpadding="2" bordercolor="#000000">'+
+															'<tr>'+
+																'<td height="30" align="center" width="270"><b>도서명</b></td>'+
+																'<td height="30" align="center" width="50"><b>중쇄</b></td>'+
+																'<td height="30" align="center" width="70"><b>정가</b></td>'+
+																'<td height="30" align="center" width="80"><b>발행부수</b></td>'+
+																'<td height="30" align="center" width="60"><b>인세율</b></td>'+
+																'<td height="30" align="center" width="120"><b>인세</b></td>'+
+																'<td height="30" align="center" width="70"><b>비고</b></td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="30" style="text-align: left; text-indent: 5; margin-left: 0; letter-spacing:-1pt;">'+ brow["sbname"] +'</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">'+ jpnum +'쇄</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">'+ numberWithCommas(brow["sbuprc"]) +'원</td>'+
+																'<td height="30" width="80" style="text-align: right; margin-right: 5">'+ numberWithCommas(row["bnum"]) +'부</td>';
+																if (row["bcode"].substring(0,5) == "11613") {
+																	htmlString +=
+																		'<td height="30" width="60" style="text-align: center; margin-right: 0">'+
+																		'인세 '+ inse +'% 의<br>1/3</td>';
+																} else {
+																	htmlString +=
+																		'<td height="30" width="60" style="text-align: center; margin-right: 0">'+
+																		'인세 '+ inse +'% 의<br>'+ jinse +'/'+ inse +'</td>';
+																}
+												htmlString +=													
+													'<td height="30" width="120" style="text-align: right; margin-right: 5">'+ numberWithCommas(sum_a) +'원</td>'+
+													'<td width="70" align="center" rowspan="2">인세는 세전</td>'+
+													'</tr>'+
+													'</table>'+
+													'</td>'+
+													'</tr>'+
+													'<tr>'+
+													'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+													'<td colspan="3" style="letter-spacing: 2">'+
+													'<p align="right"><b><font size="4">이가영(714-0048)</font></b></td>'+
+													'</tr>'+
+													'</table>';
+												if (kk < (sizeof(jjarray)-1))
+												{
+													htmlString += 
+														'<p style="page-break-before:always">'+
+														'<!--[if IE 7]><br style="height:0; line-height:0"><![endif]-->'+
+														'<!--[if IE 8]><br style="height:0; line-height:0"><![endif]-->';
+												}
+												
+											}
+										
+										htmlString += 
+											'<p style="page-break-before:always">'+
+											'<!--[if IE 7]><br style="height:0; line-height:0"><![endif]-->'+
+											'<!--[if IE 8]><br style="height:0; line-height:0"><![endif]-->';
+										
+										sum_a + (inse * brow["sbuprc"] * row["bnum"]) / 100;
+										//inse_pr53
+										htmlString += 
+											'<table border="0" width="700" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+											'<tr>'+
+											'<td align="center" height="50"></td>'+
+											'</tr>'+
+											'<tr>'+
+											'<td align="center">'+
+											'<table border="1" width="600" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+											'<tr>'+
+											'<td>'+
+											'<table border="0" width="600" id="table1" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+												'<tr>'+
+													'<td align="center" width="520" valign="top">'+
+													'<table border="0" width="100%" id="table4" cellspacing="0" cellpadding="0">'+
+														'<tr>'+
+															'<td width="20" height="20">　</td>'+
+															'<td width="480" height="20">　</td>'+
+															'<td width="20" height="20">　</td>'+
+														'</tr>'+
+														'<tr>'+
+															'<td height="50">　</td>'+
+															'<td height="50">'+
+															'<table border="0" width="100%" id="table5" cellspacing="0" cellpadding="0">'+
+																'<tr>'+
+																	'<td width="140">　</td>'+
+																	'<td width="200" style="border-bottom: 3px double #000000">'+
+																	'<p align="center"><span style="letter-spacing: 10px">'+
+																	'<font style="font-size: 20pt"><b>지출결의서</b></font></span></td>'+
+																	'<td width="140">　</td>'+
+																'</tr>'+
+															'</table>'+
+															'</td>'+
+															'<td height="50">　</td>'+
+														'</tr>'+
+														'<tr>'+
+															'<td height="30">　</td>'+
+															'<td height="30">'+
+															'<table border="0" width="100%" id="table6" cellspacing="0" cellpadding="0">'+
+																'<tr>'+
+																	'<td width="50%">'+
+																	'<p align="left"><span style="padding-left:10pt;">과 목</span></td>'+
+																	'<td width="50%">'+
+																	'<p align="right"><span style="padding-right:5pt;"><p align="right">제작일  <span style="padding-right:5pt;"><b>'+ jejak_date.substring(0,4) +'년 &nbsp;'+ jejak_date.substring(4,6) +'월 &nbsp;'+ jejak_date.substring(6,8) +'일</b></span></td>'+
+																'</tr>'+
+															'</table>'+
+															'</td>'+
+															'<td height="30">　</td>'+
+														'</tr>';
+										sum_a = (inse * brow["sbuprc"] * row["bnum"]) / 100;
+													htmlString +=
+														'<tr>'+
+															'<td height="40">　</td>'+
+															'<td height="40"><b><font style="font-size: 15pt"><span style="letter-spacing:-1;">일금'+ read_korean(sum_a) +'원정                                                                 (\\'+ numberWithCommas(sum_a) +')</span></font></b></td>'+
+															'<td height="40">　</td>'+
+														'</tr>'+
+														'<tr>'+
+															'<td height="10"></td>'+
+															'<td height="10"></td>'+
+															'<td height="10"></td>'+
+														'</tr>'+
+														'<tr>'+
+															'<td height="10"></td>'+
+															'<td height="10">'+
+															'<table border="1" width="100%" id="table8" cellspacing="0" cellpadding="2" bordercolor="#000000">'+
+																'<tr>'+
+																	'<td width="30" align="center">'+
+																	'<p align="center">내</p>'+
+																	'<p align="center">역</td>'+
+																	'<td width="450" style="text-align: left; text-indent: 10">'+
+																	'<table border="0" width="100%" id="table9" cellspacing="0" cellpadding="0">'+
+																		'<tr>'+
+																			'<td height="24" align="center"><span style="padding-left: 3pt;">'+
+																			'<b><span style="font-size: 14pt">'+ brow["sbname"] +'&nbsp;&nbsp; '+jpnum +'쇄 인세</span></b></span></td>'+
+																		'</tr>'+
+																		'<tr>'+
+																			'<td height="10">　</td>'+
+																		'</tr>';
+													for (kk = 0 ; kk < sizeof(jjarray) ; kk++)
+													{
+														jname = jjarray[kk];
+														//$jinse = (100 / sizeof($jjarray));
+														jinse = inse / sizeof(jjarray);
+														if ((row["bcode"].substring(0,5) == "12321") || (row["bcode"].substring(0,5) == "12322")) // 중학 교사 지도서 (4명)
+														{
+															switch (jname)
+															{
+																case "허화병" :
+																	jinse = 3.0;
+																	break;
+																case "이희원" :
+																	jinse = 2.5;
+																	break;
+																case "오병태" :
+																	jinse = 2.5;
+																	break;
+																case "장주연" :
+																	jinse = 2.0;
+																	break;
+															}
+														}
+														if ((row["bcode"].substring(0,5) == "41431") || (row["bcode"].substring(0,5) == "41432") || (row["bcode"].substring(0,5) == "41433")) // 보르노프 1~3권 (2명)
+														{
+															switch (jname)
+															{
+																case "김홍열" :
+																	jinse = 3;
+																	break;
+																case "노영숙" :
+																	jinse = 7;
+																	break;
+															}
+														}
+														if (row["bcode"].substring(0,5) == "16336") // 응용화성학<모범풀이집> (2명)
+														{
+															switch (jname)
+															{
+																case "오동일" :
+																	jinse = 3.0;
+																	break;
+																case "곽현규" :
+																	jinse = 7.0;
+																	break;
+															}
+														}
+														sum_a = (brow["sbuprc"] * row["bnum"] * jinse) / 100;
+														htmlString += 
+															'<tr>';
+															
+														if (row["bcode"].substring(0,5) == "11613") {
+															htmlString += '<td height="20" align="center"><span style="font-size: 11pt; padding-left:7pt; letter-spacing:0pt;">'+jname +' : '+ numberWithCommas(row["bnum"]) +'부x'+ numberWithCommas(brow["sbuprc"]) +'원x'+ numberWithComma((inse/100),2,'.',',') +' ÷3= '+ numberWithComma(sum_a) +'원</span></td>';
+														} else {
+															htmlString += '<td height="20" align="center"><span style="font-size: 11pt; padding-left:7pt; letter-spacing:0pt;">'+ jname +' : '+ numberWithComma(row["bnum"]) +'부x'+ numberWithComma(brow["sbuprc"]) +'원x'+ numberWithComma((inse/100),2,'.',',') +'x '+ numberWithComma(jinse,1,'.',',') + '\'' + numberWithComma(inse) +'='+ numberWithComma(sum_a) +'원</span></td>';
+													    }
+													    htmlString += '</tr>'; 
+												    }
+													htmlString +=
+														'<tr>'+
+															'<td height="20">　</td>'+
+														'</tr>';
+													for (kk = 0 ; kk < sizeof(jjarray) ; kk++)
+													{
+														jname = jjarray[kk];
+														
+														from = {
+																name1 : jname
+														}
+														$.ajax({
+															type : "POST",
+															contentType : "application/json; charset=utf-8;",
+															dataType : "json",
+															url : SETTING_URL + "/monthclosing/select_bookcost_statement78",
+															async : false,
+															data : JSON.stringify(from),
+															success : function(result) {
+																logNow(result);
+																var object_num = Object.keys(result);
+																var jrow = result[object_num];
+																if (!jrow["name2"])
+																	var jeoja = jrow["name1"];
+																else
+																	var jeoja = jrow["name2"] + " (" + jrow["name1"] + ")";
+																
+																htmlString +=													
+																	'<tr>'+
+																		'<td height="12" align="left"><span style="font-size: 8pt; padding-left:3pt; letter-spacing:-1;">'+ jeoja +'('+ jrow["num1"] +')</span></td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="12" align="left"><span style="font-size: 8pt; padding-left:3pt; letter-spacing:-1;">'+ jrow["addr1"] +'</span></td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="12" align="left"><span style="font-size: 8pt; padding-left:3pt; letter-spacing:-1;">'+ jrow["num2"] +'</span></td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="5"><span style="font-size: 8pt; padding-left:0pt;"></span></td>'+
+																	'</tr>';
+															}
+														});
+													}
+													htmlString +=
+																				'</table>'+
+																				'</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																		'<td height="10"></td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="40">　</td>'+
+																		'<td height="40">'+
+																		'<table border="0" width="100%" id="table7" cellspacing="0" cellpadding="0">'+
+																			'<tr>'+
+																				'<td width="50%">'+
+																				'<p align="left">지불 예정일 20'+ pyear +'년 &nbsp;'+ pmonth +'월 &nbsp;&nbsp;'+ pday +'일</td>'+
+																				'<td width="50%">'+
+																				'<p align="right">총무부 이가영</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																		'<td height="40">　</td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+																'<td align="center" width="80" valign="top">		'+
+																'<table border="0" width="50" id="table2" cellspacing="0" cellpadding="0">'+
+																	'<tr>'+
+																		'<td height="50">　</td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td>'+
+																		'<table border="1" width="100%" id="table3" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+																			'<tr>'+
+																				'<td height="30">'+
+																				'<p align="center">'+
+																				'<span style="font-size: 11pt; font-weight: 700">결재</span></td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="80%">　</td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+															'</tr>'+
+														'</table>'+
+														'</td>'+
+														'</tr>'+
+														'</table>'+
+														'</td>'+
+														'</tr>'+
+														'<tr><td height="30" align="right"><span style="padding-right:35pt;">'+ com_name +'</span></td></tr>'+
+														'<tr><td height="20"></td></tr>';
+													for (kk = 0 ; kk < sizeof(jjarray) ; kk++)
+													{
+														jname = jjarray[kk];
+														from = {
+																name1 : jname
+														}
+														$.ajax({
+															type : "POST",
+															contentType : "application/json; charset=utf-8;",
+															dataType : "json",
+															url : SETTING_URL + "/monthclosing/select_bookcost_statement79",
+															async : false,
+															data : JSON.stringify(from),
+															success : function(result) {
+																logNow(result);
+																var object_num = Object.keys(result);
+																jrow = result[object_num];
+																htmlString +=
+																	'<tr><td height="20"></td></tr>'+
+																	'<tr><td height="40">'+ jrow["addr2"] +'</td></tr>'+
+																	'<tr><td height="40"><span style="padding-left:160pt;" align="left">'+ jrow["addr3"] +'님</td></tr>'+
+																	'<tr><td height="50"><span style="padding-left:100pt; font-size:20pt; letter-spacing:15pt;" align="left">'+ jrow["zipcode"] +'</td></tr>';
+															}
+														});
+													}
+													htmlString += '</table>';
+													//inse_pr54											
+													}
+										else
+										{
+											htmlString +=
+													'<table border="0" width="720" id="table1" cellspacing="0" cellpadding="0">'+
+													'<tr>'+
+														'<td height="40" colspan="3">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3">'+
+														'<p align="center">'+
+														'<img border="0" src="logo.jpg" width="181" height="112"></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td height="40" colspan="3">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td width="240">'+
+														'　</td>'+
+														'<td style="border-bottom-style: double; border-bottom-width: 5px" bordercolor="#000000">'+
+														'<p align="center"><span style="letter-spacing: 3px"><b>'+
+														'<font face="굴림" size="5">'+ juja +' 귀하</font></b></span></td>'+
+														'<td width="240">'+
+														'　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="text-align: justify; text-indent: 0; line-height: 150%; margin-left: 20">'+
+														'<b><font size="4">안녕하세요!<br>선생님의 도서가 다음과 같이 진행되어 입고되었습니다.<br>'+
+														'인세는 &nbsp;&nbsp;월 &nbsp;&nbsp;일을 전후하여 지급할 예정입니다. 감사합니다.</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="30">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="letter-spacing: 10">'+
+														'<p align="center"><b><font size="4">-다음-</font></b></td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="10">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3">'+
+														'<table border="1" width="100%" id="table2" cellspacing="0" cellpadding="2" bordercolor="#000000">'+
+															'<tr>'+
+																'<td height="30" align="center" width="270"><b>도서명</b></td>'+
+																'<td height="30" align="center" width="50"><b>중쇄</b></td>'+
+																'<td height="30" align="center" width="70"><b>정가</b></td>'+
+																'<td height="30" align="center" width="80"><b>발행부수</b></td>'+
+																'<td height="30" align="center" width="60"><b>인세율</b></td>'+
+																'<td height="30" align="center" width="120"><b>인세</b></td>'+
+																'<td height="30" align="center" width="70"><b>비고</b></td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="30" style="text-align: left; text-indent: 5; margin-left: 0; letter-spacing:-1pt;">'+ brow["sbname"] +'</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">&nbsp;쇄</td>'+
+																'<td height="30" style="text-align: right; margin-right: 5">'+ numberWithComma(brow["sbuprc"]) +'원</td>'+
+																'<td height="30" width="80" style="text-align: right; margin-right: 5">'+ numberWithComma(row["bnum"]) +'부</td>'+
+																'<td height="30" width="60" style="text-align: right; margin-right: 5">'+ inse +'%</td>'+
+																'<td height="30" width="120" style="text-align: right; margin-right: 5">'+ numberWithComma(sum_a) +'원</td>'+
+																'<td width="70" align="center" rowspan="2">인세는 세전</td>'+
+															'</tr>'+
+														'</table>'+
+														'</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" height="20">　</td>'+
+													'</tr>'+
+													'<tr>'+
+														'<td colspan="3" style="letter-spacing: 2">'+
+														'<p align="right"><b><font size="4">박현수 실장 (714-0048)</font></b></td>'+
+													'</tr>'+
+												'</table>'+
+												'<table border="0" width="700" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+												'<tr>'+
+												'<td align="center" height="50"></td>'+
+												'</tr>'+
+												'<tr>'+
+												'<td align="center">'+
+												'<table border="1" width="600" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+												'<tr>'+
+												'<td>'+
+												'<table border="0" width="600" id="table1" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+													'<tr>'+
+														'<td align="center" width="520" valign="top">'+
+														'<table border="0" width="100%" id="table4" cellspacing="0" cellpadding="0">'+
+															'<tr>'+
+																'<td width="20" height="20">　</td>'+
+																'<td width="480" height="20">　</td>'+
+																'<td width="20" height="20">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="50">　</td>'+
+																'<td height="50">'+
+																'<table border="0" width="100%" id="table5" cellspacing="0" cellpadding="0">'+
+																	'<tr>'+
+																		'<td width="140">　</td>'+
+																		'<td width="200" style="border-bottom: 3px double #000000">'+
+																		'<p align="center"><span style="letter-spacing: 10px">'+
+																		'<font style="font-size: 20pt"><b>지출결의서</b></font></span></td>'+
+																		'<td width="140">　</td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+																'<td height="50">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="30">　</td>'+
+																'<td height="30">'+
+																'<table border="0" width="100%" id="table6" cellspacing="0" cellpadding="0">'+
+																	'<tr>'+
+																		'<td width="50%">'+
+																		'<p align="left"><span style="padding-left:10pt;">과 목</span></td>'+
+																		'<td width="50%">'+
+																		'<p align="right"><span style="padding-right:5pt;"><b>2011년 '+ tmonth +'월 '+ tday +'일</b></span></td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+																'<td height="30">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="40">　</td>'+
+																'<td height="40"><b><font style="font-size: 15pt"><span style="letter-spacing:-1;">일금영원정(\0)</span></font></b></td>'+
+																'<td height="40">　</td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="10"></td>'+
+																'<td height="10"></td>'+
+																'<td height="10"></td>'+
+															'</tr>'+
+															'<tr>'+
+																'<td height="10"></td>'+
+																'<td height="10">'+
+																'<table border="1" width="100%" id="table8" cellspacing="0" cellpadding="2" bordercolor="#000000">'+
+																	'<tr>'+
+																		'<td width="30" align="center">'+
+																		'<p align="center">내</p>'+
+																		'<p align="center">역</td>'+
+																		'<td width="450" style="text-align: left; text-indent: 10">'+
+																		'<table border="0" width="100%" id="table9" cellspacing="0" cellpadding="0">'+
+																			'<tr>'+
+																				'<td height="24" align="center"><span style="padding-left: 3pt;">'+
+																				'<b><span style="font-size: 14pt">'+ brow["sbname"] +'&nbsp;&nbsp;쇄 인세</span></b></span></td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="10">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="20" align="center"><span style="font-size: 11pt; padding-left:7pt; letter-spacing:0pt;">'+ numberWithComma(row["bnum"]) +'부x'+ numberWithComma(brow["sbuprc"]) +'원x'+ numberWithComma(inse/100)+ '=' + numberWithComma(sum_a) +'원</span></td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="20">　</td>'+
+																			'</tr>';
+											from = {
+													name1 : juja
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_bookcost_statement79",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													jrow = result[object_num];
+													htmlString +=
+																						'<tr>'+
+																						'<td height="20" align="left"><span style="font-size: 11pt; padding-left:3pt; letter-spacing:-1;"><b>'+ jrow["name1"] +'('+ jrow["num1"] +')</b></span></td>'+
+																					'</tr>'+
+																					'<tr>'+
+																						'<td height="20" align="left"><span style="font-size: 11pt; padding-left:3pt; letter-spacing:-1;"><b>'+ jrow["addr1"] +'</b></span></td>'+
+																					'</tr>'+
+																					'<tr>'+
+																						'<td height="20" align="left"><span style="font-size: 11pt; padding-left:3pt; letter-spacing:-1;"><b>'+ jrow["num2"] +'</b></span></td>'+
+																					'</tr>'+
+																				'</table>'+
+																				'</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																		'<td height="10"></td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="40">　</td>'+
+																		'<td height="40">'+
+																		'<table border="0" width="100%" id="table7" cellspacing="0" cellpadding="0">'+
+																			'<tr>'+
+																				'<td width="50%">'+
+																				'<p align="left">지불 예정일 2011년 &nbsp;2월 &nbsp;21일</td>'+
+																				'<td width="50%">'+
+																				'<p align="right">편집부 박현수</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																		'<td height="40">　</td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+																'<td align="center" width="80" valign="top">		'+
+																'<table border="0" width="50" id="table2" cellspacing="0" cellpadding="0">'+
+																	'<tr>'+
+																		'<td height="50">　</td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td>'+
+																		'<table border="1" width="100%" id="table3" cellspacing="0" cellpadding="0" bordercolor="#000000">'+
+																			'<tr>'+
+																				'<td height="30">'+
+																				'<p align="center">'+
+																				'<span style="font-size: 11pt; font-weight: 700">결재</span></td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																			'<tr>'+
+																				'<td height="55">　</td>'+
+																			'</tr>'+
+																		'</table>'+
+																		'</td>'+
+																	'</tr>'+
+																	'<tr>'+
+																		'<td height="80%">　</td>'+
+																	'</tr>'+
+																'</table>'+
+																'</td>'+
+															'</tr>'+
+														'</table>'+
+														'</td>'+
+														'</tr>'+
+														'</table>'+
+														'</td>'+
+														'</tr>'+
+														'<tr><td height="30"></td></tr>'+
+														'<tr><td height="40">'+ jrow["addr2"] +'</td></tr>'+
+														'<tr><td height="40"><span style="padding-left:160pt;" a;ign="left">'+ jrow["addr3"] +'님</td></tr>'+
+														'</table>'
+														'</table>';
+													
+												}
+											});							
+										}
+										
+										}
+								});			
+						} 
+						});
+				}
+				});
+				
+				function chkPr()
+				{
+					IEPageSetupX.header='';
+					IEPageSetupX.footer='';	
+					IEPageSetupX.Orientation = 1;
+					IEPageSetupX.leftMargin=5;
+					IEPageSetupX.rightMargin=0;
+					IEPageSetupX.topMargin=5;
+					IEPageSetupX.bottomMargin=0;	
+	
+					IEPageSetupX.PaperSize = 'A4(80)';
+					
+				//if (IEPageSetupX.GetPrinters().indexOf('DOT') > -1)
+	//				IEPageSetupX.Printer = 'DOT';
+	
+					IEPageSetupX.Print(1);
+				}
+				(popUp.document.getElementById("popdata")).innerHTML = htmlString;
+		}
+	}
+	
+	//$("#mcBookCostStatementDetailData").html(htmlString);
 }
 
-function SelBookCostStatementSobuModify(cnt) {
-	
-	var uid = $("input[name=uid1]").val()
-	var ty = $("input[name=ty1]").val()
-	var tm = $("input[name=tm1]").val()
-	var td = $("input[name=td1]").val()
-	var page = $("input[name=page1]").val()
-	var daeid = $("input[name=daeid1]").val()
-	var sobusum = $("input[name=sobusum1]").val()
-	var daeid = $("input[name=daeid1]").val()
-	var daesum = $("input[name=daesum1]").val()
-	var a = new Array();
-	logNow("넘어왔나?");
-	logNow(cnt);
-	logNow("000");
-	for(var i=0; i < cnt; i++){
-		a[i] = document.getElementsByName("sobu")[i].textContent;
-		logNow(document.getElementsByName("sobu")[i].textContent);
-	}
-	logNow("a : " + a);
-	logNow("000");
-	logNow(uid);
+function test(ty, tm, td){
+	m7('jejak_side_menu_btn0');
+	//$('#jejak_detail_view').html(jmenu7("0"));
 	logNow(ty);
 	logNow(tm);
-	logNow(td);
-	logNow(page);
-	logNow(daeid);
-	logNow(sobusum);
-	logNow(daesum);
-	logNow("넘어왔나?");
-	
-	$('#jejak_detail_view').html(jmenu7("0_소부대지수정"));
+	logNow(tm);
+}
 
+
+
+// 도서별 상세 원가계산서 소부.대지 수정
+function SobuModify(cnt) {
 	
-	
-	$("#BookCostStatementSobuModify").html(htmlString);
-	/*for (var i = 0 ; i < sizeof(daeji5) ; i++)
+	var uid = $("input[name=uid1]").val();
+	var ty = $("input[name=ty1]").val();
+	var tm = $("input[name=tm1]").val();
+	var td = $("input[name=td1]").val();
+	var page = $("input[name=page1]").val();
+	var sobu5 = new Array();
+	var daeid5 = new Array();
+	var pannum5 = new Array();
+	var daeji5 = new Array();
+	var filmnum5 = new Array();
+
+	for(var i=0; i < cnt; i++){
+		daeji5[i] = document.getElementsByName("daeji5")[i].value;
+		pannum5[i] = document.getElementsByName("pannum")[i].value;
+		daeid5[i] = document.getElementsByName("daeid")[i].defaultValue;
+		sobu5[i] = document.getElementsByName("sobu")[i].textContent;
+		filmnum5[i] = document.getElementsByName("filmnum5")[i].value;
+	}
+
+	for (var i = 0 ; i < daeji5.length ; i++)
 	{
-		if (daeji5[i])
+		if (Number(daeji5[i]))
 		{
-			new_sum = daeji5[$i];
+			var new_sum = daeji5[i];
 			//$new_sum += $sobusum[$i];
-			new_sum += (pannum5[i] * 7000);
-			new_sobu = (pannum5[i] * 7000);
+			new_sum = Number(new_sum) + Number(pannum5[i] * 7000);
+			var new_sobu = Number(pannum5[i] * 7000);
 			new_sum *= 1.1;
-			new_id = daeid[i];
-			
-			$query = "update TMPLIST5 set pannum5=$pannum5[$i], filmnum5=0, filmcost5=0, daeji5=$daeji5[$i], sobu5=$new_sobu, sum5=$new_sum where uid=$new_id";
-			$result = mysql_query($query, $dbconn);
-			if (!$result)
-			{
-				popup_msg("대지비 계산 오류");
-				exit;
+			var new_id = daeid5[i];
+			from = {
+					pannum5 : pannum5[i],
+					daeji5 : daeji5[i],
+					sobu5 : new_sobu,
+					sum5 : new_sum,
+					uid : new_id
 			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/update_bookcost_statement38",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					if (!result)
+					{
+						alert("대지비 계산 오류");
+						exit;
+					}
+				}
+			});
 		}
 		else
 		{
-			$query = "select * from TMPLIST5 where uid=$daeid[$i]";
-			$f_res = mysql_query($query, $dbconn);
-			if (!$f_res)
-			{
-				popup_msg("film 단가 오류");
-				exit;
+			from = {
+					uid : daeid5[i]
 			}
-			$f_row = mysql_fetch_array($f_res);
-			$fdanga = $f_row[filmdan5];
-			if (!$filmnum5[$i])
-				$filmnum5[$i] = 0;
-			$new_sobu = ($pannum5[$i] * 7000);
-			$new_film = ($filmnum5[$i] * $fdanga);
-			$new_sum = ($new_sobu + $new_film) * 1.1;
-			
-			$query = "update TMPLIST5 set pannum5=$pannum5[$i], filmnum5=$filmnum5[$i], filmcost5=$new_film, sobu5=$new_sobu, sum5=$new_sum, daeji5=0 where uid=$daeid[$i]";
-			$result = mysql_query($query, $dbconn);
-			if (!$result)
-			{
-				popup_msg("필름, 소부비 계산 오류");
-				exit;
-			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_bookcost_statement39",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					var object_num = Object.keys(result);
+					if (!result)
+					{
+						alert("film 단가 오류");
+						exit;
+					}
+					var f_row = result[object_num];
+					var fdanga = f_row["filmdan5"];
+					if (!filmnum5[i])
+						filmnum5[i] = 0;
+					var new_sobu = (pannum5[i] * 7000);
+					var new_film = (filmnum5[i] * fdanga);
+					var new_sum = Number(new_sobu + new_film) * 1.1;
+					from = {
+							pannum5 : pannum5[i],
+							filmnum5 : filmnum5[i],
+							filmcost5 : new_film,
+							sobu5 : new_sobu,
+							sum5 : new_sum,
+							uid : daeid5[i]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement40",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							if (!result)
+							{
+								alert("필름, 소부비 계산 오류");
+								exit;
+							}
+						}
+					});
+					
+				}
+			});
 		}
 	}
+	SelBookCostStatementDetail(uid, ty, tm, td, page);
+}
 
-	echo("<meta http-equiv='Refresh' content='0; URL=ex_view.php?uid=$uid&ty=$ty&tm=$tm&td=$td&page=$page'>");*/
+// 도서별 상세 원가계산서 인쇄비 수정
+function SelBookCostStatementPrintModify(cnt){
+	var uid = $("input[name=uid]").val();
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+	var uids = new Array();
+	var rnum = new Array();
+	var pdanga = new Array();
+	logNow(cnt);
+	for(var i=0; i < cnt; i++)
+	{
+		uids[i] = document.getElementsByName("uids")[i].value;
+		rnum[i] = document.getElementsByName("rnum")[i].value;
+		pdanga[i] = document.getElementsByName("pdanga")[i].value;
+		logNow(uids[i]);
+		from = {
+				uid : uids[i]
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement41",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				var object_num = Object.keys(result);
+				var row = result[object_num];
+				logNow(row["colo"]);
+				logNow(row["colo"] * rnum[i]);
+				if ((row["gubn"] == '표지') || (row["gubn"] == '속표지') || (row["gubn"] == '면지') || (row["gubn"] == '면지1') || 
+						(row["gubn"] == '면지2') || (row["gubn"] == '화보') || (row["gubn"] == '별지') || (row["gubn"] == '케이스'))
+					var tcolo = row["colo"] + 1;
+				else
+					var tcolo = row["colo"];
+				var new_cost = tcolo * rnum[i] * pdanga[i] * 1.1;
+
+				from = {
+						rnum : rnum[i],
+						pdanga : pdanga[i],
+						pcost : new_cost,
+						uid : uids[i]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement42",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						SelBookCostStatementDetail(uid, ty, tm, td, page);
+					}
+				});
+				
+			}
+		});
+	}
+}
+
+// 도서별 상세 원가계산서 제본비 수정
+function SelBookCostStatementJebonModify(){
+	var uid = $("input[name=uid]").val();
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+	var uids = new Array();
+	var cpage = new Array();
+	var cprice1 = new Array();
+	var cprice2 = new Array();
+	var pdanga = new Array();
+	
+	var cnt = document.getElementsByName("jebonUids").length;
+	logNow(cnt);
+	for(var i=0; i < cnt; i++)
+	{
+		logNow("커몬베이베");
+		uids[i] = document.getElementsByName("jebonUids")[i].value;
+		cpage[i] = document.getElementsByName("cpage")[i].value;
+		cprice1[i] = document.getElementsByName("cprice1")[i].value;
+		cprice2[i] = document.getElementsByName("cprice2")[i].value;
+		pdanga[i] = document.getElementsByName("jebonPdanga")[i].value;
+		
+		from = {
+				uid : uids[i]
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement43",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				
+				var new_cost = (Number(cprice2[i]) + Number(pdanga[i])) * row["cnum7"] * 1.1;
+				
+				from = {
+						cpage7 : cpage[i],
+						cprice17 : cprice1[i],
+						cprice27 : cprice2[i],
+						pdanga7 : pdanga[i],
+						totcost7 : new_cost,
+						uid : uids[i]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement44",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						if( i == (cnt -1) )
+							SelBookCostStatementDetail(uid, ty, tm, td, page);
+					}
+				});
+			}
+		});
+	}
+}
+
+// 도서별 상세 원가계산서 코팅비 추가  
+function SelBookCostStatementCCInsert(){
+
+		var uid = $("input[name=coatuid]").val();
+		var ty = $("input[name=ty]").val();
+		var tm = $("input[name=tm]").val();
+		var td = $("input[name=td]").val();
+		var page = $("input[name=page]").val();
+		var cnum = $("input[name=coatcnum]").val();
+		var cprice = $("input[name=coatcprice]").val();
+		
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement45",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				logNow(row["listid"]);
+				logNow(row["bdate"]);
+				logNow(row["m2"]);
+				logNow(row["bcode"]);
+	
+				var new_cost = cnum * cprice;
+				
+				from = {
+						ccode8 : row["m2"],
+						bcode8 : row["bcode"],
+						cdate8 : row["bdate"],
+						cnum8 : cnum,
+						cprice8 : cprice,
+						totcost8 : new_cost,
+						crnum8 : uid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement46",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						SelBookCostStatementDetail(uid, ty, tm, td, page);
+					}
+				});
+			}
+		});
+}
+
+// 도서별 상세 원가계산서 코팅비 삭제
+function SelBookCostStatementCCDelete(uids){
+	var uid = $("input[name=uid]").val();
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+
+	from = {
+			uid : uids
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/delete_bookcost_statement47",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			SelBookCostStatementDetail(uid, ty, tm, td, page);
+		}
+	});
+}
+
+// 도서별 상세 원가계산서 코팅비 수정
+function SelBookCostStatementCCModify(){
+
+	var uid = $("input[name=uid]").val();
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+	
+	var cnum = new Array;
+	var cprice = new Array;
+	var uids = new Array;
+
+	var cnt = document.getElementsByName('coatingUids').length;
+	logNow(cnt);
+	for(var i=0; i < cnt; i++)
+	{
+		cnum[i] = document.getElementsByName('cnum')[i].value;
+		cprice[i] = document.getElementsByName('cprice')[i].value;
+		uids[i] = document.getElementsByName('coatingUids')[i].value;
+		
+		var new_cost = cnum[i] * cprice[i];
+		
+		from = {
+				cnum8 : cnum[i],
+				cprice8 : cprice[i],
+				totcost8 : new_cost,
+				uid : uids[i]
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/update_bookcost_statement48",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+			}
+		});
+	}
+	SelBookCostStatementDetail(uid, ty, tm, td, page);
+}
+
+// 도서별 상세 원가계산서 비닐 추가
+function SelBookCostStatementVinylInsert(){
+	var uid = $("input[name=uid]").val();
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+	
+	var buid = $("input[name=buid]").val();
+	var bprice = $("input[name=bprice]").val();
+	
+	from = {
+			uid : buid
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_bookcost_statement49",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			row = result[object_num];
+			
+			from = {
+					ccode9 : row["m8"],
+					bcode9 : row["bcode"],
+					cdate9 : row["bdate"],
+					cnum9 : row["bnum"],
+					cprice9 : bprice,
+					crnum9 : buid
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/insert_bookcost_statement50",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					SelBookCostStatementDetail(uid, ty, tm, td, page);
+				}
+			});
+		}
+	});
+}
+
+// 도서별 상세 원가계산서 기타 수정
+function SelBookCostStatementEtc(uid){
+	
+	var ty = $("input[name=ty]").val();
+	var tm = $("input[name=tm]").val();
+	var td = $("input[name=td]").val();
+	var page = $("input[name=page]").val();
+
+	var w1 = commasRemove(document.getElementsByName('w1')[0].value);
+	var w2 = commasRemove(document.getElementsByName('w2')[0].value);
+	var w3 = commasRemove(document.getElementsByName('w3')[0].value);
+	var w4 = commasRemove(document.getElementsByName('w4')[0].value);
+	var w5 = commasRemove(document.getElementsByName('w5')[0].value);
+	var w6 = commasRemove(document.getElementsByName('w6')[0].value);
+	var w7 = commasRemove(document.getElementsByName('w7')[0].value);
+	var w8 = commasRemove(document.getElementsByName('w8')[0].value);
+	var w9 = commasRemove(document.getElementsByName('w9')[0].value);
+	var w11 = commasRemove(document.getElementsByName('w11')[0].value);
+	
+	
+	
+	from = {
+			w1 : w1,
+			w2 : w2,
+			w3 : w3,
+			w4 : w4,
+			w5 : w5,
+			w6 : w6,
+			w7 : w7,
+			w8 : w8,
+			w9 : w9,
+			w11 : w11,
+			uid : uid
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/update_bookcost_statement51",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+		}
+	});
+	
+	//케이스
+	if (w6)
+	{
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement52",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				if(object_num.length)
+				{
+					row = result[object_num];
+					from = {
+							w6 : w6,
+							uid : row["uid"]
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/update_bookcost_statement1",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);							
+						}
+					});
+				}
+				else
+				{
+					from = {
+							uid : uid
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_bookcost_statement53",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							if(!result)
+							{
+								alert("제작정보를 찾을 수 없습니다. (2)");
+								exit;
+							}
+							row = result[object_num];
+							var listid = row["listid"];
+							var ccode = row["m7"];
+							var bdate = row["bdate"];
+							
+							from = {
+									listid : listid
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/select_bookcost_statement54",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									var object_num = Object.keys(result);
+									if(!result)
+									{
+										alert("제작정보를 찾을 수 없습니다. (1)");
+										exit;
+									}
+									var row = result[object_num];
+									
+									from = {
+											ccode9 : ccode,
+											bcode9 : row["bcode"],
+											cdate9 : bdate,
+											cnum9 : row["bnum"],
+											cprice9 : w6,
+											bitag : 2,
+											crnum9 : uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/insert_bookcost_statement1",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			}
+		});
+	}
+	
+	// 스티커
+	if(w7)
+	{
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement55",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				ccode = row["m5"];
+				
+				from = {
+						cprice9 : w7,
+						crnum9 : uid,
+						ccode9 : ccode
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement2",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+			}
+		});
+	}
+	
+	// CD
+	if(w8)
+	{
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement56",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				logNow("m6");
+				logNow(row);
+				ccode = row["m6"];
+				from = {
+						cprice9 : w8,
+						crnum9 : uid,
+						ccode9 : ccode
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement3",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+				
+			}
+		});
+	}
+	
+	// 목형
+	if(w11)
+	{
+		from = {
+				uid : uid
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement57",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				ccode = row["m11"];
+				from = {
+						cprice9 : w11,
+						crnum9 : uid,
+						ccode9 : ccode
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/update_bookcost_statement4",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+					}
+				});
+				
+			}
+		});
+	}
+	SelBookCostStatementDetail(uid, ty, tm, td, page);
+}
+
+// 도서별 상세 원가 계산서 신코드 변경 버튼
+function btnNewCodeModify (uid){
+	from = {
+			uid : uid	
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_bookcost_statement72",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				
+				from = {
+						listid : row["listid"]	
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_bookcost_statement73",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							row = result[object_num];
+							
+							var tuid = String(row["uid"]);
+							var tcode = Number(row["bcode"].substring(0,6));
+							logNow(tcode);
+							from = {
+									sbbook : tcode	
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_bookcost_statement74",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										row = result[object_num];
+										
+										var tnew = String(row["sbbook"]);
+										var tprice = row["sbuprc"];
+										
+										from = {
+												bcode : tnew,
+												bprice : tprice,
+												uid : tuid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_bookcost_statement26",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+										from = {
+												bookcode : tnew,
+												juid : uid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_bookcost_statement27",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+										logNow(tnew);
+										logNow(uid);
+										from = {
+												bcode : tnew,
+												uid : uid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_bookcost_statement28",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+										from = {
+												bcode : tnew,
+												uid : uid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_bookcost_statement29",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+										from = {
+												bcode : tnew,
+												uid : uid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_bookcost_statement30",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+										from = {
+												bcode : tnew,
+												uid : uid
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/update_bookcost_statement31",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+											}
+										});
+									}
+								});
+						}
+					});
+			}
+		});
 }
 
 // 잡물 원가계산서
@@ -2908,6 +6682,7 @@ function SelJMCostStatement(lm_s, lm_t) {
 					}
 					
 					var t_janh = CheckJANH(row10["jbjanh"]);
+					logNow("장형?"+row10["jbjanh"]);
 					htmlString +=
 						'</tr>'+
 	                    '<tr>'+
@@ -4099,17 +7874,18 @@ function SelJMCostStatementDetail(uid, ty, tm, td, page) {
 								data : JSON.stringify(from),
 								success : function(result) {
 									logNow(result);
+									
 									var object_num = Object.keys(result);
-									if(object_num.length)
+									if(!result)
 									{
 										from = {
 												uid : uid
-										};
+										}
 										$.ajax({
 											type : "POST",
 											contentType : "application/json; charset=utf-8;",
 											dataType : "json",
-											url : SETTING_URL + "/monthclosing/select_jmcost_statement17",
+											url : SETTING_URL + "/monthclosing/insert_jmcost_statement17",
 											async : false,
 											data : JSON.stringify(from),
 											success : function(result) {
@@ -4262,25 +8038,29 @@ function SelJMCostStatementDetail(uid, ty, tm, td, page) {
 											    '</tr>'+
 											'</table>';
 									
-										
+									logNow(total_cost);
+									logNow(total_danga);
+									logNow(uid);
 									from = {
 											total_cost : total_cost,
 											total_danga : total_danga,
 											uid : uid
-									};
+									}
 									$.ajax({
 										type : "POST",
 										contentType : "application/json; charset=utf-8;",
 										dataType : "json",
-										url : SETTING_URL + "/monthclosing/select_jmcost_statement18",
+										url : SETTING_URL + "/monthclosing/update_jmcost_statement18",
 										async : false,
 										data : JSON.stringify(from),
 										success : function(result) {
+
+											logNow("에러잡기");
 											logNow(result);
 											if (!result)
 											{
-												popup_msg("원가 업데이트 오류");
-												exit;
+												alert("원가 업데이트 오류");
+												return 0;
 											}
 										}
 									});
@@ -4963,7 +8743,6 @@ function btnPumMonInsert(bdate) {
 			data : JSON.stringify(from),
 			success : function(result) {
 				logNow(result);
-				logNow("여기?");
 				var object_num = Object.keys(result);
 				for(var i=0; i < object_num.length; i++)
 				{
@@ -5386,6 +9165,7 @@ function SelPumPer(bdate) {
 
 					var object_num = Object.keys(result);
 					htmlString = "";
+					var ii = 0;
 					var snum1 = 0;
 					var snum2 = 0;
 					var snum3 = 0;
@@ -5430,7 +9210,7 @@ function SelPumPer(bdate) {
 
 						htmlString += 
 								'<tr>'+
-								'<td style="cursor:hand" onClick="javascript:View_All();" width="80" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+data["wjname"]+'</span></td>'+
+								'<td style="cursor:hand" onClick="javascript:View_All(in'+ ii +',out'+ ii +');" width="80" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+data["wjname"]+'</span></td>'+
 								'<td width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
 						if (num1)
 							htmlString += numberWithCommas(num1) + " R ";
@@ -5438,20 +9218,20 @@ function SelPumPer(bdate) {
 						htmlString += 
 								'</span></td>'+
 								'<td width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt1"])+'</span></td>'+
-								'<td style="cursor:hand" onClick="javascript:View_Com();" width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
+								'<td style="cursor:hand" onClick="javascript:View_Com('+ '\'' +'in'+ ii + '\'' +');" width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
 						if (num3)
 							htmlString += numberWithCommas(num3) + " R ";
 						htmlString += num4;
 						htmlString += 
 								'</span></td>'+
-								'<td style="cursor:hand" onClick="javascript:View_Com();" width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt2"])+'</span></td>'+
-								'<td style="cursor:hand" onClick="javascript:View_Com();" width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
+								'<td style="cursor:hand" onClick="javascript:View_Com(in'+ ii +');" width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt2"])+'</span></td>'+
+								'<td style="cursor:hand" onClick="javascript:View_Com(out'+ ii +');" width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
 						if (num5)
 							htmlString += numberWithCommas(num5) + " R ";
 						htmlString += num6;
 						htmlString += 
 								'</span></td>'+
-								'<td style="cursor:hand" onClick="javascript:View_Com();" width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt3"])+'</span></td>'+
+								'<td style="cursor:hand" onClick="javascript:View_Com(out'+ ii +');" width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt3"])+'</span></td>'+
 								'<td width="85" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">';
 						if (num7)
 							htmlString += numberWithCommas(num7) + " R ";
@@ -5459,6 +9239,91 @@ function SelPumPer(bdate) {
 						htmlString += 
 								'</span></td>'+
 								'<td width="90" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+numberWithCommas(data["amnt4"])+'</span></td>' + '</tr>';
+						'<tr style="display:none;" id="in'+ ii +'">'+
+	                	'<td width="780" bgcolor="#FFF5F5" colspan="9" align="center" valign="middle" bgcolor="white">'+
+	                		'<table width="520" border="0" cellpadding="0" cellspacing="0">'+
+	                			'<tr><td width="520" colspan="4" height="5"></td></tr>'+
+	                			'<tr>'+
+	                				'<td width="80" height="15" style="border-top: 1px solid #AAAAAA; border-bottom: 1px solid #AAAAAA;" align="center"><span style="font-size:8pt; letter-spacing:20pt;">'+
+	                					'일자</span></td>'+
+	                				'<td width="240" height="15" style="border-top: 1px solid #AAAAAA; border-bottom: 1px solid #AAAAAA; border-left: 1px solid #AAAAAA;" align="center"><span style="font-size:8pt; letter-spacing:20pt;">'+
+	                					'구매처</span></td>'+
+	                				'<td width="100" height="15" style="border-top: 1px solid #AAAAAA; border-bottom: 1px solid #AAAAAA; border-left: 1px solid #AAAAAA;" align="center"><span style="font-size:8pt; letter-spacing:20pt;">'+
+	                					'수량</span></td>'+
+	                				'<td width="100" height="15" style="border-top: 1px solid #AAAAAA; border-bottom: 1px solid #AAAAAA; border-left: 1px solid #AAAAAA;" align="center"><span style="font-size:8pt; letter-spacing:20pt;">'+
+	                					'금액</span></td>'+
+	                			'</tr>';
+					function mktime(h, i, s, m, d, y){
+
+						  var mkt = new Date(y, m-1, d, h, i, s);
+
+						  if( mktime.arguments.length == 0 ) mkt = new Date();
+
+						  return Math.floor(mkt.getTime()/1000);
+					}
+						var tsum1 = 0;
+						var tsum2 = 0;
+						var tdate1 = mktime(0,0,0,intval(tm),1,intval(ty))
+						var tdate2 = mktime(0,0,0,intval(tm2),32,intval(ty));
+						
+						from = {
+								yjcode : row["yjcode"],
+								date1 : tdate1,
+								date2 : tdate2,
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_pum_per7",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								for(i in object_num)
+								{
+									crow = result[i];
+									from = {
+											wccode : crow["comid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_pum_per8",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											trow = result[object_num];
+											var custname = trow["wcname"];
+											
+											tsum1 += crow["num"];
+											tsum2 += crow["tprice"];
+											var tnum1 = "";
+											var tnum2 = "";
+											if (crow["num"] > 0)
+											{
+												num1 = Math.floor(crow["num"] / 500);
+												num2 = crow["num"] % 500;
+											}
+											else
+											{
+												num1 = Math.floor(abs(crow["num"]) / 500);
+												num2 = abs(crow["num"]) % 500;
+												num1 *= -1;
+											}
+											if (num1)
+												tnum1 = sprintf("%s", num1) + " R";
+											if (num2)
+												tnum2 = sprintf("%s", num2);
+										}
+									});
+								}
+							}
+						});
 					}
 					$("#mcPumPerData1").html(htmlString);
 
@@ -6020,8 +9885,6 @@ function btnPumPerInsert(bdate) {
 						a2 = row["amnt2"];
 						q3 = row["qnty3"];
 						a3 = row["amnt3"];
-						logNow("이게 왜 널이야? : " +bdate);
-						logNow("얘는 왜 널이야? : " + mrow["wjcode"])
 						from = {
 								yjcode : mrow["wjcode"],
 								indate : indate,
@@ -6055,15 +9918,7772 @@ function btnPumPerInsert(bdate) {
 }
 
 // 제조비명세표
+function SelMCSpecification(bdate){
+	var dbname = "JEJOMSTEST";
+	logNow(bdate);
+	var sy = bdate.substring(0,4);
+	var sm = bdate.substring(4,6);
+	var num_ = 0;
+	var num_PR = 0; // 제판,인쇄
+	var num_CT = 0; // 코팅
+	var num_JB = 0; // 제본
+	var num_ST = 0; // 스티커
+	var num_CD = 0; // CD
+	var num_CS = 0; // 케이스
+	var num_VN = 0; // 비닐
+	
+	var etc_sum = 0;
+	
+	var td_num = 0;
+	
+	// 인쇄 전역변수 공간
+	var mc1;
+	// 인쇄 전역변수 끝
+	function eregi(str1, str2){
+		var patt = new RegExp(str1, 'i');
+		return str2.match(patt);
+	}
+	
+	from = {
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification1",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				mc1 = result;
+				var object_num = Object.keys(result);
+				for(i in object_num)
+				{
+					row = result[i];
+					eval("var num_" + row["jmfield"] + "=" + row["uid"]);
+				}
+				logNow("vn : "+num_VN);
+				//재판
+				var a = "";
+				for(var ii=1; ii <= num_PR; ii++)
+				{
+					var fieldname = "jp" + ii;
+					a += "SUM(" + fieldname + ") AS " + fieldname + ", ";
+				}
+				
+				var dbattr = a.slice(0, -1);
+				
+				logNow("-----");
+				logNow(dbattr.slice(0,-1));
+				dbattr = dbattr.slice(0,-1);
+				logNow(dbattr);
+				logNow("-----");
+				from = {
+						dbattr : dbattr,
+						dbname : dbname,
+						bdate : bdate
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							var row = result[object_num];
+							
+							var jp_array = new Array();
+							var jps_array = new Array();
+							var jps2_array = new Array();
+							var tnum = 0;
+							
+							for(var ii=0; ii < num_PR; ii++)
+							{
+								if(row["jp"+(ii+1)] != 0)
+								{
+									var fdname = "jp" + (ii+1);
+									jp_array[tnum] = fdname;
+									
+									from = {
+											dbattr : fdname,
+											dbattr : fdname,
+											dbname : dbname,
+											bdate : bdate
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(tresult) {
+												logNow(tresult);
+												var object_tnum = Object.keys(tresult);
+												var trow = tresult[object_tnum];
+												jps_array[tnum] = trow["sum1"];
+												jps2_array[tnum] = trow["sum2"];
+												tnum++;
+											}
+										});
+								}
+							}
+							
+							td_num = tnum;
+							var query = "";
+							for (var ii = 1 ; ii <= num_PR ; ii++)
+							{
+								fieldname = "pr" + ii;
+								query += "SUM(" + fieldname + ") AS "+ fieldname +",";
+							}
+							
+							from = {
+									dbattr : query.slice(0,-1),
+									dbname : dbname,
+									bdate : bdate
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification4",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										row = result[object_num];
+										
+										var pr_array = new Array();
+										var prs_array = new Array();
+										var prs2_array = new Array();
+										tnum = 0;
+										
+										for (ii = 0 ; ii < num_PR ; ii++)
+										{
+											if (row["pr"+(ii+1)] != 0)
+											{
+												fdname = "pr" + (ii+1);
+												pr_array[tnum] = fdname;
+												from = {
+														dbattr : fdname,
+														dbattr : fdname,
+														dbname : dbname,
+														bdate : bdate
+														}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(tresult) {
+														logNow(tresult);
+														var object_tnum = Object.keys(tresult);
+														trow = tresult[object_tnum];
+														prs_array[tnum] = trow["sum1"];
+														prs2_array[tnum] = trow["sum2"];
+														tnum++;
+														}
+												});
+											}
+										}
+										
+										num_PR = tnum;
+										td_num += tnum;
+										query = "";
+										//코팅
+										var ct_array = new Array();
+										var cts_array = new Array();
+										var cts2_array = new Array();
+										for(var ii=1; ii <= num_CT; ii++)
+										{
+											fieldname = "ct" + ii;
+											query += "SUM(" + fieldname + ") AS " + fieldname + ", ";
+										}
+										from = {
+												dbattr : query.slice(0,-2),
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													var object_num = Object.keys(result);
+													var row = result[object_num];
+													tnum = 0;
+													for(var ii=0; ii < num_CT; ii++)
+													{
+														if(row["ct"+(ii+1)] != 0)
+														{
+															fdname = "ct" + (ii+1);
+															ct_array[tnum] = fdname;
+															
+															from = {
+																	dbattr : fdname,
+																	dbattr : fdname,
+																	dbname : dbname,
+																	bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(tresult) {
+																		logNow(tresult);
+																		var object_tnum = Object.keys(tresult);
+																		var trow = tresult[object_tnum];
+																		cts_array[tnum] = trow["sum1"];
+																		cts2_array[tnum] = trow["sum2"];
+																		tnum++;
+																	}
+																});
+														}
+													}
+												}
+											});
+										num_CT = tnum;
+										td_num += tnum;
+										
+										// 제본
+										var jb_array = new Array();
+										var jbs_array = new Array();
+										var jbs2_array = new Array();
+										query = "";
+										for(var ii=1; ii <= num_JB; ii++)
+										{
+											fieldname = "jb" + ii;
+											query += "sum(" + fieldname + ") AS " + fieldname + ",";
+										}
+										from = {
+												dbattr : query.slice(0,-1),
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													var row = result[object_num];
+													tnum = 0;
+													
+													for(var ii=0; ii < num_JB; ii++)
+													{
+														if(row["jb"+(ii+1)] != 0)
+														{
+															fdname = "jb" + (ii+1);
+															jb_array[tnum] = fdname;
+															
+															from = {
+																	dbattr : fdname,
+																	dbattr : fdname,
+																	dbname : dbname,
+																	bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(tresult) {
+																		logNow(tresult);
+																		var object_tnum = Object.keys(tresult);
+																		var trow = tresult[object_tnum];
+																		jbs_array[tnum] = trow["sum1"];
+																		jbs2_array[tnum] = trow["sum2"];
+																		tnum++;
+																	}
+																});
+														}
+													}
+												}
+											});
+										num_JB = tnum;
+										td_num += tnum;
+										
+										// 비닐
+										var vn_array = new Array();
+										var vns_array = new Array();
+										var vns2_array = new Array();
+										query = "";
+										for(var ii=1; ii <= num_VN; ii++)
+										{
+											fieldname = "vn" + ii;
+											query += "sum(" + fieldname + ") AS " + fieldname + ",";
+										}
+										from = {
+												dbattr : query.slice(0,-1),
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													var row = result[object_num];
+													tnum = 0;
+													
+													for(var ii=0; ii < num_VN; ii++)
+													{
+														if(row["vn"+(ii+1)] != 0)
+														{
+															fdname = "vn" + (ii+1);
+															vn_array[tnum] = fdname;
+															
+															from = {
+																	dbattr : fdname,
+																	dbattr : fdname,
+																	dbname : dbname,
+																	bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(tresult) {
+																		logNow(tresult);
+																		var object_tnum = Object.keys(tresult);
+																		var trow = tresult[object_tnum];
+																		vns_array[tnum] = trow["sum1"];
+																		vns2_array[tnum] = trow["sum2"];
+																		tnum++;
+																	}
+																});
+														}
+													}
+												}
+											});
+										num_VN = tnum;
+										td_num += tnum;
+										logNow("비닐어레이 " +  vn_array + "tnum : " + num_VN);
+										// 케이스
+										var cs_array = new Array();
+										var css_array = new Array();
+										var css2_array = new Array();
+										if(num_CS > 0)
+										{	
+											query = "";
+											for(var ii=1; ii <= num_CS; ii++)
+											{
+												fieldname = "cs" + ii;
+												query += "sum(" + fieldname + ") AS " + fieldname + ",";
+											}
+											from = {
+													dbattr : query.slice(0,-1),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														for(var ii=0; ii < num_CS; ii++)
+														{
+															if(row["cs"+(ii+1)] != 0)
+															{
+																fdname = "cs" + (ii+1);
+																cs_array[tnum] = fdname;
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			css_array[tnum] = trow["sum1"];
+																			css2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_CS = tnum;
+											td_num += tnum;
+										}
+										
+										// 스티커
+										var st_array = new Array();
+										var sts_array = new Array();
+										var sts2_array = new Array();
+										query = "";
+										for(var ii=1; ii <= num_ST; ii++)
+										{
+											fieldname = "st" + ii;
+											query += "sum(" + fieldname + ") AS " + fieldname + ",";
+										}
+										from = {
+												dbattr : query.slice(0,-1),
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													var row = result[object_num];
+													tnum = 0;
+													
+													for(var ii=0; ii < num_ST; ii++)
+													{
+														if(row["st"+(ii+1)] != 0)
+														{
+															fdname = "st" + (ii+1);
+															st_array[tnum] = fdname;
+															
+															from = {
+																	dbattr : fdname,
+																	dbattr : fdname,
+																	dbname : dbname,
+																	bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(tresult) {
+																		logNow(tresult);
+																		var object_tnum = Object.keys(tresult);
+																		var trow = tresult[object_tnum];
+																		sts_array[tnum] = trow["sum1"];
+																		sts2_array[tnum] = trow["sum2"];
+																		tnum++;
+																	}
+																});
+														}
+													}
+												}
+											});
+										num_ST = tnum;
+										td_num += tnum;
+										
+										// CD
+										var cd_array = new Array();
+										var cds_array = new Array();
+										var cds2_array = new Array();
+										query = "";
+										for(var ii=1; ii <= num_CD; ii++)
+										{
+											fieldname = "cd" + ii;
+											query += "sum(" + fieldname + ") AS " + fieldname + ",";
+										}
+										from = {
+												dbattr : query.slice(0,-1),
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													var row = result[object_num];
+													tnum = 0;
+													
+													for(var ii=0; ii < num_CD; ii++)
+													{
+														if(row["cd"+(ii+1)] != 0)
+														{
+															fdname = "cd" + (ii+1);
+															cd_array[tnum] = fdname;
+															
+															from = {
+																	dbattr : fdname,
+																	dbattr : fdname,
+																	dbname : dbname,
+																	bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(tresult) {
+																		logNow(tresult);
+																		var object_tnum = Object.keys(tresult);
+																		var trow = tresult[object_tnum];
+																		cds_array[tnum] = trow["sum1"];
+																		cds2_array[tnum] = trow["sum2"];
+																		tnum++;
+																	}
+																});
+														}
+													}
+												}
+											});
+										num_CD = tnum;
+										td_num += tnum;
+										
+										var tbl_width = (td_num * 60) + 960;
+										htmlString = "";
+										
+										htmlString += 
+									        '<td width="'+ tbl_width +'" align="left" valign="top">'+
+									        '<table border="0" cellspacing="1" width="'+ tbl_width +'" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">'+
+						              			'<tr>'+
+								                    '<td width="40" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">순번</span></p></td>'+
+								                    '<td width="250" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">도서명</span></p></td>'+
+								                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">코드</span></p></td>'+
+								                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">수량</span></p></td>'+
+								                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">단가</span></p></td>'+
+								                    '<td width="300" align="center" valign="middle" bgcolor="#F4F4F4" colspan="5" height="30"><span style="font-size:9pt;">선불</span></td>'+
+								                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">원재료</span></td>'+
+								                    '<td width="'+ num_PR*60 +'" colspan="'+ num_PR +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제판</span></td>'+
+								                    '<td width="'+ num_PR*60 +'" colspan="'+ num_PR +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">인쇄</span></td>'+
+								                    '<td width="'+ num_JB*60 +'" colspan="'+ num_JB +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">제본</span></td>'+
+								                    '<td width="'+ num_CT*60 +'" colspan="'+ num_CT +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">코팅</span></td>';
+										
+										if (num_VN) {
+											htmlString += '<td width="'+ num_VN*60 +'" colspan="'+ num_VN +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><p><span style="font-size:9pt;">비닐</span></p></td>';
+											}
+										if (num_CS) {
+											htmlString += '<td width="'+ num_CS*60 +'" colspan="'+ num_CS +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><p><span style="font-size:9pt;">케이스</span></p></td>';
+											}
+										if (num_ST) {
+											htmlString += '<td width="'+ num_ST*60 +'" colspan="'+ num_ST +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><p><span style="font-size:9pt;">스티커</span></p></td>';
+											}
+										if (num_CD) {
+											htmlString += '<td width="'+ num_CD*60 +'" colspan="'+num_CD +'" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><p><span style="font-size:9pt;">C D</span></p></td>';
+											}
+										
+										htmlString += 
+						                    '<td width="60" rowspan="2" align="center" valign="middle" bgcolor="#F4F4F4" height="60"><p><span style="font-size:9pt;">기타</span></p></td>'+
+						                    '<td width="70" align="center" valign="middle" bgcolor="#F4F4F4" rowspan="2" height="60"><p><span style="font-size:9pt;">계</span></p></td>'+
+						                '</tr>'+
+						                '<tr>'+
+					                    	'<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">원고</span></td>'+
+						                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">저자</span></td>'+
+						                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">출력</span></td>'+
+						                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">사보</span></td>'+
+						                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">증지</span></td>'+
+						                    '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">용지</span></td>';
+										
+										// 제판										
+										for (var ii = 0 ; ii < num_PR ; ii++)
+										{
+											from = {
+													jmfield : pr_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// 인쇄									
+										for (var ii = 0 ; ii < num_PR ; ii++)
+										{
+											from = {
+													jmfield : pr_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// 제본
+										for (var ii = 0 ; ii < num_JB ; ii++)
+										{
+											from = {
+													jmfield : jb_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// 코팅
+										for (var ii = 0 ; ii < num_CT ; ii++)
+										{
+											from = {
+													jmfield : ct_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// 비닐
+										for (var ii = 0 ; ii < num_VN ; ii++)
+										{
+											logNow("----------------------");
+											from = {
+													jmfield : vn_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													logNow("----------------------");
+												}
+											});
+										}
+										
+										// 케이스
+										for (var ii = 0 ; ii < num_CS ; ii++)
+										{
+											from = {
+													jmfield : cs_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// 스티커
+										for (var ii = 0 ; ii < num_ST ; ii++)
+										{
+											from = {
+													jmfield : st_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										// CD
+										for (var ii = 0 ; ii < num_CD ; ii++)
+										{
+											logNow("씨띠");
+											logNow(cd_array[ii]);
+											from = {
+													jmfield : cd_array[ii]
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+													var object_num = Object.keys(result);
+													row = result[object_num];
+													
+													htmlString += '<td width="60" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">'+ row["wcyakc"] +'</span></td>';
+													
+												}
+											});
+										}
+										
+										var article_num = 1;
+										
+										from = {
+												dbname : dbname,
+												bdate : bdate
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification7",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												for(i in object_num)
+												{
+													mrow = result[i];
+													logNow("mor");
+													logNow(mrow);
+													logNow(mrow["jb16"]);
+													logNow(mrow["jb25"]);
+													
+													from = {
+															sbbook : mrow["bookcode"]
+													}
+													$.ajax({
+														type : "POST",
+														contentType : "application/json; charset=utf-8;",
+														dataType : "json",
+														url : SETTING_URL + "/monthclosing/select_MC_Specification8",
+														async : false,
+														data : JSON.stringify(from),
+														success : function(result) {
+															logNow(result);
+															var object_num = Object.keys(result);
+															row = result[object_num];
+															if(row["sbinse"])
+																var k_inse = 1;
+															else
+																var k_inse = 0;
+															var bo_list = mrow["bolist"];
+															
+															var etc1 = 0;
+															
+															from = {
+																	jenum : mrow["jejonum"]
+															}
+															$.ajax({
+																type : "POST",
+																contentType : "application/json; charset=utf-8;",
+																dataType : "json",
+																url : SETTING_URL + "/monthclosing/select_MC_Specification9",
+																async : false,
+																data : JSON.stringify(from),
+																success : function(result) {
+																	logNow(result);
+																	var object_num = Object.keys(result);
+																	var row = result[object_num];
+																	if(result[0]["w9"])
+																	{
+																		etc1 = result[0]["w9"];
+																		etc_sum += etc1;
+																	}
+																	htmlString += 
+																		'<tr>'+
+													                    	'<td width="40" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ article_num +'</span></td>'+
+													                    '<td width="250" align="left" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt; padding-left:3pt;">'+ mrow["bookname"] +'</span></td>'+
+													                    '<td width="60" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ mrow["bookcode"] +'</span></td>'+
+													                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(mrow["jejoamnt"]) +'</span></td>'+
+													                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithComma(mrow["jejodang"]) +'</span></td>'+
+													                // 선불
+													                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													                    	if (mrow["s1"]) htmlString += numberWithCommas(mrow["s1"]); htmlString += '</span></td>';
+													                    htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													                    	if (mrow["s2"]) {if (k_inse) htmlString += "인 "; htmlString += numberWithCommas(mrow["s2"]);}
+													                
+											                    	if ((mrow["bookcode"] == "329210") || (mrow["bookcode"] == "329220")) // 박태희의 알레그로 피아노곡집 1,2 - 해외인세 표시
+											                    	{
+											                    		htmlString += "<br>";
+											                    		htmlString += numberWithCommas(mrow["s21"]);
+											                    	}
+											                    	
+											                    	htmlString += 
+											                    		'</span></td>'+
+											                    		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+											                    		if (mrow["s3"]) htmlString += numberWithCommas(mrow["s3"]); htmlString += '</span></td>'+
+											                    		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+											                    		if (mrow["s4"]) htmlString += numberWithCommas(mrow["s4"]); htmlString += '</span></td>'+
+											                    		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+											                    		if (mrow["s5"]) htmlString += numberWithCommas(mrow["s5"]); htmlString += '</span></td>';
+											                    	
+											                    	var fname = "";	
+											                    		
+											                    	// 용지
+											                    	htmlString +=
+											                    		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(mrow["yj1"]) +'</span></td>';
+											                    	// 제판
+											                    	for (var ii = 0 ; ii < num_PR ; ii++)
+											                    	{
+											                    		fname = jp_array[ii];
+											                    		htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+											                    		if (mrow[fname]) htmlString += numberWithCommas(mrow[fname]); htmlString += '</span></td>';
+											                    	// 인쇄 
+											                    	}
+											                    	for (var ii = 0 ; ii < num_PR ; ii++)
+											                    	{
+											                    		fname = pr_array[ii];
+											                    		htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+											                    		if (mrow[fname]) htmlString += mrow[fname]; htmlString += '</span></td>';
+											                    	// 제본
+											                    	}
+											                    	for (var ii = 0 ; ii < num_JB ; ii++)
+											                    	{
+											                    		logNow("fname : " +fname);
+											                    		logNow("ASD: " + mrow[fname]);
+											                    		fname = jb_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick="javascript:Mv4('+ mrow[fname] +',' + bdate +',' + '\'' +fname + '\'' + ',' + '\'' +mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 5);" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			//if (eregi("JB", $bo_list)) echo("<font color=\"red\">");
+											                    			if (eregi(fname, bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);		
+											                    			//if (eregi("JB", $bo_list)) echo("</font>");
+											                    			if (eregi(fname, bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// 코팅
+											                    	for (var ii = 0 ; ii < num_CT ; ii++)
+											                    	{
+											                    		fname = ct_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick=\"javascript:Mv2('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 6);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			if (eregi("ct", bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);
+											                    			if (eregi("ct", bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// 비닐
+											                    	for (var ii = 0 ; ii < num_VN ; ii++)
+											                    	{
+											                    		fname = vn_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick=\"javascript:Mv2('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 1);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			if (eregi("vn", bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);
+											                    			if (eregi("vn", bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// 케이스
+											                    	for (var ii = 0 ; ii < num_CS ; ii++)
+											                    	{
+											                    		fname = cs_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick=\"javascript:Mv2('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 2);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			if (eregi("cs", bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);
+											                    			if (eregi("cs", bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// 스티커
+											                    	for (var ii = 0 ; ii < num_ST ; ii++)
+											                    	{
+											                    		fname = st_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick=\"javascript:Mv2('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 4);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			if (eregi("st", bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);
+											                    			if (eregi("st", bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// CD
+											                    	for (var ii = 0 ; ii < num_CD ; ii++)
+											                    	{
+											                    		fname = cd_array[ii];
+											                    		if (mrow[fname])
+											                    		{
+											                    			htmlString += '<td onClick=\"javascript:Mv2('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 3);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    			if (eregi("cd", bo_list)) htmlString += '<font color=\"red\">';
+											                    			htmlString += numberWithCommas(mrow[fname]);
+											                    			if (eregi("cd", bo_list)) htmlString += '</font>';
+											                    			htmlString += '</span></td>';
+											                    		}
+											                    		else
+											                    			htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	}
+											                    	
+											                    	// 기타
+											                    	if (etc1)
+											                    	{
+											                    		//echo("<td onClick=\"javascript:Mv2($mrow[$fname], '$sy$sm', '$fname', '$mrow[BOOKNAME]', $mrow[JEJONUM], 7);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">");
+											                    		htmlString += '<td width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+											                    		if (eregi("et", bo_list)) htmlString += '<font color=\"red\">';
+											                    		htmlString += numberWithCommas(etc1);
+											                    		if (eregi("et", bo_list)) htmlString += '</font>';
+											                    		htmlString += '</span></td>';
+											                    	}
+											                    	else
+											                    		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+											                    	
+											                    	// 계
+											                    	htmlString +=
+											                    		'<td width="70" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">' +numberWithCommas(mrow["sum1"]) +'</span></td>'+
+											                    		'</tr>';
+											                    	
+											                    	article_num++;
+																}
+															});
+														}
+													});
+												}
+												
+												htmlString += 
+													'<tr>'+
+														'<td width="470" colspan="5" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">합계</span></td>';
+												
+												// 선불
+												var tsum = 0;
+												for (var ii = 1 ; ii <= 5 ; ii++)
+												{
+													var tot_inse = 0;
+													fdname = "s" + ii;
+													logNow(fdname);
+													from = {
+															dbattr : fdname,
+															dbattr : fdname,
+															dbname : dbname,
+															bdate : bdate
+													}
+													$.ajax({
+														type : "POST",
+														contentType : "application/json; charset=utf-8;",
+														dataType : "json",
+														url : SETTING_URL + "/monthclosing/select_MC_Specification10",
+														async : false,
+														data : JSON.stringify(from),
+														success : function(result) {
+															logNow("이번엔 니야?");
+															logNow(result);
+															if(result != null)
+															{
+																logNow("안들어와?");
+															var object_num = Object.keys(result);
+															var row = result[object_num];
+															tsum += row[fdname];
+															tot_inse += row[fdname];
+															if (ii == 2)
+															{
+																from = {
+																		dbname : dbname,
+																		bdate : bdate
+																}
+																$.ajax({
+																	type : "POST",
+																	contentType : "application/json; charset=utf-8;",
+																	dataType : "json",
+																	url : SETTING_URL + "/monthclosing/select_MC_Specification11",
+																	async : false,
+																	data : JSON.stringify(from),
+																	success : function(result) {
+																		logNow(result);
+																		var object_num = Object.keys(result);
+																		row = result[object_num];
+																		tsum += row["s21"];
+																		tot_inse += row["s21"];
+																	}
+																});
+															}
+															}
+															logNow(fdname+ " : "+ tot_inse);
+															logNow(fdname+ " : "+ tot_inse);
+															logNow(fdname+ " : " +tot_inse);
+															logNow(fdname+ " : " +tot_inse);
+															logNow(fdname+ " : " +tot_inse);
+															logNow(fdname+ " : " +tot_inse);
+															htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+										                    	if (tot_inse) htmlString += numberWithCommas(tot_inse); htmlString += '</span></td>';
+														}
+													});
+												}
+												
+												// 용지
+												from = {
+														dbname : dbname,
+														bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification12",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tsum += row["yj1"];
+														htmlString +=
+															'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(row["yj1"]) +'</span></td>';
+													}
+												});
+												
+												for (var ii = 0 ; ii < num_PR ; ii++)
+												{
+													tsum += jps_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(jps_array[ii]) +'</span></td>';
+												}
+												for (var ii = 0 ; ii < num_PR ; ii++)
+												{
+													tsum += prs_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(prs_array[ii]) +'</span></td>';
+												}
+												for (var ii = 0 ; ii < num_JB ; ii++)
+												{
+													tsum += jbs_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(jbs_array[ii]) +'</span></td>';
+												}
+												for (var ii = 0 ; ii < num_CT ; ii++)
+												{
+													tsum += cts_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(cts_array[ii]) +'</span></td>';
+												}
+												for (var ii = 0 ; ii < num_VN ; ii++)
+												{
+													tsum += vns_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													if (vns_array[ii]) htmlString += numberWithCommas(vns_array[ii]); htmlString += '</span></td>';
+												}
+												for (var ii = 0 ; ii < num_CS ; ii++)
+												{
+													tsum += css_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													if (css_array[ii]) htmlString += numberWithCommas(css_array[ii]); htmlString += '</span></td>';
+												}
+												for (var ii = 0 ; ii < num_ST ; ii++)
+												{
+													tsum += sts_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													if (sts_array[ii]) htmlString += numberWithCommas(sts_array[ii]); htmlString += '</span></td>';
+												}
+												for (var ii = 0 ; ii < num_CD ; ii++)
+												{
+													tsum += cds_array[ii];
+													htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+													if (cds_array[ii]) htmlString += numberWithCommas(cds_array[ii]); htmlString += '</span></td>';
+												}
+												tsum += etc_sum;
+												
+												htmlString +=
+													'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                    		if (etc_sum) htmlString += numberWithCommas(etc_sum); htmlString += '</span></td>'+
+						                    		'<td width="70" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(tsum) +'</span></td>'+
+						                    		'</tr>';
+						                    		
+						                    	var isum = 0;
+						                    	
+						                		from = {
+						                				dbname : dbname,
+						                				bdate : bdate
+						                		}
+						                		$.ajax({
+						                			type : "POST",
+						                			contentType : "application/json; charset=utf-8;",
+						                			dataType : "json",
+						                			url : SETTING_URL + "/monthclosing/select_MC_Specification13",
+						                			async : false,
+						                			data : JSON.stringify(from),
+						                			success : function(result) {
+						                				logNow(result);
+						                				var object_num = Object.keys(result);
+						                				if(object_num.length){
+						                					var row = result[object_num];
+						                					htmlString +=
+						                						'<tr>'+
+						                	                    '<td width="470" colspan="5" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">이월</span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                	                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>';
+						                					for (var ii = 0 ; ii < num_PR ; ii++)
+						                					{
+						                						htmlString +=
+						                							'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;"></span></td>'+
+						                							'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if ((sy == "2016") && (sm == "10") && (ii == 0))
+						                						{
+						                							htmlString += '2,000,900';
+						                							isum += 237600;
+						                							isum += 1763300;
+						                						}
+						                						if ((sy == "2016") && (sm == "10") && (ii == 1))
+						                						{
+						                							htmlString += '13,188,461';
+						                							isum += 171600;
+						                							isum += 13016861;
+						                						}
+						                						if ((sy == "2016") && (sm == "11") && (ii == 0))
+						                						{
+						                							htmlString += '2,041,600';
+						                							isum += 2041600;
+						                						}
+						                						if ((sy == "2016") && (sm == "11") && (ii == 1))
+						                						{
+						                							htmlString += '16,622,452';
+						                							isum += 16622452;
+						                						}
+						                						htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_JB ; ii++)
+						                					{
+						                						fname = jb_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_CT ; ii++)
+						                					{
+						                						fname = ct_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_VN ; ii++)
+						                					{
+						                						fname = vn_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_CS ; ii++)
+						                					{
+						                						fname = cs_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_ST ; ii++)
+						                					{
+						                						fname = st_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					for (ii = 0 ; ii < num_CD ; ii++)
+						                					{
+						                						fname = cd_array[ii];
+						                						isum += row[fname];
+						                						htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                						if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+						                					}
+						                					var et_iwol = 0;
+						                					
+						                					from = {
+						                					}
+						                					$.ajax({
+						                						type : "POST",
+						                						contentType : "application/json; charset=utf-8;",
+						                						dataType : "json",
+						                						url : SETTING_URL + "/monthclosing/select_MC_Specification14",
+						                						async : false,
+						                						data : JSON.stringify(from),
+						                						success : function(result) {
+						                							logNow(result);
+						                							var object_num = Object.keys(result);
+						                							for(var j=0; j < object_num; j++)
+						                							{
+						                								row = result[object_num[j]];
+						                								from = {
+						                										custcode : row["wccode"],
+						                										bdate : bdate
+						                								}
+						                								$.ajax({
+						                									type : "POST",
+						                									contentType : "application/json; charset=utf-8;",
+						                									dataType : "json",
+						                									url : SETTING_URL + "/monthclosing/select_MC_Specification15",
+						                									async : false,
+						                									data : JSON.stringify(from),
+						                									success : function(result) {
+						                										logNow(result);
+						                										var object_num = Object.keys(result);
+						                										crow = result[object_num];
+						                										if (crow["jana"])
+						                											et_iwol += crow["jana"];
+						                									}
+						                								});
+						                							}
+						                						}
+						                					});
+						                					isum += et_iwol;
+						                					htmlString += 
+						                						'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						            	                    	if (et_iwol) htmlString += numberWithCommas(et_iwol); htmlString += '</span></td>'+
+						            	                    	'<td width="70" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(isum) +'</span></td>'+
+						            	                    	'</tr>';
+						                				}
+						                				
+						                				// 잡물
+						                				etc_sum = 0;
+						                				from = {
+						                						dbname : dbname,
+						                						bdate : bdate
+						                				}
+						                				$.ajax({
+						                					type : "POST",
+						                					contentType : "application/json; charset=utf-8;",
+						                					dataType : "json",
+						                					url : SETTING_URL + "/monthclosing/select_MC_Specification16",
+						                					async : false,
+						                					data : JSON.stringify(from),
+						                					success : function(result) {
+						                						logNow(result);
+						                						var object_num = Object.keys(result);
+						                						for (var j=0; j < object_num.length; j++)
+						                						{
+						                							mrow = result[object_num[j]];
+						                							
+						                							from = {
+						                									sbbook : mrow["bookcode"]
+						                							}
+						                							$.ajax({
+						                								type : "POST",
+						                								contentType : "application/json; charset=utf-8;",
+						                								dataType : "json",
+						                								url : SETTING_URL + "/monthclosing/select_MC_Specification8",
+						                								async : false,
+						                								data : JSON.stringify(from),
+						                								success : function(result) {
+						                									logNow(result);
+						                									var object_num = Object.keys(result);
+						                									row = result[object_num];
+						                									
+						                									if (row["sbinse"])
+						                										k_inse = 1;
+						                									else
+						                										k_inse = 0;
+						                									bo_list = mrow["bolist"];
+						                									
+						                									etc1 = 0;
+						                									
+						                									from = {
+						                											jenum : mrow["jejonum"]
+						                									}
+						                									$.ajax({
+						                										type : "POST",
+						                										contentType : "application/json; charset=utf-8;",
+						                										dataType : "json",
+						                										url : SETTING_URL + "/monthclosing/select_MC_Specification17",
+						                										async : false,
+						                										data : JSON.stringify(from),
+						                										success : function(result) {
+						                											logNow("널 위 ?");
+						                											logNow(result);
+						                											var object_num = Object.keys(result);
+						                											row = result[object_num];
+						                											if (result[0] == [])
+						                											{
+						                											if (result[0]["w9"])
+						                											{
+						                												etc1 = row["w9"];
+						                												etc_sum += etc1;
+						                											}
+						                											}
+						                											htmlString +=
+						                												'<tr>'+
+						                							                    '<td width="40" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ article_num +'</span></td>'+
+						                							                    '<td width="250" align="left" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt; padding-left:3pt;">'+ mrow["bookname"] +'</span></td>'+
+						                							                    '<td width="60" align="center" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ mrow["bookcode"] +'</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(mrow["jejoamnt"]) +'</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithComma(mrow["jejodang"]) +'</span></td>'+
+						                							                // 선불 
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                    	if (mrow["s1"]) htmlString += numberWithCommas(mrow["s1"]); htmlString += '</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                    	if (mrow["s2"]) {if (k_inse) htmlString += '인 '; htmlString += numberWithCommas(mrow["s2"]);} htmlString += '</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                    	if (mrow["s3"]) htmlString += numberWithCommas(mrow["s3"]); htmlString += '</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                    	if (mrow["s4"]) htmlString += numberWithCommas(mrow["s4"]); htmlString += '</span></td>'+
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                    	if (mrow["s5"]) htmlString += numberWithCommas(mrow["s5"]); htmlString += '</span></td>'+
+						                							                // 용지
+						                							                    '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(mrow["yj1"]) +'</span></td>';
+						                							                // 제판
+						                							                for (ii = 0 ; ii < num_PR ; ii++)
+						                							                {
+						                							                	fname = jp_array[ii];
+						                							                	htmlString +=
+						                							                		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                	if (mrow[fname]) htmlString += numberWithCommas(mrow[fname]); htmlString += '</span></td>';
+						                							                // 인쇄
+						                							                }
+						                							                for (ii = 0 ; ii < num_PR ; ii++)
+						                							                {
+						                							                	fname = pr_array[ii];
+						                							                	htmlString +=
+						                							                		'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							                	if (mrow[fname]) htmlString += numberWithCommas(mrow[fname]); htmlString += '</span></td>';
+						                							                // 제본
+						                							                }
+						                							                for (ii = 0 ; ii < num_JB ; ii++)
+						                							                {
+						                							                	fname = jb_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 5);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("jb", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("jb", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+						                							                // 코팅
+						                							                for (ii = 0 ; ii < num_CT ; ii++)
+						                							                {
+						                							                	fname = ct_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 6);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("ct", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("ct", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+
+						                							                // 비닐
+						                							                for (ii = 0 ; ii < num_VN ; ii++)
+						                							                {
+						                							                	fname = vn_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 1);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("vn", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("vn", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+
+						                							                // 케이스
+						                							                for (ii = 0 ; ii < num_CS ; ii++)
+						                							                {
+						                							                	fname = cs_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 2);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("cs", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("cs", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+
+						                							                // 스티커
+						                							                for (ii = 0 ; ii < num_ST ; ii++)
+						                							                {
+						                							                	fname = st_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 4);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("st", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("st", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+						                							                
+						                							                // CD
+						                							                for (ii = 0 ; ii < num_CD ; ii++)
+						                							                {
+						                							                	fname = cd_array[ii];
+						                							                	if (mrow[fname])
+						                							                	{
+						                							                		htmlString += '<td onClick=\"javascript:Mv3('+ mrow[fname] +',' + bdate +',' + '\'' + fname + '\'' +',' + '\'' + mrow["bookname"] + '\'' + ',' + mrow["jejonum"] + ', 3);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                		if (eregi("cd", bo_list)) htmlString += '<font color=\"red\">';
+						                							                		htmlString += numberWithCommas(mrow[fname]);
+						                							                		if (eregi("cd", bo_list)) htmlString += '</font>';
+						                							                		htmlString += '</span></td>';
+						                							                	}
+						                							                	else
+						                							                		htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                }
+
+						                							                // 기타
+						                							                if (etc1)
+						                							                {
+						                							                	//echo("<td onClick=\"javascript:Mv3($mrow[$fname], '$sy$sm', '$fname', '$mrow[BOOKNAME]', $mrow[JEJONUM], 7);\" onMouseOver=this.style.backgroundColor=\"8CFFFE\" onMouseOut=this.style.backgroundColor=\"FFFFFF\" width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">");
+						                							                	htmlString += '<td width=\"60\" align=\"right\" style=\"padding-right:5\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"font-size:9pt;\">';
+						                							                	if (eregi("et", bo_list)) htmlString += '<font color=\"red\">';
+						                							                	htmlString += numberWithCommas(etc1);
+						                							                	if (eregi("et", bo_list)) htmlString += '</font>';
+						                							                	htmlString += '</span></td>';
+						                							                }
+						                							                else
+						                							                	htmlString += '<td width=\"60\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"30\"><span style=\"padding-left:0pt;\"></span></td>';
+						                							                
+						                							                // 계
+						                						                    htmlString +=
+						                						                    	'<td width="70" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(mrow["sum1"]) +'</span></td></tr>';
+						                						                    article_num++;
+						                										}
+						                									});
+						                								}
+						                							});
+						                						}
+						                						
+						                						htmlString +=
+						                							'<tr>'+
+						                							'<td width="470" colspan="5" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">합1계</span></td>';
+						                						// 선불
+						                						tsum = 0;
+						                						for (ii = 1 ; ii <= 5 ; ii++)
+						                						{
+						                							fdname = "s" + ii;
+						                							from = {
+						                									dbname2 : fdname,
+						                									dbname3 : fdname,
+						                									dbname : dbname,
+						                									bdate : bdate
+						                							}
+						                							$.ajax({
+						                								type : "POST",
+						                								contentType : "application/json; charset=utf-8;",
+						                								dataType : "json",
+						                								url : SETTING_URL + "/monthclosing/select_MC_Specification66",
+						                								async : false,
+						                								data : JSON.stringify(from),
+						                								success : function(result) {
+						                									logNow(fdname);
+						                									logNow(bdate);
+						                									logNow(result);
+						                									var object_num = Object.keys(result);
+						                									row = result[object_num];
+						                									if(row != null)
+						                										tsum += row[fdname];
+						                									htmlString +=
+						                										'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                										if (row) htmlString += numberWithCommas(row[fdname]); htmlString += '</span></td>';
+						                								}
+						                							});             
+						                						}
+						                						// 용지 
+						                						from = {
+						                								dbname : dbname,
+						                								bdate : bdate
+						                						}
+						                						$.ajax({
+						                							type : "POST",
+						                							contentType : "application/json; charset=utf-8;",
+						                							dataType : "json",
+						                							url : SETTING_URL + "/monthclosing/select_MC_Specification19",
+						                							async : false,
+						                							data : JSON.stringify(from),
+						                							success : function(result) {
+						                								logNow(result);
+						                								var object_num = Object.keys(result);
+						                								row = result[object_num];
+						                								if(row){
+						                								tsum += row["yj1"];
+						                								}
+		                							                    htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+		                							                    if (row) htmlString += numberWithCommas(row["yj1"]); htmlString += '</span></td>';
+						                							}
+						                						});
+						                						
+						                						for (ii = 0 ; ii < num_PR ; ii++)
+						                						{
+						                							tsum += jps2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(jps2_array[ii]) +'</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_PR ; ii++)
+						                						{
+						                							tsum += prs2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(prs2_array[ii]) +'</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_JB ; ii++)
+						                						{
+						                							tsum += jbs2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (jbs2_array[ii]) htmlString += numberWithCommas(jbs2_array[ii]); htmlString +='</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_CT ; ii++)
+						                						{
+						                							tsum += cts2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (cts2_array[ii]) htmlString += numberWithCommas(cts2_array[ii]); htmlString += '</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_VN ; ii++)
+						                						{
+						                							tsum += vns2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (vns2_array[ii]) htmlString += numberWithCommas(vns2_array[ii]); htmlString += '</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_CS ; ii++)
+						                						{
+						                							tsum += css2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (css2_array[ii]) htmlString += numberWithCommas(css2_array[ii]); htmlString += '</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_ST ; ii++)
+						                						{
+						                							tsum += sts2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (sts2_array[ii]) htmlString += numberWithCommas(sts2_array[ii]); htmlString += '</span></td>';
+						                						}
+						                						for (ii = 0 ; ii < num_CD ; ii++)
+						                						{
+						                							tsum += cds2_array[ii];
+						                							htmlString += '<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (cds2_array[ii]) htmlString += numberWithCommas(cds2_array[ii]); htmlString += '</span></td>';
+						                						}
+						                							tsum += etc_sum;
+						                							htmlString +=
+						                								'<td width="60" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">';
+						                							if (etc_sum) htmlString += numberWithCommas(etc_sum); htmlString += '</span></td>'+
+						                								'<td width="70" align="right" style="padding-right:5" valign="middle" bgcolor="white" height="30"><span style="font-size:9pt;">'+ numberWithCommas(tsum) +'</span></td>'+
+						                								'</tr>';
+						                						
+						                					}
+						                				});
+						                			}
+						                		});
+											}
+										});
+										
+										htmlString +=
+											'</table>';
+										
+										$("#mcSpecification").html(htmlString);
+									}
+								});
+						}
+					});
+			}
+		});
+	document.getElementById("btnMCSpecificationPrint").onclick = function() {// 인쇄 //lwhee
+		var t_URL = "/popup?print";
+		if (popUp && !popUp.closed) {
+			popUp.close();
+		}
+		popUp = window
+				.open(
+						t_URL,
+						"PopUpPrintjejakplan",
+						'left=0,top=0,width=820,height=500,toolbar=no,menubar=no,status=no,scrollbars=yes,resizable=yes');// DATEW
+		popUp.document.write(jmenu7("4_인쇄팝업"));
+		
+		/*var num_ = 0;
+		var num_PR = 0; // 제판,인쇄
+		var num_CT = 0; // 코팅
+		var num_JB = 0; // 제본
+		var num_ST = 0; // 스티커
+		var num_CD = 0; // CD
+		var num_CS = 0; // 케이스
+		var num_VN = 0; // 비닐
+		
+		htmlString = "";
+		
+		obejct_num = Object.kesy(mc1);
+		for (i in object_num.length)
+		{
+			row = mc1[i];
+			eval("var num_" + row["jmfield"] + "=" + row["uid"]);
+		}
+		
+		// 제판*/
+		
+		htmlString = "";
+		
+		var dbname = "JEJOMSTEST";
+		logNow(bdate);
+		var sy = bdate.substring(0,4);
+		var sm = bdate.substring(4,6);
+		var num_ = 0;
+		var num_PR = 0; // 제판,인쇄
+		var num_CT = 0; // 코팅
+		var num_JB = 0; // 제본
+		var num_ST = 0; // 스티커
+		var num_CD = 0; // CD
+		var num_CS = 0; // 케이스
+		var num_VN = 0; // 비닐
+		var isum;
+		var etc_sum = 0;
+		
+		var td_num = 0;
+		
+		// 인쇄 전역변수 공간
+		var mc1;
+		// 인쇄 전역변수 끝
+		function eregi(str1, str2){
+			var patt = new RegExp(str1, 'i');
+			return str2.match(patt);
+		}
+		
+		from = {
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_MC_Specification1",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					mc1 = result;
+					var object_num = Object.keys(result);
+					for(i in object_num)
+					{
+						row = result[i];
+						eval("var num_" + row["jmfield"] + "=" + row["uid"]);
+					}
+					logNow("vn : "+num_VN);
+					//재판
+					var a = "";
+					for(var ii=1; ii <= num_PR; ii++)
+					{
+						var fieldname = "jp" + ii;
+						a += "SUM(" + fieldname + ") AS " + fieldname + ", ";
+					}
+					
+					var dbattr = a.slice(0, -1);
+					
+					logNow("-----");
+					logNow(dbattr.slice(0,-1));
+					dbattr = dbattr.slice(0,-1);
+					logNow(dbattr);
+					logNow("-----");
+					from = {
+							dbattr : dbattr,
+							dbname : dbname,
+							bdate : bdate
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								var row = result[object_num];
+								
+								var jp_array = new Array();
+								var jps_array = new Array();
+								var jps2_array = new Array();
+								var tnum = 0;
+								
+								for(var ii=0; ii < num_PR; ii++)
+								{
+									if(row["jp"+(ii+1)] != 0)
+									{
+										var fdname = "jp" + (ii+1);
+										jp_array[tnum] = fdname;
+										
+										from = {
+												dbattr : fdname,
+												dbattr : fdname,
+												dbname : dbname,
+												bdate : bdate
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(tresult) {
+													logNow(tresult);
+													var object_tnum = Object.keys(tresult);
+													var trow = tresult[object_tnum];
+													jps_array[tnum] = trow["sum1"];
+													jps2_array[tnum] = trow["sum2"];
+													tnum++;
+												}
+											});
+									}
+								}
+								
+								td_num = tnum;
+								var query = "";
+								for (var ii = 1 ; ii <= num_PR ; ii++)
+								{
+									fieldname = "pr" + ii;
+									query += "SUM(" + fieldname + ") AS "+ fieldname +",";
+								}
+								
+								from = {
+										dbattr : query.slice(0,-1),
+										dbname : dbname,
+										bdate : bdate
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_MC_Specification4",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											row = result[object_num];
+											
+											var pr_array = new Array();
+											var prs_array = new Array();
+											var prs2_array = new Array();
+											tnum = 0;
+											
+											for (ii = 0 ; ii < num_PR ; ii++)
+											{
+												if (row["pr"+(ii+1)] != 0)
+												{
+													fdname = "pr" + (ii+1);
+													pr_array[tnum] = fdname;
+													from = {
+															dbattr : fdname,
+															dbattr : fdname,
+															dbname : dbname,
+															bdate : bdate
+															}
+													$.ajax({
+														type : "POST",
+														contentType : "application/json; charset=utf-8;",
+														dataType : "json",
+														url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+														async : false,
+														data : JSON.stringify(from),
+														success : function(tresult) {
+															logNow(tresult);
+															var object_tnum = Object.keys(tresult);
+															trow = tresult[object_tnum];
+															prs_array[tnum] = trow["sum1"];
+															prs2_array[tnum] = trow["sum2"];
+															tnum++;
+															}
+													});
+												}
+											}
+											
+											num_PR = tnum;
+											td_num += tnum;
+											query = "";
+											//코팅
+											var ct_array = new Array();
+											var cts_array = new Array();
+											var cts2_array = new Array();
+											for(var ii=1; ii <= num_CT; ii++)
+											{
+												fieldname = "ct" + ii;
+												query += "SUM(" + fieldname + ") AS " + fieldname + ", ";
+											}
+											from = {
+													dbattr : query.slice(0,-2),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														for(var ii=0; ii < num_CT; ii++)
+														{
+															if(row["ct"+(ii+1)] != 0)
+															{
+																fdname = "ct" + (ii+1);
+																ct_array[tnum] = fdname;
+																
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			cts_array[tnum] = trow["sum1"];
+																			cts2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_CT = tnum;
+											td_num += tnum;
+											
+											// 제본
+											var jb_array = new Array();
+											var jbs_array = new Array();
+											var jbs2_array = new Array();
+											query = "";
+											for(var ii=1; ii <= num_JB; ii++)
+											{
+												fieldname = "jb" + ii;
+												query += "sum(" + fieldname + ") AS " + fieldname + ",";
+											}
+											from = {
+													dbattr : query.slice(0,-1),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														
+														for(var ii=0; ii < num_JB; ii++)
+														{
+															if(row["jb"+(ii+1)] != 0)
+															{
+																fdname = "jb" + (ii+1);
+																jb_array[tnum] = fdname;
+																
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			jbs_array[tnum] = trow["sum1"];
+																			jbs2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_JB = tnum;
+											td_num += tnum;
+											
+											// 비닐
+											var vn_array = new Array();
+											var vns_array = new Array();
+											var vns2_array = new Array();
+											query = "";
+											for(var ii=1; ii <= num_VN; ii++)
+											{
+												fieldname = "vn" + ii;
+												query += "sum(" + fieldname + ") AS " + fieldname + ",";
+											}
+											from = {
+													dbattr : query.slice(0,-1),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														
+														for(var ii=0; ii < num_VN; ii++)
+														{
+															if(row["vn"+(ii+1)] != 0)
+															{
+																fdname = "vn" + (ii+1);
+																vn_array[tnum] = fdname;
+																
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			vns_array[tnum] = trow["sum1"];
+																			vns2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_VN = tnum;
+											td_num += tnum;
+											logNow("비닐어레이 " +  vn_array + "tnum : " + num_VN);
+											// 케이스
+											var cs_array = new Array();
+											var css_array = new Array();
+											var css2_array = new Array();
+											if(num_CS > 0)
+											{	
+												query = "";
+												for(var ii=1; ii <= num_CS; ii++)
+												{
+													fieldname = "cs" + ii;
+													query += "sum(" + fieldname + ") AS " + fieldname + ",";
+												}
+												from = {
+														dbattr : query.slice(0,-1),
+														dbname : dbname,
+														bdate : bdate
+													}
+													$.ajax({
+														type : "POST",
+														contentType : "application/json; charset=utf-8;",
+														dataType : "json",
+														url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+														async : false,
+														data : JSON.stringify(from),
+														success : function(result) {
+															logNow(result);
+															var object_num = Object.keys(result);
+															var row = result[object_num];
+															tnum = 0;
+															for(var ii=0; ii < num_CS; ii++)
+															{
+																if(row["cs"+(ii+1)] != 0)
+																{
+																	fdname = "cs" + (ii+1);
+																	cs_array[tnum] = fdname;
+																	from = {
+																			dbattr : fdname,
+																			dbattr : fdname,
+																			dbname : dbname,
+																			bdate : bdate
+																		}
+																		$.ajax({
+																			type : "POST",
+																			contentType : "application/json; charset=utf-8;",
+																			dataType : "json",
+																			url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																			async : false,
+																			data : JSON.stringify(from),
+																			success : function(tresult) {
+																				logNow(tresult);
+																				var object_tnum = Object.keys(tresult);
+																				var trow = tresult[object_tnum];
+																				css_array[tnum] = trow["sum1"];
+																				css2_array[tnum] = trow["sum2"];
+																				tnum++;
+																			}
+																		});
+																}
+															}
+														}
+													});
+												num_CS = tnum;
+												td_num += tnum;
+											}
+											
+											// 스티커
+											var st_array = new Array();
+											var sts_array = new Array();
+											var sts2_array = new Array();
+											query = "";
+											for(var ii=1; ii <= num_ST; ii++)
+											{
+												fieldname = "st" + ii;
+												query += "sum(" + fieldname + ") AS " + fieldname + ",";
+											}
+											from = {
+													dbattr : query.slice(0,-1),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														
+														for(var ii=0; ii < num_ST; ii++)
+														{
+															if(row["st"+(ii+1)] != 0)
+															{
+																fdname = "st" + (ii+1);
+																st_array[tnum] = fdname;
+																
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			sts_array[tnum] = trow["sum1"];
+																			sts2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_ST = tnum;
+											td_num += tnum;
+											
+											// CD
+											var cd_array = new Array();
+											var cds_array = new Array();
+											var cds2_array = new Array();
+											query = "";
+											for(var ii=1; ii <= num_CD; ii++)
+											{
+												fieldname = "cd" + ii;
+												query += "sum(" + fieldname + ") AS " + fieldname + ",";
+											}
+											from = {
+													dbattr : query.slice(0,-1),
+													dbname : dbname,
+													bdate : bdate
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification2",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														var row = result[object_num];
+														tnum = 0;
+														
+														for(var ii=0; ii < num_CD; ii++)
+														{
+															if(row["cd"+(ii+1)] != 0)
+															{
+																fdname = "cd" + (ii+1);
+																cd_array[tnum] = fdname;
+																
+																from = {
+																		dbattr : fdname,
+																		dbattr : fdname,
+																		dbname : dbname,
+																		bdate : bdate
+																	}
+																	$.ajax({
+																		type : "POST",
+																		contentType : "application/json; charset=utf-8;",
+																		dataType : "json",
+																		url : SETTING_URL + "/monthclosing/select_MC_Specification3",
+																		async : false,
+																		data : JSON.stringify(from),
+																		success : function(tresult) {
+																			logNow(tresult);
+																			var object_tnum = Object.keys(tresult);
+																			var trow = tresult[object_tnum];
+																			cds_array[tnum] = trow["sum1"];
+																			cds2_array[tnum] = trow["sum2"];
+																			tnum++;
+																		}
+																	});
+															}
+														}
+													}
+												});
+											num_CD = tnum;
+											td_num += tnum;									
+											var cell_num = num_JB + num_CT + num_VN + num_CS + num_CD + num_ST + 1;
+											var rec_no = 1;
+                                            
+                                            htmlString +=
+                                                    //<table border="0" cellpadding="0" cellspacing="0" width="1160">
+                                                    '<tr>'+
+                                                        '<td width="100%" align="right" height="30"><span style="font-size:18pt; padding-right:5pt;"><b>'+ sy +' 년 '+ sm +' 월 </b></span></td>'+
+                                                    '</tr>'+
+                                                    '<tr>'+
+                                                        '<td width="100%" align="right" height="20"><span style="font-size:9pt;">&nbsp;</span></td>'+
+                                                    '</tr>'+
+                                                    '<tr>'+
+                                                        '<td width="100%" align="left" valign="top">'+
+                                                            '<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+                                                                '<tr>'+
+                                                                    '<td width="40" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:1pt;"><b>순번</b></span></p></td>'+
+                                                                    '<td width="300" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:45pt;"><b>도서명</b></span></p></td>'+
+                                                                    '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>코드</b></span></p></td>'+
+                                                                    '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>수량</b></span></p></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:10pt;"><b>단가</b></span></p></td>'+
+                                                                    '<td width="350" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" colspan="5" height="25"><span style="font-size:10pt; letter-spacing:80pt;"><b>선불</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:2pt;"><b>원재료</b></span></td>'+
+                                                                    '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>제판</b></span></td>'+
+                                                                    '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>인쇄</b></span></td>'+
+                                                                '</tr>'+
+                                                                '<tr>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>원고</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>저자</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>출력</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>사보</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>증지</b></span></td>'+
+                                                                    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>용지</b></span></td>';
+                                            
+                                            for (ii = 0 ; ii < num_PR ; ii++)
+                                            {
+                                                ////selMCSpecification6
+                                                from = {
+                                                    jmfield : pr_array[ii]
+                                                }
+                                                $.ajax({
+                                                    type : "POST",
+                                                    contentType : "application/json; charset=utf-8;",
+                                                    dataType : "json",
+                                                    url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                                                    async : false,
+                                                    data : JSON.stringify(from),
+                                                    success : function(result) {
+                                                        logNow(result);
+                                                        var object_num = Object.keys(result);
+                                                        row = result[object_num];
+                                                        htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                                                    }
+                                                }); 
+                                            }
+                                            
+                                            for (ii = 0 ; ii < num_PR ; ii++)
+                                            {
+                                                ///selMCSpecification6
+                                                from = {
+                                                    jmfield : pr_array[ii]
+                                                }
+                                                $.ajax({
+                                                    type : "POST",
+                                                    contentType : "application/json; charset=utf-8;",
+                                                    dataType : "json",
+                                                    url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                                                    async : false,
+                                                    data : JSON.stringify(from),
+                                                    success : function(result) {
+                                                        logNow(result);
+                                                        var object_num = Object.keys(result);
+                                                        row = result[object_num];
+                                                        htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                                                    }
+                                                }); 
+                                            }
+                                            htmlString += '</tr>';
+											
+                                    		from = {
+                                    				dbname : dbname,
+                                    				bdate : bdate
+                                    		}
+                                    		$.ajax({
+                                    			type : "POST",
+                                    			contentType : "application/json; charset=utf-8;",
+                                    			dataType : "json",
+                                    			url : SETTING_URL + "/monthclosing/select_MC_Specification7",
+                                    			async : false,
+                                    			data : JSON.stringify(from),
+                                    			success : function(result) {
+                                    				logNow(result);
+                                    				var object_num = Object.keys(result);
+                                    				for(i in object_num)
+                                    				{
+                                    					mrow = result[i];
+                                    					k_inse = row["sbinse"];
+                                    					
+                                    					htmlString +=
+                                    						'<tr>'+
+		                                    				    '<td width="40" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="center" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ mrow["jejosuns"] +'</span></td>'+
+		                                    				    '<td width="300" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="left" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; padding-left:2pt;">'+ mrow["bookname"];
+		                                    					if((mrow["bookcode"] == "125361") || (mrow["bookcode"] == "125371")) htmlString += '<span style=\"font-size:8pt;\">&nbsp;&nbsp;(세금계산서)</span>'; htmlString += '</span></td>'+
+		                                    				    '<td width="50" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="center" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ mrow["bookcode"] +'</span></td>'+
+		                                    				    '<td width="50" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithCommas(mrow["jejoamnt"]) +'</span></td>'+
+		                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithComma(mrow["jejodang"]) +'</span></td>'+
+		                                    			// 선불 
+		                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+		                                    				    	if (mrow["s1"]) htmlString += numberWithCommas(mrow["s1"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+		                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; letter-spacing:-1pt;">';
+		                                    				    	if (mrow["s2"]) {if (k_inse) htmlString += '인 '; htmlString += numberWithCommas(mrow["s2"]);} else htmlString += '&nbsp;';
+
+	                                    				if ((mrow["bookcode"] == "329210") || (mrow["bookcode"] == "329220")) // 박태희의 알레그로 피아노곡집 1,2 - 해외인세 표시
+	                                    				{
+	                                    					htmlString += '<br>';
+	                                    					new_val = mrow["jejoamnt"] * 8000 * 0.15;
+	                                    					htmlString += numberWithCommas(new_val);
+	                                    				}
+	                                    				htmlString +=
+	                                    					'</span></td>'+
+	                                    					'<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    				    	if (mrow["s3"]) htmlString += numberWithCommas(mrow["s3"]); else htmlString += '&nbsp;'; htmlString += '</span></td>' +
+	                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    				    	if (mrow["s4"]) htmlString += numberWithCommas(mrow["s4"]); else htmlString += '&nbsp;'; htmlString += '</span></td>' +
+	                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    				    	if (mrow["s5"]) htmlString += numberWithCommas(mrow["s5"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	                                    				// 용지 
+	                                    				    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithCommas(mrow["yj1"]) +'</span></td>';
+	                                    				// 제판 
+	
+	                                    				for (ii = 0 ; ii < num_PR ; ii++)
+	                                    				{
+	                                    					fname = jp_array[ii];
+	                                    					htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"25\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                                    					if (mrow[fname])
+	                                    					{
+	                                    						if (mrow["bookcode"] == "123360")
+	                                    						{
+	                                    							htmlString += '<b><i><u>';
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    							htmlString += '</u></i></b>';
+	                                    						}
+	                                    						else
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    					}
+	                                    					htmlString += '</span></td>';
+	                                    				}
+	                                    				/* <!-- 인쇄 --> */
+	                                    				for (ii = 0 ; ii < num_PR ; ii++)
+	                                    				{
+	                                    					fname = pr_array[ii];
+	                                    					htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"25\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                                    					if (mrow[fname])
+	                                    					{
+	                                    						if (mrow["bookcode"] == "123360")
+	                                    						{
+	                                    							htmlString += '<b><i><u>';
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    							htmlString += '</u></i></b>';
+	                                    						}
+	                                    						else
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    					}
+	                                    					htmlString += '</span></td>';
+	                                    				}
+	
+	                                    				htmlString += '</tr>';
+	                                    				
+	                                    				if ((rec_no % 20) == 0)
+	                                    					//if (($rec_no % 15) == 0)
+	                                    					{
+	                                    						//new_jp_b1.inc
+	                                    						htmlString +=
+	                                    							'</table>'+
+	                                    								'</td>'+
+	                                    								'</tr>'+
+	                                    								'<tr>'+
+	                                    									'<td width="100%" align="left" height="20"><span style="font-size:10pt;"><b>'+ com_name +'</b></span></td>'+
+                                    									'</tr>'+
+	                                    							'</table>';
+	                                    						//new_jp_b1.inc
+	                                    						htmlString += '<p style=\"page-break-before:always\">';
+	                                    						htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+	                                    						htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+	                                    						
+	                                    						//new_jp_h1.inc
+	                                    						htmlString +=
+	                                                                //<table border="0" cellpadding="0" cellspacing="0" width="1160">
+	                                    							'<table border="0" cellpadding="0" cellspacing="0" width="1300">'+
+	                                                                '<tr>'+
+	                                                                    '<td width="100%" align="right" height="30"><span style="font-size:18pt; padding-right:5pt;"><b>'+ sy +' 년 '+ sm +' 월 </b></span></td>'+
+	                                                                '</tr>'+
+	                                                                '<tr>'+
+	                                                                    '<td width="100%" align="right" height="20"><span style="font-size:9pt;">&nbsp;</span></td>'+
+	                                                                '</tr>'+
+	                                                                '<tr>'+
+	                                                                    '<td width="100%" align="left" valign="top">'+
+	                                                                        '<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+	                                                                            '<tr>'+
+	                                                                                '<td width="40" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:1pt;"><b>순번</b></span></p></td>'+
+	                                                                                '<td width="300" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:45pt;"><b>도서명</b></span></p></td>'+
+	                                                                                '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>코드</b></span></p></td>'+
+	                                                                                '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>수량</b></span></p></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:10pt;"><b>단가</b></span></p></td>'+
+	                                                                                '<td width="350" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" colspan="5" height="25"><span style="font-size:10pt; letter-spacing:80pt;"><b>선불</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:2pt;"><b>원재료</b></span></td>'+
+	                                                                                '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>제판</b></span></td>'+
+	                                                                                '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>인쇄</b></span></td>'+
+	                                                                            '</tr>'+
+	                                                                            '<tr>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>원고</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>저자</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>출력</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>사보</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>증지</b></span></td>'+
+	                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>용지</b></span></td>';
+	                                                        
+		                                                        for (ii = 0 ; ii < num_PR ; ii++)
+		                                                        {
+		                                                            ////selMCSpecification6
+		                                                            from = {
+		                                                                jmfield : pr_array[ii]
+		                                                            }
+		                                                            $.ajax({
+		                                                                type : "POST",
+		                                                                contentType : "application/json; charset=utf-8;",
+		                                                                dataType : "json",
+		                                                                url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+		                                                                async : false,
+		                                                                data : JSON.stringify(from),
+		                                                                success : function(result) {
+		                                                                    logNow(result);
+		                                                                    var object_num = Object.keys(result);
+		                                                                    row = result[object_num];
+		                                                                    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+		                                                                }
+		                                                            }); 
+		                                                        }
+		                                                        
+		                                                        for (ii = 0 ; ii < num_PR ; ii++)
+		                                                        {
+		                                                            ///selMCSpecification6
+		                                                            from = {
+		                                                                jmfield : pr_array[ii]
+		                                                            }
+		                                                            $.ajax({
+		                                                                type : "POST",
+		                                                                contentType : "application/json; charset=utf-8;",
+		                                                                dataType : "json",
+		                                                                url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+		                                                                async : false,
+		                                                                data : JSON.stringify(from),
+		                                                                success : function(result) {
+		                                                                    logNow(result);
+		                                                                    var object_num = Object.keys(result);
+		                                                                    row = result[object_num];
+		                                                                    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+		                                                                }
+		                                                            }); 
+		                                                        }
+		                                                        htmlString += '</tr>';
+		                                                      //new_jp_h1.inc
+	                                    					}
+	                                    					rec_no++;
+                                    				}
+                                    			}
+                                    		});
+                                    		
+                                    		//new_jp_t1
+                                    		htmlString +=
+                                    			'<tr>'+
+                                    				'<td width="520" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="center" valign="middle" bgcolor="white" height="25" colspan="5"><span style="font-size:10pt; padding-left:3pt; letter-spacing:100pt;">합계</span></td>';
+                                    		// 선불 
+
+                                    		var tsum = 0;
+                                    		for (ii = 1 ; ii <= 5 ; ii++)
+                                    		{
+                                    			var tot_inse = 0;
+                                    			fdname = "s" + ii;
+                                    			from = {
+                                    					dbattr : fdname,
+                                    					dbattr : fdname,
+                                    					dbname : dbname,
+                                    					bdate : bdate
+                                    			}
+                                    			$.ajax({
+                                    				type : "POST",
+                                    				contentType : "application/json; charset=utf-8;",
+                                    				dataType : "json",
+                                    				url : SETTING_URL + "/monthclosing/select_MC_Specification10",
+                                    				async : false,
+                                    				data : JSON.stringify(from),
+                                    				success : function(result) {
+                                    					logNow(result);
+                                    					var object_num = Object.keys(result);
+                                    					row = result[object_num];
+                                    					tsum += row[fdname];
+                                            			var tot_inse = row[fdname];
+                                            			if (ii == 2)
+                                            			{
+                                            				from = {
+                                            						dbname : dbname,
+                                            						bdate : bdate
+                                            				}
+                                            				$.ajax({
+                                            					type : "POST",
+                                            					contentType : "application/json; charset=utf-8;",
+                                            					dataType : "json",
+                                            					url : SETTING_URL + "/monthclosing/select_MC_Specification11",
+                                            					async : false,
+                                            					data : JSON.stringify(from),
+                                            					success : function(result) {
+                                            						logNow(result);
+                                            						var object_num = Object.keys(result);
+                                            						row = result[object_num];
+                                                    				tsum += row["s21"];
+                                                    				tot_inse += row["s21"];
+                                            					}
+                                            				});
+                                            			}
+
+                                            		    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+                                            		    if (tot_inse) htmlString += numberWithCommas(tot_inse); htmlString += '</span></td>';
+                                    				}
+                                    			});
+                                    		}
+                                    		// 용지
+
+                                    		from = {
+                                    				dbname : dbname,
+                                    				bdate : bdate
+                                    		}
+                                    		$.ajax({
+                                    			type : "POST",
+                                    			contentType : "application/json; charset=utf-8;",
+                                    			dataType : "json",
+                                    			url : SETTING_URL + "/monthclosing/select_MC_Specification12",
+                                    			async : false,
+                                    			data : JSON.stringify(from),
+                                    			success : function(result) {
+                                    				logNow(result);
+                                    				var object_num = Object.keys(result);
+                                    				row = result[object_num];
+                                    				tsum += row["yj1"];
+
+                                        		    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt;">' + numberWithCommas(row["yj1"]) +'</span></td>';
+                                    			}
+                                    		});
+                                    		// 제판
+                                    		for (ii = 0 ; ii < num_PR ; ii++)
+                                    		{
+                                    			tsum += jps_array[ii];
+
+                                    		    htmlString +=
+                                    		    	'<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt;">'+ numberWithCommas(jps_array[ii]) +'</span></td>';
+                                    		}
+                                    		// 인쇄 
+                                    		for (ii = 0 ; ii < num_PR ; ii++)
+                                    		{
+                                    			tsum += prs_array[ii];
+
+                                    		    htmlString +=
+                                    		    	'<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt;">'+ numberWithCommas(prs_array[ii]) +'</span></td>';
+                                    		}
+                                    		
+                                    		htmlString +=                                    		
+                                    			'</tr>'+
+                                    			'<tr>'+
+                                    			'<td width="520" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="center" valign="middle" bgcolor="white" height="25" colspan="5"><span style="font-size:10pt; padding-left:3pt; letter-spacing:100pt;">이월</span></td>';
+
+                                    		cell_num = 6 + (num_PR * 2);
+                                    		//for (ii = 1 ; ii <= 8 ; ii++)
+                                    		for (ii = 1 ; ii <= cell_num ; ii++)
+                                    		{
+
+                                    		    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+
+                                    		if ((sy == "2016") && (sm == "10") && (ii == 8))
+                                    		{
+                                    			htmlString += '2,000,900';
+                                    			isum += 237600;
+                                    			isum += 1763300;
+                                    		}
+                                    		if ((sy == "2016") && (sm == "10") && (ii == 10))
+                                    		{
+                                    			htmlString += '13,188,461';
+                                    			isum += 171600;
+                                    			isum += 13016861;
+                                    		}
+                                    		if ((sy == "2016") && (sm == "11") && (ii == 8))
+                                    		{
+                                    			htmlString += '2,041,600';
+                                    			isum += 2041600;
+                                    		}
+                                    		if ((sy == "2016") && (sm == "11") && (ii == 10))
+                                    		{
+                                    			htmlString += '16,622,452';
+                                    			isum += 16622452;
+                                    		}                                    		
+                                    		htmlString += '</span></td>';
+                                    		}
+                                    		htmlString += '</tr>';
+
+                                    		//new_jp_t1
+                                    		
+                                    		rec_no += 2;
+                                    		var tttk = sy + sm;
+                                    		if (tttk == "201612")
+                            					//if (($rec_no % 15) == 0)
+                            					{
+                            						//new_jp_b1.inc
+                            						htmlString +=
+                            							'</table>'+
+                            								'</td>'+
+                            								'</tr>'+
+                            								'<tr>'+
+                            									'<td width="100%" align="left" height="20"><span style="font-size:10pt;"><b>'+ com_name +'</b></span></td>'+
+                        									'</tr>'+
+                            							'</table>';
+                            						//new_jp_b1.inc
+                            						htmlString += '<p style=\"page-break-before:always\">';
+                            						htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            						htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            						
+                            						//new_jp_h1.inc
+                            						htmlString +=
+                                                        //<table border="0" cellpadding="0" cellspacing="0" width="1160">
+                            							'<table border="0" cellpadding="0" cellspacing="0" width="1300">'+
+                                                        '<tr>'+
+                                                            '<td width="100%" align="right" height="30"><span style="font-size:18pt; padding-right:5pt;"><b>'+ sy +' 년 '+ sm +' 월 </b></span></td>'+
+                                                        '</tr>'+
+                                                        '<tr>'+
+                                                            '<td width="100%" align="right" height="20"><span style="font-size:9pt;">&nbsp;</span></td>'+
+                                                        '</tr>'+
+                                                        '<tr>'+
+                                                            '<td width="100%" align="left" valign="top">'+
+                                                                '<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+                                                                    '<tr>'+
+                                                                        '<td width="40" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:1pt;"><b>순번</b></span></p></td>'+
+                                                                        '<td width="300" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:45pt;"><b>도서명</b></span></p></td>'+
+                                                                        '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>코드</b></span></p></td>'+
+                                                                        '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>수량</b></span></p></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:10pt;"><b>단가</b></span></p></td>'+
+                                                                        '<td width="350" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" colspan="5" height="25"><span style="font-size:10pt; letter-spacing:80pt;"><b>선불</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:2pt;"><b>원재료</b></span></td>'+
+                                                                        '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>제판</b></span></td>'+
+                                                                        '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>인쇄</b></span></td>'+
+                                                                    '</tr>'+
+                                                                    '<tr>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>원고</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>저자</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>출력</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>사보</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>증지</b></span></td>'+
+                                                                        '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>용지</b></span></td>';
+                                                
+                                                    for (ii = 0 ; ii < num_PR ; ii++)
+                                                    {
+                                                        ////selMCSpecification6
+                                                        from = {
+                                                            jmfield : pr_array[ii]
+                                                        }
+                                                        $.ajax({
+                                                            type : "POST",
+                                                            contentType : "application/json; charset=utf-8;",
+                                                            dataType : "json",
+                                                            url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                                                            async : false,
+                                                            data : JSON.stringify(from),
+                                                            success : function(result) {
+                                                                logNow(result);
+                                                                var object_num = Object.keys(result);
+                                                                row = result[object_num];
+                                                                htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                                                            }
+                                                        }); 
+                                                    }
+                                                    
+                                                    for (ii = 0 ; ii < num_PR ; ii++)
+                                                    {
+                                                        ///selMCSpecification6
+                                                        from = {
+                                                            jmfield : pr_array[ii]
+                                                        }
+                                                        $.ajax({
+                                                            type : "POST",
+                                                            contentType : "application/json; charset=utf-8;",
+                                                            dataType : "json",
+                                                            url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                                                            async : false,
+                                                            data : JSON.stringify(from),
+                                                            success : function(result) {
+                                                                logNow(result);
+                                                                var object_num = Object.keys(result);
+                                                                row = result[object_num];
+                                                                htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                                                            }
+                                                        }); 
+                                                    }
+                                                    htmlString += '</tr>';
+                                                  //new_jp_h1.inc
+                            					}
+                                    		from = {
+                                    				dbname : dbname,
+                                    				bdate : bdate
+                                    		}
+                                    		$.ajax({
+                                    			type : "POST",
+                                    			contentType : "application/json; charset=utf-8;",
+                                    			dataType : "json",
+                                    			url : SETTING_URL + "/monthclosing/select_MC_Specification16",
+                                    			async : false,
+                                    			data : JSON.stringify(from),
+                                    			success : function(result) {
+                                    				logNow(result);
+                                    				var object_num = Object.keys(result);
+                                    				if(object_num.length)
+                                    				{
+                                    					for(i in object_num)
+                                    					{
+                                    						mrow = result[i];
+                                    						//new_jp_c3
+                                    						htmlString +=
+                                    							'<tr>'+
+		                                    					    '<td width="390" colspan="3" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="left" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; padding-left:10pt;">'+ mrow["bookname"] +'</span></td>'+
+		                                    					    '<td width="50" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithCommas(mrow["jejoamnt"]) +'</span></td>'+
+		                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithComma(mrow["jejodang"]) +'</span></td>';
+	                                    					// 선불
+	                                    					    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    					    	if (mrow["s1"]) htmlString += numberWithCommas(mrow["s1"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; letter-spacing:-1pt;">';
+	                                    					    	if (mrow["s2"]) {if (k_inse) htmlString += '인 '; htmlString += numberWithCommas(mrow["s2"]);} else htmlString +='&nbsp;'; htmlString += '</span></td>'+
+	                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    					    	if (mrow["s3"]) htmlString += numberWithCommas(mrow["s3"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    					    	if (mrow["s4"]) htmlString += numberWithCommas(mrow["s4"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">';
+	                                    					    	if (mrow["s5"]) htmlString += numberWithCommas(mrow["s5"]); else htmlString += '&nbsp;'; htmlString += '</span></td>'+
+	                                    					// 용지 
+	                                    					    '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;">'+ numberWithCommas(mrow["yj1"]) +'</span></td>';
+	                                    					// 제판 
+	
+	                                    					    //<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;"><?=number_format($mrow[JP1]);?></span></td>
+	
+	                                    					for (ii = 0 ; ii < num_PR ; ii++)
+	                                    					{
+	                                    						fname = jp_array[ii];
+	                                    						htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"25\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                                    						if (mrow[fname])
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    						htmlString += '</span></td>';
+	                                    					}
+	                                    					// 인쇄 
+	                                    					    //<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt;"><?=number_format($mrow[PR1]);?></span></td>
+	
+	
+	                                    					for (ii = 0 ; ii < num_PR ; ii++)
+	                                    					{
+	                                    						fname = pr_array[ii];
+	                                    						htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"25\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                                    						if (mrow[fname])
+	                                    							htmlString += numberWithCommas(mrow[fname]);
+	                                    						htmlString += '</span></td>';
+	                                    					}
+	                                    					htmlString += '</tr>';
+
+                                    						//new_jp_c3
+	                                    					if ((rec_no % 20) == 0)
+	                                    						//if (($rec_no % 15) == 0)
+	                                    						{
+		                                    						//new_jp_b1.inc
+		                                    						htmlString +=
+		                                    							'</table>'+
+		                                    								'</td>'+
+		                                    								'</tr>'+
+		                                    								'<tr>'+
+		                                    									'<td width="100%" align="left" height="20"><span style="font-size:10pt;"><b>'+ com_name +'</b></span></td>'+
+	                                    									'</tr>'+
+		                                    							'</table>';
+		                                    						//new_jp_b1.inc
+		                                    						htmlString += '<p style=\"page-break-before:always\">';
+		                                    						htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+		                                    						htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+		                                    						
+		                                    						//new_jp_h1.inc
+		                                    						htmlString +=
+		                                                                //<table border="0" cellpadding="0" cellspacing="0" width="1160">
+		                                    							'<table border="0" cellpadding="0" cellspacing="0" width="1300">'+
+		                                                                '<tr>'+
+		                                                                    '<td width="100%" align="right" height="30"><span style="font-size:18pt; padding-right:5pt;"><b>'+ sy +' 년 '+ sm +' 월 </b></span></td>'+
+		                                                                '</tr>'+
+		                                                                '<tr>'+
+		                                                                    '<td width="100%" align="right" height="20"><span style="font-size:9pt;">&nbsp;</span></td>'+
+		                                                                '</tr>'+
+		                                                                '<tr>'+
+		                                                                    '<td width="100%" align="left" valign="top">'+
+		                                                                        '<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+		                                                                            '<tr>'+
+		                                                                                '<td width="40" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:1pt;"><b>순번</b></span></p></td>'+
+		                                                                                '<td width="300" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:45pt;"><b>도서명</b></span></p></td>'+
+		                                                                                '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>코드</b></span></p></td>'+
+		                                                                                '<td width="50" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:5pt;"><b>수량</b></span></p></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" rowspan="2" height="50"><p><span style="font-size:10pt; letter-spacing:10pt;"><b>단가</b></span></p></td>'+
+		                                                                                '<td width="350" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" colspan="5" height="25"><span style="font-size:10pt; letter-spacing:80pt;"><b>선불</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:2pt;"><b>원재료</b></span></td>'+
+		                                                                                '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>제판</b></span></td>'+
+		                                                                                '<td width="=80*num_PR" colspan="=num_PR" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:20pt;"><b>인쇄</b></span></td>'+
+		                                                                            '</tr>'+
+		                                                                            '<tr>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>원고</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>저자</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>출력</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>사보</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>증지</b></span></td>'+
+		                                                                                '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>용지</b></span></td>';
+		                                                        
+			                                                        for (ii = 0 ; ii < num_PR ; ii++)
+			                                                        {
+			                                                            ////selMCSpecification6
+			                                                            from = {
+			                                                                jmfield : pr_array[ii]
+			                                                            }
+			                                                            $.ajax({
+			                                                                type : "POST",
+			                                                                contentType : "application/json; charset=utf-8;",
+			                                                                dataType : "json",
+			                                                                url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+			                                                                async : false,
+			                                                                data : JSON.stringify(from),
+			                                                                success : function(result) {
+			                                                                    logNow(result);
+			                                                                    var object_num = Object.keys(result);
+			                                                                    row = result[object_num];
+			                                                                    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+			                                                                }
+			                                                            }); 
+			                                                        }
+			                                                        
+			                                                        for (ii = 0 ; ii < num_PR ; ii++)
+			                                                        {
+			                                                            ///selMCSpecification6
+			                                                            from = {
+			                                                                jmfield : pr_array[ii]
+			                                                            }
+			                                                            $.ajax({
+			                                                                type : "POST",
+			                                                                contentType : "application/json; charset=utf-8;",
+			                                                                dataType : "json",
+			                                                                url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+			                                                                async : false,
+			                                                                data : JSON.stringify(from),
+			                                                                success : function(result) {
+			                                                                    logNow(result);
+			                                                                    var object_num = Object.keys(result);
+			                                                                    row = result[object_num];
+			                                                                    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:10pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+			                                                                }
+			                                                            }); 
+			                                                        }
+			                                                        htmlString += '</tr>';
+			                                                      //new_jp_h1.inc
+			                                                        }
+	                                    					rec_no++;
+	                                    					}
+                                    					}
+                                    				//new_jp_t3
+                                    				htmlString +=                                  					
+                                    					'<tr>'+
+                                    						'<td width="520" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="center" valign="middle" bgcolor="white" height="25" colspan="5"><span style="font-size:9pt; padding-left:3pt; letter-spacing:100pt;">합2계</span></td>';
+	                                    			// 선불
+	
+	                                    			var tsum = 0;
+	                                    			for (ii = 1 ; ii <= 5 ; ii++)
+	                                    			{
+	                                    				fdname = "s" + ii;
+	                                    				from = {
+	                                    						dbattr : fdname,
+	                                    						dbattr : fdname,
+	                                    						dbname : dbname,
+	                                    						bdate : bdate
+	                                    				}
+	                                    				$.ajax({
+	                                    					type : "POST",
+	                                    					contentType : "application/json; charset=utf-8;",
+	                                    					dataType : "json",
+	                                    					url : SETTING_URL + "/monthclosing/select_MC_Specification57",
+	                                    					async : false,
+	                                    					data : JSON.stringify(from),
+	                                    					success : function(result) {
+	                                    						logNow(result);
+	                                    						var object_num = Object.keys(result);
+	                                    						row = result[object_num];
+	                                    						logNow("asd : " + row["s1"]);
+	                                    						tsum += row[fdname];
+	                                    						
+	                                    						htmlString +=
+	                                    							'<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-left:0pt;">';
+	    	                                    			    if (row[fdname]) htmlString += numberWithCommas(row[fdname]); htmlString += '</span></td>';
+	                                    					}
+	                                    				});
+	                                    			}
+	                                    			// 용지
+	                                    			from = {
+	                                    					dbname : dbname,
+	                                    					bdate : bdate
+	                                    			}
+	                                    			$.ajax({
+	                                    				type : "POST",
+	                                    				contentType : "application/json; charset=utf-8;",
+	                                    				dataType : "json",
+	                                    				url : SETTING_URL + "/monthclosing/select_MC_Specification19",
+	                                    				async : false,
+	                                    				data : JSON.stringify(from),
+	                                    				success : function(result) {
+	                                    					logNow(result);
+	                                    					var object_num = Object.keys(result);
+	                                    					row = result[object_num];
+	                                    					
+	                                    					tsum += row["yj1"];
+	                                    					
+		                                    			    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt;">'+ numberWithCommas(row["yj1"]) +'</span></td>';
+	                                    				}
+	                                    			});
+	                                    			// 제판
+	                                    			for (ii = 0 ; ii < num_PR ; ii++)
+	                                    			{
+	                                    				tsum += jps2_array[ii];
+	
+	                                    			    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt;">'+ numberWithCommas(jps2_array[ii]) +'</span></td>';
+	                                    			}
+	                                    			// 인쇄
+	                                    			for (ii = 0 ; ii < num_PR ; ii++)
+	                                    			{
+	                                    				tsum += prs2_array[ii];
+	
+	                                    			    htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt;">'+ numberWithCommas(prs2_array[ii]) +'</span></td>';
+	                                    			}
+	                                    			htmlString += '</tr>';
+
+                                    				//new+jp_t3
+	                                    			//new_jp_b1.inc
+                            						htmlString +=
+                            							'</table>'+
+                            								'</td>'+
+                            								'</tr>'+
+                            								'<tr>'+
+                            									'<td width="100%" align="left" height="20"><span style="font-size:10pt;"><b>'+ com_name +'</b></span></td>'+
+                        									'</tr>'+
+                            							'</table>';
+                            						//new_jp_b1.inc
+                            						htmlString += '<p style=\"page-break-before:always\">';
+                            						htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            						htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            						
+                            						// 끝까지
+                            						rec_no = 1;
+                            						from = {
+                            								dbname : dbname,
+                            								bdate : bdate
+                            						}
+                            						$.ajax({
+                            							type : "POST",
+                            							contentType : "application/json; charset=utf-8;",
+                            							dataType : "json",
+                            							url : SETTING_URL + "/monthclosing/select_MC_Specification58",
+                            							async : false,
+                            							data : JSON.stringify(from),
+                            							success : function(result) {
+                            								logNow(result);
+                            								var object_num = Object.keys(result);
+                            								row = result[object_num];
+                            								var total_rec = row["uid"];
+                            								var total_page = Math.ceil(total_rec / 20);
+                            								var total_sum = 0;
+                            								
+                            								page = 1;
+                            							
+                            								// new_jp_h2
+                            								htmlString +=
+                            									'<table border="0" cellpadding="0" cellspacing="0" width="'+ cell_num*110 + 90 +'">'+
+                            									'<tr>'+
+                            									'<td width="100%" align="left" height="30"><span style="font-size:18pt; padding-left:5pt;"><b>제 조 비 명 세 표</b></span></td>'+
+                            									'</tr>'+
+                            									'<tr>'+
+                            									'<td width="100%" align="right" height="20"><span style="font-size:10pt;"><b>(단위 : 원)</b></span></td>'+
+                            									'</tr>'+
+                            									'<tr>'+
+                            									'<td width="100%" align="left" valign="top">'+
+                            									'<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+                            									'<tr>'+
+                            									'<td width="'+ num_JB*80 +'" colspan="'+ num_JB +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:60pt;"><b>제본</b></span></td>'+
+                            									'<td width="'+ num_CT*80 +'" colspan="'+ num_CT +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>코팅</b></span></td>';
+	                            							if (num_VN) {
+	                            								htmlString += '<td width="'+ num_VN*80 +'" colspan="<?=$num_VN?>" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>비닐</b></span></td>';
+	                            							}
+	                            							if (num_CS) {
+	                            								htmlString += '<td width="'+ num_CS*100 +'" colspan="'+ num_CS +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>케이스</b></span></td>';
+	                            							}
+	                            							if (num_ST) {
+	                            								htmlString += '<td width="'+ num_ST*80 +'" colspan="'+ num_ST +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>스티커</b></span></td>';
+	                            							}
+	                            							if (num_CD) {
+	                            								htmlString += '<td width="'+ num_CD*80 +'" colspan="'+ num_CD +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>CD</b></span></td>';
+	                            							}
+	                            							htmlString += 
+	                            								'<td width="80" rowspan="2" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50"><span style="font-size:10pt; letter-spacing:8pt;"><b>기타</b></span></td>'+
+	                            								'<td width="90" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50" rowspan="2"><span style="font-size:10pt;"><b>계</b></span></td>'+
+	                            								'</tr>'+
+	                            								'<tr>';
+	
+	                            							for (ii = 0 ; ii < num_JB ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : jb_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							for (ii = 0 ; ii < num_CT ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : ct_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							for (ii = 0 ; ii < num_VN ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : vn_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							for (ii = 0 ; ii < num_CS ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : cs_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							for (ii = 0 ; ii < num_ST ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : st_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							for (ii = 0 ; ii < num_CD ; ii++)
+	                            							{
+	                            								from = {
+	                            										jmfield : cd_array[ii]
+	                            								}
+	                            								$.ajax({
+	                            									type : "POST",
+	                            									contentType : "application/json; charset=utf-8;",
+	                            									dataType : "json",
+	                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            									async : false,
+	                            									data : JSON.stringify(from),
+	                            									success : function(result) {
+	                            										logNow(result);
+	                            										var object_num = Object.keys(result);
+	                            										row = result[object_num];
+	                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            									}
+	                            								});
+	                            							}
+	                            							htmlString += '</tr>';
+
+                            								// new_jp_h2
+	                            							
+	                            							var etc_sum = 0;
+	                            							
+	                            							from = {
+	                            									dbname : dbname,
+	                            									bdate : bdate
+	                            							}
+	                            							$.ajax({
+	                            								type : "POST",
+	                            								contentType : "application/json; charset=utf-8;",
+	                            								dataType : "json",
+	                            								url : SETTING_URL + "/monthclosing/select_MC_Specification7",
+	                            								async : false,
+	                            								data : JSON.stringify(from),
+	                            								success : function(result) {
+	                            									logNow(result);
+	                            									var object_num = Object.keys(result);
+	                            									for(i in object_num)
+	                            									{
+	                            										mrow = result[i];
+	                            										bo_list = mrow["bolist"];
+	                            										
+	                            										from = {
+	                            												sbbook : mrow["bookcode"]
+	                            										}
+	                            										$.ajax({
+	                            											type : "POST",
+	                            											contentType : "application/json; charset=utf-8;",
+	                            											dataType : "json",
+	                            											url : SETTING_URL + "/monthclosing/select_MC_Specification8",
+	                            											async : false,
+	                            											data : JSON.stringify(from),
+	                            											success : function(result) {
+	                            												logNow(result);
+	                            												var object_num = Object.keys(result);
+	                            												row = result[object_num];
+	                            												
+	                            												var k_inse = row["sbinse"];
+	                            												var etc1 = 0;
+	                            												logNow("왜많아 : " + mrow["jejonum"]);
+	                            												from = {
+	                            														jenum : mrow["jejonum"]
+	                            												}
+	                            												$.ajax({
+	                            													type : "POST",
+	                            													contentType : "application/json; charset=utf-8;",
+	                            													dataType : "json",
+	                            													url : SETTING_URL + "/monthclosing/select_MC_Specification9",
+	                            													async : false,
+	                            													data : JSON.stringify(from),
+	                            													success : function(result) {
+	                            														logNow(result);
+	                            														var object_num = Object.keys(result);
+	                            														row = result[object_num];
+	                            														if(result[0]["w9"])
+	                            														{
+	                            															etc1 = result[0]["w9"];
+	                            															etc_sum += etc1;
+	                            														}
+	                            														
+	                            														//new_jp_c2
+	                            														htmlString += '<tr>';
+	                            														 // 제본
+	                            														for (ii = 0 ; ii < num_JB ; ii++)
+	                            														{
+	                            															fname = jb_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("jb", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("jb", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// 코딩
+	                            														for (ii = 0 ; ii < num_CT ; ii++)
+	                            														{
+	                            															fname = ct_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("ct", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("ct", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// 비닐
+	                            														for (ii = 0 ; ii < num_VN ; ii++)
+	                            														{
+	                            															fname = vn_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("vn", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("vn", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// 케이스
+	                            														for (ii = 0 ; ii < num_CS ; ii++)
+	                            														{
+	                            															fname = cs_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("cs", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("cs", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// 스티커
+	                            														for (ii = 0 ; ii < num_ST ; ii++)
+	                            														{
+	                            															fname = st_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("st", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("st", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// CD
+	                            														for (ii = 0 ; ii < num_CD ; ii++)
+	                            														{
+	                            															fname = cd_array[ii];
+	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            															if (mrow[fname])
+	                            															{
+	                            																if (eregi("cd", bo_list)) htmlString += '<u><b><i>';
+	                            																htmlString += numberWithCommas(mrow[fname]);
+	                            																if (eregi("cd", bo_list)) htmlString += '</i></b></u>';
+	                            															}
+	                            															htmlString += '</span></td>';
+	                            														}
+	                            														// 기타
+	                            														htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	                            														if (etc1)
+	                            														{
+	                            															if (eregi("et", bo_list)) htmlString += '<u><b><i>';
+	                            															htmlString += numberWithCommas(etc1);
+	                            															if (eregi("et", bo_list)) htmlString += '</i></b></u>';
+	                            														}
+	                            														htmlString += '</span></td>';
+
+	                            														htmlString +=
+	                            															'<td width="90" style="border-bottom: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(mrow["sum1"]) +'</span></td>'+
+	                            															'</tr>';
+
+	                            														//new_jp_c2
+	                            														
+	                            														if ((rec_no % 20) == 0)
+	                            															//if (($rec_no % 15) == 0)
+	                            															{
+	                            																//new_jp_b2
+	                            																htmlString +=
+	                            																	'</table>'+
+	                            															        '</td>'+
+	                            															        '</tr>'+
+	                            															        '<tr>'+
+	                            															        '<td width="100%" align="left" height="20"><span style="font-size:10pt; padding-left:3pt;"><b>'+ page +' / '+ total_page +'</b></span></td>'+
+	                            																    '</tr>'+
+	                            																    '</table>';
+	                            																//new_jp_b2
+	                            																page++;
+	                            																htmlString += '<p style=\"page-break-before:always\">';
+	                            																htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+	                            																htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+	                            																// new_jp_h2
+	                            	                            								htmlString +=
+	                            	                            									'<table border="0" cellpadding="0" cellspacing="0" width="'+ cell_num*110 + 90 +'">'+
+	                            	                            									'<tr>'+
+	                            	                            									'<td width="100%" align="left" height="30"><span style="font-size:18pt; padding-left:5pt;"><b>제 조 비 명 세 표</b></span></td>'+
+	                            	                            									'</tr>'+
+	                            	                            									'<tr>'+
+	                            	                            									'<td width="100%" align="right" height="20"><span style="font-size:10pt;"><b>(단위 : 원)</b></span></td>'+
+	                            	                            									'</tr>'+
+	                            	                            									'<tr>'+
+	                            	                            									'<td width="100%" align="left" valign="top">'+
+	                            	                            									'<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+	                            	                            									'<tr>'+
+	                            	                            									'<td width="'+ num_JB*80 +'" colspan="'+ num_JB +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:60pt;"><b>제본</b></span></td>'+
+	                            	                            									'<td width="'+ num_CT*80 +'" colspan="'+ num_CT +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>코팅</b></span></td>';
+	                            		                            							if (num_VN) {
+	                            		                            								htmlString += '<td width="'+ num_VN*80 +'" colspan="<?=$num_VN?>" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>비닐</b></span></td>';
+	                            		                            							}
+	                            		                            							if (num_CS) {
+	                            		                            								htmlString += '<td width="'+ num_CS*100 +'" colspan="'+ num_CS +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>케이스</b></span></td>';
+	                            		                            							}
+	                            		                            							if (num_ST) {
+	                            		                            								htmlString += '<td width="'+ num_ST*80 +'" colspan="'+ num_ST +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>스티커</b></span></td>';
+	                            		                            							}
+	                            		                            							if (num_CD) {
+	                            		                            								htmlString += '<td width="'+ num_CD*80 +'" colspan="'+ num_CD +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>CD</b></span></td>';
+	                            		                            							}
+	                            		                            							htmlString += 
+	                            		                            								'<td width="80" rowspan="2" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50"><span style="font-size:10pt; letter-spacing:8pt;"><b>기타</b></span></td>'+
+	                            		                            								'<td width="90" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50" rowspan="2"><span style="font-size:10pt;"><b>계</b></span></td>'+
+	                            		                            								'</tr>'+
+	                            		                            								'<tr>';
+	                            		
+	                            		                            							for (ii = 0 ; ii < num_JB ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : jb_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							for (ii = 0 ; ii < num_CT ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : ct_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							for (ii = 0 ; ii < num_VN ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : vn_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							for (ii = 0 ; ii < num_CS ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : cs_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							for (ii = 0 ; ii < num_ST ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : st_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							for (ii = 0 ; ii < num_CD ; ii++)
+	                            		                            							{
+	                            		                            								from = {
+	                            		                            										jmfield : cd_array[ii]
+	                            		                            								}
+	                            		                            								$.ajax({
+	                            		                            									type : "POST",
+	                            		                            									contentType : "application/json; charset=utf-8;",
+	                            		                            									dataType : "json",
+	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	                            		                            									async : false,
+	                            		                            									data : JSON.stringify(from),
+	                            		                            									success : function(result) {
+	                            		                            										logNow(result);
+	                            		                            										var object_num = Object.keys(result);
+	                            		                            										row = result[object_num];
+	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	                            		                            									}
+	                            		                            								});
+	                            		                            							}
+	                            		                            							htmlString += '</tr>';
+	                            																//new_jp_h2
+	                            															}
+	                            														total_sum += mrow["sum1"];
+	                            														rec_no++;
+	                            														
+	                            													}
+	                            												});
+	                            											}
+	                            											});
+	                            										}
+	                            														//new_jp_t2
+	                            														htmlString += '<tr>';
+	                            														 // 제본
+	                            														for (ii = 0 ; ii < num_JB ; ii++)
+	                            														{
+
+	                            														    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">';
+	                            														    	if (jbs_array[ii]) htmlString += numberWithCommas(jbs_array[ii]); htmlString += '</span></td>';
+	                            														}
+	                            														 // 코팅
+	                            														for (ii = 0 ; ii < num_CT ; ii++)
+	                            														{
+
+	                            															htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(cts_array[ii]) +'</span></td>';
+	                            														}
+	                            														 // 비닐
+	                            														for (ii = 0 ; ii < num_VN ; ii++)
+	                            														{
+
+	                            															htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">';
+	                            														    	if (vns_array[ii]) htmlString += numberWithCommas(vns_array[ii]); htmlString += '</span></td>';
+	                            														}
+	                            														 // 케이스
+	                            														for (ii = 0 ; ii < num_CS ; ii++)
+	                            														{
+
+	                            															htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(css_array[ii]) +'</span></td>';
+	                            														}
+	                            														 // 스티커
+	                            														for (ii = 0 ; ii < num_ST ; ii++)
+	                            														{
+
+	                            															htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(sts_array[ii]) +'</span></td>';
+	                            														}
+	                            														 // CD
+	                            														for (ii = 0 ; ii < num_CD ; ii++)
+	                            														{
+
+	                            															htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(cds_array[ii]) +'</span></td>';
+	                            														}
+	                            														// 기타
+	                            														htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(etc_sum) +'</span></td>'+
+	                            															'<td width="90" style="border-bottom: 3px double #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-right:3pt;">'+ numberWithCommas(total_sum) +'</span></td>'+
+	                            															'</tr>';
+
+	                            														isum = 0;
+	                            														//select_MC_Specification13
+	                            														from = {
+	                            																dbname : dbname,
+	                            																bdate : bdate
+	                            														}
+	                            														$.ajax({
+	                            															type : "POST",
+	                            															contentType : "application/json; charset=utf-8;",
+	                            															dataType : "json",
+	                            															url : SETTING_URL + "/monthclosing/select_MC_Specification13",
+	                            															async : false,
+	                            															data : JSON.stringify(from),
+	                            															success : function(result) {
+	                            																logNow(result);
+	                            																var object_num = Object.keys(result);
+	                            																if (object_num.length)
+	    	                            														{
+	    	                            															row = result[object_num];
+
+	    	                            															htmlString += '<tr>';
+	    	                            															
+	    	                            															for (ii = 0 ; ii < num_JB ; ii++)
+	    	                            															{
+	    	                            																fname = jb_array[ii];
+	    	                            																isum += row[fname];
+	    	                            															
+	    	                            															    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															for (ii = 0 ; ii < num_CT ; ii++)
+	    	                            															{
+	    	                            																fname = ct_array[ii];
+	    	                            																isum += row[fname];
+	    	                            																
+	    	                            																htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															for (ii = 0 ; ii < num_VN ; ii++)
+	    	                            															{
+	    	                            																fname = vn_array[ii];
+	    	                            																isum += row[fname];
+	    	                            															
+	    	                            															    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															for (ii = 0 ; ii < num_CS ; ii++)
+	    	                            															{
+	    	                            																fname = cs_array[ii];
+	    	                            																isum += row[fname];
+		    	                            															
+	    	                            															    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															for (ii = 0 ; ii < num_ST ; ii++)
+	    	                            															{
+	    	                            																fname = st_array[ii];
+	    	                            																isum += row[fname];
+		    	                            															
+	    	                            															    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															for (ii = 0 ; ii < num_CD ; ii++)
+	    	                            															{
+	    	                            																fname = cd_array[ii];
+	    	                            																isum += row[fname];
+		    	                            															
+	    	                            															    htmlString += '<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            															    	if (row[fname]) htmlString += numberWithCommas(row[fname]); htmlString += '</span></td>';
+	    	                            															}
+	    	                            															var et_iwol = 0;
+	    	                            															//sel14
+	    	                            															from = {
+	    	                            															}
+	    	                            															$.ajax({
+	    	                            																type : "POST",
+	    	                            																contentType : "application/json; charset=utf-8;",
+	    	                            																dataType : "json",
+	    	                            																url : SETTING_URL + "/monthclosing/select_MC_Specification14",
+	    	                            																async : false,
+	    	                            																data : JSON.stringify(from),
+	    	                            																success : function(result) {
+	    	                            																	logNow(result);
+	    	                            																	var object_num = Object.keys(result);row = result[object_num];
+	    	                            																	for(i in object_num)
+	    	    	                            															{
+	    	                            																		crow = result[i];
+	    	                            																		if (crow[0])
+	    	    	                            																	et_iwol += crow["jana"];
+	    	    	                            															}
+	    	                            																}
+	    	                            															});
+	    	                            															isum += et_iwol;
+	    	                            															htmlString +=
+	    	                            																'<td width="80" style="border-bottom: 3px double #000000; border-left: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">';
+	    	                            																if (et_iwol) htmlString += numberWithCommas(et_iwol); htmlString += '</span></td>';	    	                            																
+	    	                            															htmlString += '<td width="90" style="border-bottom: 3px double #000000; border-left: 1px solid #000000; border-right: 1px solid #000000;" align="right" style="padding-right:3" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; padding-left:0pt;">'+ "여기4 : " +numberWithCommas(isum) +'</span></td>'+
+	    	                            																'</tr>';
+	    	                            														}
+	                            															}
+	                            														});
+	                            														htmlString += '</tr>';
+
+	                            														//new_jp_t2
+	                            														rec_no += 2;
+	                            														
+	                            														var tttk = bdate;
+	                            														if (tttk == "201612")
+	                            														{
+	                            															//new_jp_b2
+                            																htmlString +=
+                            																	'</table>'+
+                            															        '</td>'+
+                            															        '</tr>'+
+                            															        '<tr>'+
+                            															        '<td width="100%" align="left" height="20"><span style="font-size:10pt; padding-left:3pt;"><b>'+ page +' / '+ total_page +'</b></span></td>'+
+                            																    '</tr>'+
+                            																    '</table>';
+                            																//new_jp_b2
+                            																page++;
+                            																htmlString += '<p style=\"page-break-before:always\">';
+                            																htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            																htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+                            																// new_jp_h2
+                            	                            								htmlString +=
+                            	                            									'<table border="0" cellpadding="0" cellspacing="0" width="'+ cell_num*110 + 90 +'">'+
+                            	                            									'<tr>'+
+                            	                            									'<td width="100%" align="left" height="30"><span style="font-size:18pt; padding-left:5pt;"><b>제 조 비 명 세 표</b></span></td>'+
+                            	                            									'</tr>'+
+                            	                            									'<tr>'+
+                            	                            									'<td width="100%" align="right" height="20"><span style="font-size:10pt;"><b>(단위 : 원)</b></span></td>'+
+                            	                            									'</tr>'+
+                            	                            									'<tr>'+
+                            	                            									'<td width="100%" align="left" valign="top">'+
+                            	                            									'<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+                            	                            									'<tr>'+
+                            	                            									'<td width="'+ num_JB*80 +'" colspan="'+ num_JB +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:60pt;"><b>제본</b></span></td>'+
+                            	                            									'<td width="'+ num_CT*80 +'" colspan="'+ num_CT +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>코팅</b></span></td>';
+                            		                            							if (num_VN) {
+                            		                            								htmlString += '<td width="'+ num_VN*80 +'" colspan="<?=$num_VN?>" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>비닐</b></span></td>';
+                            		                            							}
+                            		                            							if (num_CS) {
+                            		                            								htmlString += '<td width="'+ num_CS*100 +'" colspan="'+ num_CS +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>케이스</b></span></td>';
+                            		                            							}
+                            		                            							if (num_ST) {
+                            		                            								htmlString += '<td width="'+ num_ST*80 +'" colspan="'+ num_ST +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>스티커</b></span></td>';
+                            		                            							}
+                            		                            							if (num_CD) {
+                            		                            								htmlString += '<td width="'+ num_CD*80 +'" colspan="'+ num_CD +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>CD</b></span></td>';
+                            		                            							}
+                            		                            							htmlString += 
+                            		                            								'<td width="80" rowspan="2" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50"><span style="font-size:10pt; letter-spacing:8pt;"><b>기타</b></span></td>'+
+                            		                            								'<td width="90" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50" rowspan="2"><span style="font-size:10pt;"><b>계</b></span></td>'+
+                            		                            								'</tr>'+
+                            		                            								'<tr>';
+                            		
+                            		                            							for (ii = 0 ; ii < num_JB ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : jb_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							for (ii = 0 ; ii < num_CT ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : ct_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							for (ii = 0 ; ii < num_VN ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : vn_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							for (ii = 0 ; ii < num_CS ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : cs_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							for (ii = 0 ; ii < num_ST ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : st_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							for (ii = 0 ; ii < num_CD ; ii++)
+                            		                            							{
+                            		                            								from = {
+                            		                            										jmfield : cd_array[ii]
+                            		                            								}
+                            		                            								$.ajax({
+                            		                            									type : "POST",
+                            		                            									contentType : "application/json; charset=utf-8;",
+                            		                            									dataType : "json",
+                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+                            		                            									async : false,
+                            		                            									data : JSON.stringify(from),
+                            		                            									success : function(result) {
+                            		                            										logNow(result);
+                            		                            										var object_num = Object.keys(result);
+                            		                            										row = result[object_num];
+                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+                            		                            									}
+                            		                            								});
+                            		                            							}
+                            		                            							htmlString += '</tr>';
+                            																//new_jp_h2
+	                            															$rec_no = 1;
+	                            														}
+	                            														total_sum = 0;
+	                            														etc_sum = 0;
+	                            														
+	                            														from = {
+	                            																dbname : dbname,
+	                            																bdate : bdate
+	                            														}
+	                            														$.ajax({
+	                            															type : "POST",
+	                            															contentType : "application/json; charset=utf-8;",
+	                            															dataType : "json",
+	                            															url : SETTING_URL + "/monthclosing/select_MC_Specification16",
+	                            															async : false,
+	                            															data : JSON.stringify(from),
+	                            															success : function(result) {
+	                            																logNow(result);
+	                            																var object_num = Object.keys(result);
+	                            																if(object_num.length)
+	                            																{
+	                            																	for(i in object_num)
+	                            																	{
+	                            																		mrow = result[i];
+	                            																		etc1 = 0;
+	                            																		logNow("17 : " + mrow["jejonum"]);
+	                            																		from = {
+	                            																				jenum : mrow["jejonum"]
+	                            																		}
+	                            																		$.ajax({
+	                            																			type : "POST",
+	                            																			contentType : "application/json; charset=utf-8;",
+	                            																			dataType : "json",
+	                            																			url : SETTING_URL + "/monthclosing/select_MC_Specification17",
+	                            																			async : false,
+	                            																			data : JSON.stringify(from),
+	                            																			success : function(result) {
+	                            																				logNow(result);
+	                            																				var object_num = Object.keys(result);
+	                            																				row = result[object_num];
+	                            																				if(result[0]["w9"])
+	                            																				{
+	                            																					etc1 = result[0]["w9"];
+	                            																					etc_sum += etc1;
+	                            																				}
+	                            																				
+	                            																			}
+	                            																		});
+	                            																		//new_jp_c2
+	            	                            														htmlString += '<tr>';
+	            	                            														 // 제본
+	            	                            														for (ii = 0 ; ii < num_JB ; ii++)
+	            	                            														{
+	            	                            															fname = jb_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("jb", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("jb", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// 코딩
+	            	                            														for (ii = 0 ; ii < num_CT ; ii++)
+	            	                            														{
+	            	                            															fname = ct_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("ct", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("ct", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// 비닐
+	            	                            														for (ii = 0 ; ii < num_VN ; ii++)
+	            	                            														{
+	            	                            															fname = vn_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("vn", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("vn", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// 케이스
+	            	                            														for (ii = 0 ; ii < num_CS ; ii++)
+	            	                            														{
+	            	                            															fname = cs_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("cs", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("cs", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// 스티커
+	            	                            														for (ii = 0 ; ii < num_ST ; ii++)
+	            	                            														{
+	            	                            															fname = st_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("st", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("st", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// CD
+	            	                            														for (ii = 0 ; ii < num_CD ; ii++)
+	            	                            														{
+	            	                            															fname = cd_array[ii];
+	            	                            															htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            															if (mrow[fname])
+	            	                            															{
+	            	                            																if (eregi("cd", bo_list)) htmlString += '<u><b><i>';
+	            	                            																htmlString += numberWithCommas(mrow[fname]);
+	            	                            																if (eregi("cd", bo_list)) htmlString += '</i></b></u>';
+	            	                            															}
+	            	                            															htmlString += '</span></td>';
+	            	                            														}
+	            	                            														// 기타
+	            	                            														htmlString += '<td width=\"80\" style=\"border-bottom: 1px solid #000000; border-left: 1px solid #000000;\" align=\"right\" valign=\"middle\" bgcolor=\"white\" height=\"35\"><span style=\"font-size:9pt; padding-right:3pt;\">';
+	            	                            														if (etc1)
+	            	                            														{
+	            	                            															if (eregi("et", bo_list)) htmlString += '<u><b><i>';
+	            	                            															htmlString += + numberWithCommas(etc1);
+	            	                            															if (eregi("et", bo_list)) htmlString += '</i></b></u>';
+	            	                            														}
+	            	                            														htmlString += '</span></td>';
+	            	                            														
+	            	                            														
+	            	                            														htmlString +=
+	            	                            															'<td width="90" style="border-bottom: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="35"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(mrow["sum1"]) +'</span></td>'+
+	            	                            															'</tr>';
+
+	            	                            														//new_jp_c2
+	            	                            														
+	            	                            														if ((rec_no % 20) == 0)
+	            	                            															//if (($rec_no % 15) == 0)
+	            	                            															{
+	            	                            																//new_jp_b2
+	            	                            																htmlString +=
+	            	                            																	'</table>'+
+	            	                            															        '</td>'+
+	            	                            															        '</tr>'+
+	            	                            															        '<tr>'+
+	            	                            															        '<td width="100%" align="left" height="20"><span style="font-size:10pt; padding-left:3pt;"><b>'+ page +' / '+ total_page +'</b></span></td>'+
+	            	                            																    '</tr>'+
+	            	                            																    '</table>';
+	            	                            																//new_jp_b2
+	            	                            																page++;
+	            	                            																htmlString += '<p style=\"page-break-before:always\">';
+	            	                            																htmlString += '<!--[if IE 7]><br style=\"height:0; line-height:0\"><![endif]-->';
+	            	                            																htmlString += '<!--[if IE 8]><br style=\"height:0; line-height:0\"><![endif]-->';
+	            	                            																// new_jp_h2
+	            	                            	                            								htmlString +=
+	            	                            	                            									'<table border="0" cellpadding="0" cellspacing="0" width="'+ cell_num*110 + 90 +'">'+
+	            	                            	                            									'<tr>'+
+	            	                            	                            									'<td width="100%" align="left" height="30"><span style="font-size:18pt; padding-left:5pt;"><b>제 조 비 명 세 표</b></span></td>'+
+	            	                            	                            									'</tr>'+
+	            	                            	                            									'<tr>'+
+	            	                            	                            									'<td width="100%" align="right" height="20"><span style="font-size:10pt;"><b>(단위 : 원)</b></span></td>'+
+	            	                            	                            									'</tr>'+
+	            	                            	                            									'<tr>'+
+	            	                            	                            									'<td width="100%" align="left" valign="top">'+
+	            	                            	                            									'<table border="0" cellspacing="0" width="100%" cellpadding="2" bgcolor="white" bordercolor="black">'+
+	            	                            	                            									'<tr>'+
+	            	                            	                            									'<td width="'+ num_JB*80 +'" colspan="'+ num_JB +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:60pt;"><b>제본</b></span></td>'+
+	            	                            	                            									'<td width="'+ num_CT*80 +'" colspan="'+ num_CT +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>코팅</b></span></td>';
+	            	                            		                            							if (num_VN) {
+	            	                            		                            								htmlString += '<td width="'+ num_VN*80 +'" colspan="<?=$num_VN?>" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>비닐</b></span></td>';
+	            	                            		                            							}
+	            	                            		                            							if (num_CS) {
+	            	                            		                            								htmlString += '<td width="'+ num_CS*100 +'" colspan="'+ num_CS +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:0pt;"><b>케이스</b></span></td>';
+	            	                            		                            							}
+	            	                            		                            							if (num_ST) {
+	            	                            		                            								htmlString += '<td width="'+ num_ST*80 +'" colspan="'+ num_ST +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>스티커</b></span></td>';
+	            	                            		                            							}
+	            	                            		                            							if (num_CD) {
+	            	                            		                            								htmlString += '<td width="'+ num_CD*80 +'" colspan="'+ num_CD +'" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="25"><span style="font-size:10pt; letter-spacing:7pt;"><b>CD</b></span></td>';
+	            	                            		                            							}
+	            	                            		                            							htmlString += 
+	            	                            		                            								'<td width="80" rowspan="2" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50"><span style="font-size:10pt; letter-spacing:8pt;"><b>기타</b></span></td>'+
+	            	                            		                            								'<td width="90" style="border-bottom: 1px solid #000000; border-top: 1px solid #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" height="50" rowspan="2"><span style="font-size:10pt;"><b>계</b></span></td>'+
+	            	                            		                            								'</tr>'+
+	            	                            		                            								'<tr>';
+	            	                            		
+	            	                            		                            							for (ii = 0 ; ii < num_JB ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : jb_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							for (ii = 0 ; ii < num_CT ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : ct_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							for (ii = 0 ; ii < num_VN ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : vn_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							for (ii = 0 ; ii < num_CS ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : cs_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							for (ii = 0 ; ii < num_ST ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : st_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							for (ii = 0 ; ii < num_CD ; ii++)
+	            	                            		                            							{
+	            	                            		                            								from = {
+	            	                            		                            										jmfield : cd_array[ii]
+	            	                            		                            								}
+	            	                            		                            								$.ajax({
+	            	                            		                            									type : "POST",
+	            	                            		                            									contentType : "application/json; charset=utf-8;",
+	            	                            		                            									dataType : "json",
+	            	                            		                            									url : SETTING_URL + "/monthclosing/select_MC_Specification6",
+	            	                            		                            									async : false,
+	            	                            		                            									data : JSON.stringify(from),
+	            	                            		                            									success : function(result) {
+	            	                            		                            										logNow(result);
+	            	                            		                            										var object_num = Object.keys(result);
+	            	                            		                            										row = result[object_num];
+	            	                            		                            										htmlString += '<td width="80" style="border-bottom: 1px solid #000000; border-left: 1px solid #000000;" bgcolor="#F4F4F4" align="center" valign="middle" bgcolor="white" height="25"><span style="font-size:10pt; letter-spacing:1pt;"><b>'+ row["wcyakc"] +'</b></span></td>';
+	            	                            		                            									}
+	            	                            		                            								});
+	            	                            		                            							}
+	            	                            		                            							htmlString += '</tr>';
+	            	                            																//new_jp_h2
+	            	                            															}
+	            	                            														total_sum += mrow["sum1"];
+	            	                            														rec_no++;
+	                            																	}
+	                            																}
+	                            																
+	                            																//new_jp_t4
+	                            																htmlString += '<tr>';
+	                            																 // 제본
+	                            																for (ii = 0 ; ii < num_JB ; ii++)
+	                            																{
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (jbs2_array[ii]) htmlString += numberWithCommas(jbs2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																 // 코팅
+	                            																for (ii = 0 ; ii < num_CT ; ii++)
+	                            																{
+
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (cts2_array[ii]) htmlString += numberWithCommas(cts2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																 // 비닐
+	                            																for (ii = 0 ; ii < num_VN ; ii++)
+	                            																{
+
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (vns2_array[ii]) htmlString += numberWithCommas(vns2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																 // 케이스
+	                            																for (ii = 0 ; ii < num_CS ; ii++)
+	                            																{
+
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (css2_array[ii]) htmlString += numberWithCommas(css2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																 // 스티커
+	                            																for (ii = 0 ; ii < num_ST ; ii++)
+	                            																{
+
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (sts2_array[ii]) htmlString += numberWithCommas(sts2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																 // CD
+	                            																for (ii = 0 ; ii < num_CD ; ii++)
+	                            																{
+
+	                            																    htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (cds2_array[ii]) htmlString += numberWithCommas(cds2_array[ii]); htmlString += '</span></td>';
+	                            																}
+	                            																// 기타 
+	                            																htmlString += '<td width="80" style="border-bottom: 1px double #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">';
+	                            																    	if (etc_sum) htmlString += numberWithCommas(etc_sum); htmlString += '</span></td>'+
+	                            																	'<td width="90" style="border-bottom: 1px double #000000; border-right: 1px solid #000000; border-left: 1px solid #000000;" align="right" valign="middle" bgcolor="white" height="25"><span style="font-size:9pt; padding-right:3pt;">'+ numberWithCommas(total_sum) +'</span></td>'+
+	                            																	'</tr>';
+	                            																//new_jp_t4
+                        																    	//new_jp_b2
+	                            																htmlString +=
+	                            																	'</table>'+
+	                            															        '</td>'+
+	                            															        '</tr>'+
+	                            															        '<tr>'+
+	                            															        '<td width="100%" align="left" height="20"><span style="font-size:10pt; padding-left:3pt;"><b>'+ page +' / '+ total_page +'</b></span></td>'+
+	                            																    '</tr>'+
+	                            																    '</table>';
+	                            																//new_jp_b2
+	                            															}
+	                            														});
+	                            													}
+	                            												});
+	                            											}
+	                            										});
+	                            									
+	                            								
+                                    				}
+                                    		});
+                                    		}
+									});						
+								}				
+						});
+					}
+			});
+		(popUp.document.getElementById("popdata")).innerHTML = htmlString;
+		}
+}
+
+// 제조비명세표 새로작성
+function SelMCSpecificationInsert(){
+	// 제조비명세표 Table 작성
+	var sy = $("select[name=ty]").val();
+	var sm = $("select[name=tm]").val();
+	var bdate = String(sy) + String(sm);
+	function mktime(h, i, s, m, d, y){
+
+		  var mkt = new Date(y, m-1, d, h, i, s);
+
+		  if( mktime.arguments.length == 0 ) mkt = new Date();
+
+		  return Math.floor(mkt.getTime()/1000);
+
+	}
+	
+	dbname = "JEJOMSTEST";
+	if (!sy)
+	{
+		var ctime = new Date();
+		sy = ctime.getFullYear();
+		sm = ctime.getMonth();	
+	}
+	var st = mktime(0, 0, 1, sm, 1, sy);
+	var et = mktime(0, 0, 0, sm+1, 1, sy);
+	logNow("sy : " +sy);
+	logNow("sm : " +sm);
+	logNow("st : " +st);
+	logNow("et : " +et);
+	var jjdate = sy + sm;
+	var htmlString = "";
+	logNow("jjdate :" +jjdate);
+	from = {
+			dbname : dbname,
+			jejodate : jjdate
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/delete_MC_Specification1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+		}
+	});
+	
+	var article_num = 1;
+	
+	from = {
+			date1 : st,
+			date2 : et
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_MC_Specification20",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for ( i in object_num )
+			{
+				logNow("반복1");
+				mrow = result[i];
+				
+				var total = 0;
+				var bolist = "";
+				var burok = 0;
+				if (mrow["sbsbph1"])
+					burok += 1;
+				if (mrow["sbsbph2"])
+					burok += 1;
+				if (mrow["sbsbph3"])
+					burok += 1;
+				if (mrow["sbsbph4"])
+					burok += 1;
+				
+				var new_uid;
+				var total;
+				from = {
+						jenum : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification21",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						
+						total += row["w1"] + row["w2"] + row["w3"] + row["w4"] + row["w5"] + row["w21"];
+						
+						from = {
+								dbname : dbname
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification22",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								xrow = result[object_num];
+								new_uid = xrow["uid"] + 1;
+								
+								from = {
+										dbname : dbname,
+										uid : new_uid,
+										jejonum : mrow["uid"],
+										jejodate : jjdate,
+										jejosuns : article_num,
+										bookname : mrow["bname"],
+										bookcode : mrow["bcode"],
+										jejoamnt : mrow["bnum"],
+										jejodang : row["wdanga"],
+										s1 : row["w1"],
+										s2 : row["w2"],
+										s21 : row["w21"],
+										s3 : row["w3"],
+										s4 : row["w4"],
+										s5 :row["w5"] 
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/insert_MC_Specification1",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+									}
+								});
+							}
+						});
+					}
+				});
+				
+				//용지
+				logNow("유아디화긴이여 : " + mrow["uid"]);
+				from = {
+						uid : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification24",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow("너님임?");
+						logNow(result);
+						var object_num = Object.keys(result);
+						//htmlString += query + '<br>';
+						t_yongji = 0;
+						for ( i in object_num )
+						{
+							row = result[i];
+							t_yongji += row["ycost"];
+						}
+						if(burok)
+						{
+							for ( var j = 1; j <= burok; j++ )
+							{
+								bur_uid = mrow["uid"] + i;
+								from = {
+										uid : bur_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification24",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow("너구나 이시키야");
+										logNow(result);
+										var object_num = Object.keys(result);
+										for ( q in object_num )
+										{
+											row2 = result[q];
+											t_yongji += row2["ycost"];
+										}
+									}
+								});
+							}
+						}
+						
+						total += t_yongji;
+						
+						from = {
+								dbname : dbname,
+								yj1 : t_yongji,
+								uid : new_uid
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification1",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								//htmlString += query + "<br>";
+							}
+						});
+					}
+				});
+				
+				// 인쇄
+				var t_print = 0;
+				var xcust;
+				from = {
+						uid : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification24",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						//htmlString += query + "<br>";
+						var object_num = Object.keys(result);
+						for ( i in object_num )
+						{
+							logNow("===========");
+							var row = result[i];
+							logNow(row);
+							logNow("===========");
+							t_print += row["pcost"];
+							if ( row["pcost"] )
+							{
+								from = {
+										uid : mrow["uid"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification25",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										var pcust = trow["m1"];
+										
+										from = {
+												wccode : pcust
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification26",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												logNow("필드 : " + trow["jmfield"]);
+												xcust = trow["jmfield"];
+											}
+										});
+									}
+								});
+							}
+						}		
+						if ( burok )
+						{
+							for (var j = 1; j <= burok; j++)
+							{
+								bur_uid = mrow["uid"] + i;
+								from = {
+										uid : bur_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification24",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										row = result[object_num];
+										for( q in object_num)
+										{
+											t_print += row2["pcost"];
+										}
+									}
+								});
+							}
+						}
+						logNow("xcust : " +xcust);
+						total += t_print;
+						from = {
+								dbname : dbname,
+								dbattr : xcust,
+								sum1 : t_print,
+								uid : new_uid
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								row = result[object_num];
+							}
+						});
+					}
+				});
+				
+				// 제판
+				t_jepan = 0;
+				xcust = xcust.substring(2,);
+				xcust = "jp" + xcust;
+				
+				from = {
+						uid : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification27",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for ( i in object_num )
+						{
+							logNow("제판 반복?");
+							row = result[i];
+							t_jepan += row["sum5"]
+						}
+						if ( burok )
+						{
+							for( j = 1; j <= burok; j++ )
+							{
+								bur_uid = mrow["uid"] + j;
+								from = {
+										uid : bur_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification28",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										for ( q in object_num)
+										{
+											logNow("제판 부록?");
+											row2 = result[q];
+											t_jepan += row2["sum5"]
+										}
+									}
+								});
+							}
+						}
+						total += t_jepan;
+						from = {
+								dbname : dbname,
+								dbattr : xcust,
+								sum1 : t_print,
+								uid : new_uid
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								//htmlString += query + '<br>';
+								//htmlString += query + '<br>';
+							}
+						});
+					}
+				});
+				/*  인쇄소 추가. 수정 끝 -- 2013.01.03 */
+				// 제본
+				//$t_jebon = 0;
+				//$jebon_c = "";
+				from = {
+						crnum7 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification29",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for ( i in object_num)
+						{
+							logNow("반복?");
+							row = result[i];
+							from = {
+									wccode : row["ccode7"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/select_MC_Specification30",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									var object_num = Object.keys(result);
+									trow = result[object_num];
+									var jbname = trow["jmfield"];
+									if ( row["boryu"] )
+									{
+										from = {
+												dbname : dbname,
+												uid : new_uid
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification31",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												bolist += "*" + jbname;
+											}
+										});
+									}
+									logNow("jbname : " + jbname + " uid : " + new_uid);
+									from = {
+											dbattr : jbname,
+											dbname : dbname,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_MC_Specification32",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											trow = result[object_num];
+											if ( trow[jbname] )
+												var new_val = trow[jbname] + row[totcost7];
+											else
+												var new_val = row[totcost7];
+											
+											from = {
+													dbname : dbname,
+													dbattr : jbname,
+													name1 : new_val,
+													bolist : bolist,
+													uid : new_uid
+											}
+											$.ajax({
+												type : "POST",
+												contentType : "application/json; charset=utf-8;",
+												dataType : "json",
+												url : SETTING_URL + "/monthclosing/update_MC_Specification3",
+												async : false,
+												data : JSON.stringify(from),
+												success : function(result) {
+													logNow(result);
+												}
+											});
+											
+											total += row[totcost7];
+										}
+									});
+								}
+							});
+						}
+					}
+				});
+				//htmlString += '제본 <br>';
+				
+				//코팅
+				var t_coat = 0;
+				from = {
+						crnum8 : mrow["uid"]						
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification33",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						//htmlString += query + '<br>';
+						if ( object_num.length )
+						{
+							for ( i in object_num )
+							{
+								logNow("코팅 반복?");
+								var row = result[i];
+								t_coat += (row["totcost8"] * 1.1);
+								
+								from = {
+										wccode : row["ccode8"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification34",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										
+										if ( row["boryu"] )
+										{
+											bolist += "*" + trow["jmfield"]
+										}
+										xcust = trow["jmfield"];
+									}
+								});
+							}
+							if ( t_coat )
+							{
+								total += t_coat;
+								logNow("aasdasdsadsadsadsadsadsad");
+								logNow(xcust);
+								logNow(parseInt(t_coat));
+								logNow(new_uid);
+								logNow("aasdasdsadsadsadsadsadsad");
+								from = {
+										dbname : dbname,
+										dbattr : xcust,
+										name1 : parseInt(t_coat),
+										uid : new_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/update_MC_Specification4",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+									}
+								});
+							}
+						}
+					}
+				});
+				//htmlString += '코팅 <br>';
+				// 비닐
+				var t_vynn = 0;
+				from = {
+						crnum9 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification35",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						if ( object_num.length )
+						{
+							for ( i in object_num )
+							{
+								logNow("비닐 반복?");
+								row = result[i];
+								from = {
+										wccode : row["ccode9"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification36",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										
+										if ( row["boryu"] )
+											bolist += "*" + trow["jmfield"];
+										t_vynn += row["cprice9"];
+									}
+								});
+							}
+							total += t_vynn;
+							from = {
+									dbname : dbname,
+									dbattr : trow["jmfield"],
+									sum1 : t_vvyn,
+									uid : new_uid
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification5",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+						//htmlString += '비닐 <br>';
+					}
+				});
+				// 케이스
+				var t_case = 0;
+				from = {
+						crnum9 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification37",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						//htmlString += query + '<br>';
+						if(object_num.length)
+						{
+							for(i in object_num)
+							{
+								row = result[i];
+								from = {
+										wccode : row["ccode9"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										if(row["boryu"])
+											bolist += "*" + trow["jmfield"];
+										t_case += row["cprice9"]
+									}
+								});
+							}
+							total += t_case;
+							
+							from = {
+									dbname : dbname,
+									dbattr : trow["jmfield"],
+									name1 : t_case,
+									uid : new_uid
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification6",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									//htmlString += query + ' - cas<br>';
+								}
+							});
+						}
+					}
+				});
+				//htmlString += '1 <br>';
+				// 스티커
+				t_stic = 0;
+				from = {
+						crnum9 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification39",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						//htmlString += query + '<br>';
+						if(object_num.length)
+						{
+							for(i in object_num)
+							{
+								row = result[i];
+								from = {
+										wccode : row["ccode9"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										if (row["boryu"])
+											bolist += "*" + trow["jmfield"];
+										t_stic += row["cprice9"]
+										from = {
+												dbname : dbname,
+												dbattr : trow["jmfield"],
+												name1 : row["cprice9"],
+												uid : new_uid
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/update_MC_Specification7",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+											}
+										});
+										total += t_stic;
+									}
+								});
+							}
+						}
+						
+					}
+				});
+				//htmlString += '2 <br>'
+				//CD
+				var t_cd = 0;
+				from = {
+						crnum9 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification40",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						//htmlString += query + '<br>';
+						if(object_num.length)
+						{
+							for(i in object_num)
+							{
+								row = result[i];
+								from = {
+										wccode : row["ccode9"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										if(row["boryu"])
+											bolist += "*" + trow["jmfield"];
+										t_cd += row["cprice9"];
+									}
+								});
+							}
+							total += t_cd;
+							from = {
+									dbname : dbname,
+									dbattr : trow["jmfield"],
+									name1 : t_cd,
+									uid : new_uid
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification8",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+					}
+				});
+				//htmlString += 'CD <br>';
+				// 기타
+				var t_etc=0;
+				from = {
+						crnum9 : mrow["uid"]
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification41",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						if(object_num.length)
+						{
+							for(i in object_num)
+							{
+								row = result[i];
+								from = {
+										wccode : row["ccode9"]
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										trow = result[object_num];
+										if(row["boryu"])
+											bolist += "*" + trow["jmfield"];
+										t_etc += row["cprice9"];
+									}
+								});
+							}
+							total += t_etc;
+							from = {
+									dbname : dbname,
+									dbattr : trow["jmfield"],
+									name1 : t_etc,
+									uid : new_uid
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification8",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+						else
+						{
+							from = {
+									jenum : mrow["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/select_MC_Specification42",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									var object_num = Object.keys(result);
+									var row = result[object_num];
+									if(row["w9"])
+										total += row["w9"];
+								}
+							});
+						}
+						from = {
+								dbname : dbname,
+								sum1 : total,
+								bolist : bolist,
+								uid : new_uid
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification9",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								row = result[object_num];
+							}
+						});
+					}
+				});
+				article_num++;
+			}
+			// 이월
+			var tyear = parseInt(sy);
+			var tmon = parseInt(sm);
+			
+			from = {
+					dbname : dbname
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_MC_Specification22",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					xrow = result[object_num];
+					new_uid = xrow["uid"] + 1;
+					
+					from = {
+							dbname : dbname,
+							uid : new_uid,
+							jejodate : jjdate
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/insert_MC_Specification2",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+						}
+					});
+				}
+			});
+			var iwol = bdate;
+			
+			from = {
+					bdate : iwol
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_MC_Specification43",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					//htmlString += '2. ' + query = '<br>';
+					for(i in object_num)
+					{
+						row = result[i];
+						from = {
+								wccode : row["custcode"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification44",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+//								echo("3. $query <br>");
+								logNow(result);
+								var object_num = Object.keys(result);
+								trow = result[object_num];
+								from = {
+										dbname : dbname,
+										dbattr : trow["jmfield"],
+										name1 : row["jana"],
+										uid : new_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/update_MC_Specification8",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+//										echo("4. $query <br>");
+										logNow(result);
+									}
+								});
+							}
+						});
+					}
+					//htmlString += '- 제품 - <br>'
+				}
+			});
+			
+			// 잡물
+			from = {
+					date1 : st,
+					date2 : et
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_MC_Specification45",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					row = result[object_num];
+					//htmlString += query + '<br>';
+					for(i in object_num)
+					{
+						mrow = result[i];
+						//echo("$mrow[JBNAME] <br>");
+						var total = 0;
+						var bolist = "";
+						
+						from = {
+								jenum : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification46",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								row = result[object_num];
+								//htmlString += query +'<br>';
+								total += row["w1"] + row["w2"] + row["w3"] + row["w4"] + row["w5"];
+								from = {
+										dbname : dbname
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_MC_Specification22",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										var xrow = result[object_num];
+										new_uid = xrow["uid"] + 1;
+										from = {
+												dbname : dbname, 
+												uid : new_uid,
+												jejonum : mrow["uid"],
+												jejodate : jjdate,
+												jejosuns : article_num,
+												bookname : mrow["jbname"],
+												bookcode : mrow["jbcode"],
+												jejoamnt : mrow["jbamnt"],
+												jejodang : row["wdanga"],
+												s1 : row["w1"],
+												s2 : row["w2"],
+												s3 : row["w3"],
+												s4 : row["w4"],
+												s5 : row["w5"],
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/insert_MC_Specification3",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);0
+												//htmlString += query + '<br>';
+											}
+										});
+									}
+								});
+							}
+						});
+						//$new_uid = mysql_insert_id();
+						/*
+							// 용지, 인쇄
+							$query = "select * from TMPJAB3 where JBID=$mrow[UID]";
+							echo("$query <br>");
+							$res = mysql_query($query, $dbconn) or die(mysql_error());
+							$t_yongji = 0;
+							$t_print = 0;
+							while ($row = mysql_fetch_array($res))
+							{
+								$t_yongji += $row[YCOST];
+								$t_print += $row[PCOST];
+							}
+							$total += $t_yongji;
+							$total += $t_print;
+							// 제판
+							$t_jepan = 0;
+							$query = "select * from TMPJAB5 where LISTID=$mrow[UID]";
+							echo("$query <br>");
+							$res = mysql_query($query, $dbconn) or die(mysql_error());
+							while ($row = mysql_fetch_array($res))
+								$t_jepan += $row[SUM5];	
+							$total += $t_jepan;
+
+							$query = "UPDATE $dbname SET YJ1='$t_yongji', JP1='$t_jepan', PR1='$t_print' WHERE UID='$new_uid'";
+							echo("$query <br>");
+							$res = mysql_query($query, $dbconn) or die(mysql_error());
+						*/
+						//용지
+						from = {
+								uid : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification23",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								var t_yongji = 0;
+								for(i in object_num)
+								{
+									t_yongji += row["ycost"];
+								}
+								total += t_yongji;
+								from = {
+										dbname : dbname,
+										yj1 : t_yongji,
+										uid : new_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/update_MC_Specification1",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										//htmlString += query + '<br>';
+										logNow(result);
+									}
+								});
+								
+							}
+						});
+						// 인쇄
+						var t_print = 0;
+						from = {
+								uid : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification23",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								var xcust;
+								for(i in object_num)
+								{
+									row = result[i];
+									t_print += row["pcost"];
+									if(row["pcost"])
+									{
+										from = {
+												uid : mrow["uid"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification47",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>'
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												var pcust = trow["m1"];
+												from = {
+														wccode : pcust
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_MC_Specification26",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														//htmlString += query + '<br>'
+														logNow(result);
+														var object_num = Object.keys(result);
+														var trow = result[object_num];
+														xcust = trow["jmfield"];
+													}
+												});
+											}
+										});
+									}
+								}
+								total += t_print;
+								from = {
+										dbname : dbname,
+										dbattr : xcust,
+										name1 : t_print,
+										uid : new_uid
+								}
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										//htmlString += query + '<br>'
+										logNow(result);
+										//echo("- 인쇄 - <br>");
+									}
+								});
+							}
+						});
+						// 제판
+						var t_jepan = 0;
+						t_jepan = 0;
+						xcust = xcust.substring(2,);
+						xcust = "jp" + xcust;
+						
+						from = {
+								listid : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification4",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								for(i in object_num)
+								{
+									row = result[object_num];
+									t_jepan += row["sum5"]
+								}
+								if(t_jepan)
+								{
+									total += t_jepan;
+									from = {
+											dbname : dbname,
+											dbattr : xcust,
+											name1 : t_jepan,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>'
+											logNow(result);
+										}
+									});
+								}
+								//htmlString += '- 제판 - <br>';
+							}
+						});
+						
+						// 제본
+						var t_jebon = 0;
+						from = {
+								crnum7 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification49",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										t_jebon += row["totcost7"];
+										from = {
+												wccode : row["ccode7"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification30",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>'
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+											}
+										});
+									}
+									total += t_jebon;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_jebon,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>'
+											logNow(result);
+											//htmlString += '- 제본 - <br>';
+										}
+									});
+								}
+							}
+						});
+						
+						// 코팅
+						var t_coat = 0;
+						from = {
+								crnum8 : mrow["uid"]								
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification50",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										t_coat += parseInt(row["totcost8"] * 1.1);
+										from = {
+												wccode : row["ccode8"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification34",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+											}
+										});
+									}
+									total += t_coat;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_coat,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											row = result[object_num];
+											//htmlString += '- 코팅 - <br>';
+										}
+									});
+								}
+							}
+						});
+						
+						// 비닐
+						var t_vynn = 0;
+						from = {
+								crnum9 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification51",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										from = {
+												wccode : row["ccode9"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>'
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+												t_vynn += row["cprice9"];
+											}
+										});
+									}
+									total += t_vynn;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_vynn,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>'
+											logNow(result);
+										}
+									});
+								}
+								//htmlString += '- 비닐 - <br>';
+							}
+						});
+						
+						// 케이스
+						t_case = 0;
+						from = {
+								crnum9 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification52",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										var row = result[i];
+										from = {
+												wccode : row["ccode9"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>'
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+												t_case += row["cprice9"];
+											}
+										});
+									}
+									total += t_case;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_case,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>'
+											logNow(result);
+										}
+									});
+								}
+								//htmlString += '- 비닐 - <br>';
+							}
+						});
+						
+						// 스티커
+						var t_stic = 0;
+						from = {
+								crnum9 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification53",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>'
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										from = {
+												wccode : row["ccode9"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>'
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+												t_stic += row["cprice9"];
+											}
+										});
+									}
+									total += t_stic;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_stic,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>'
+											logNow(result);
+										}
+									});
+								}
+								//htmlString += '- 스티커 - <br>';
+							}
+						});
+						
+						// CD
+						var t_cd = 0;
+						from = {
+								crnum9 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification54",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>';
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										from = {
+												wccode : row["ccode9"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												//htmlString += query + '<br>';
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+												t_cd += row["cprice9"];
+											}
+										});
+									}
+									total += t_cd;
+									from = {
+											dbname : dbname,
+											dbattr : trow["jmfield"],
+											name1 : t_cd,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification2",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											//htmlString += query + '<br>';
+											logNow(result);
+										}
+									});
+									//htmlString += '- CD - <br>';
+								}
+							}
+						});
+						
+						//기타
+						var t_etc = 0;
+						from = {
+								crnum9 : mrow["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_MC_Specification55",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								//htmlString += query + '<br>';
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(object_num.length)
+								{
+									for(i in object_num)
+									{
+										row = result[i];
+										from = {
+												wccode : row["wccode9"]
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_MC_Specification38",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												trow = result[object_num];
+												if(row["boryu"])
+													bolist += "*" + trow["jmfield"];
+												t_etc += row["cprice9"];
+											}
+										});
+									}
+									total += t_etc;
+									from = {
+											dbname : dbname,
+											sum1 : total,
+											bolist : bolist,
+											uid : new_uid
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_MC_Specification9",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+										}
+									});
+								}
+							}
+						});
+						article_num++;
+						
+					}
+				}
+			});
+		}
+	});
+	//htmlString += '99<br>';
+}
+
+//제조비명세표 Mv2
+function Mv2(bvalue, bdate, mcode, bname, buid, btag){
+	if(confirm(bname))
+	{
+		var tblname = "JEJOMSTEST";
+		var bo_check;
+		// 비용테이블 보류 표시
+		switch(btag)
+		{
+			case 1: // 비닐
+			case 2: // 케이스
+			case 3: // CD
+			case 4: // 스티커
+				dbname = "BITABLE9";
+				fieldname = "crnum9";
+				break;
+			case 5: // 제본
+				dbname = "BITABLE7";
+				fieldname = "crnum7";
+				break;
+			case 6: // 코팅
+				dbname = "BITABLE8";
+				fieldname = "crnum8";
+				break;
+		/*
+			case 7: // 기타
+				$dbname = "BITABLE9";
+				$fieldname = "crnum9";
+				break;
+		*/
+		}
+		from = {
+				jmfield : mcode
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification59",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				ccode = row["wccode"];
+				var resultData;
+				if (btag > 4){
+					//$query = "select * from $dbname where $fieldname=$buid and totcost7=$bvalue";
+					from = {
+							dbname : dbname,
+							dbattr : fieldname,
+							uid : buid
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_MC_Specification63",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							resultData = result;
+							
+						}
+					});
+				}
+				else{
+					from = {
+							dbname : dbname,
+							dbattr : fieldname,
+							uid : buid,
+							bitag : btag
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_MC_Specification64",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							resultData = result;
+						}
+					});
+				}
+				if(!resultData)
+				{
+					alert("비용정보 읽기 오류");
+					return 0;
+				}
+				var object_num = Object.keys(resultData); 
+				for(i in object_num)
+				{
+					var row2 = resultData[i];
+					if(row2["boryu"])
+					{
+						bo_check = 1;
+						from = {
+								dbname : dbname,
+								dbattr : "0",
+								uid : row2["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								if(!result)
+								{
+									alert("보류정보 기록 오류 1");
+									return 0;
+								}
+							}
+						});
+					}
+					else
+					{
+						logNow("-===");
+						logNow(dbname);
+						logNow(row2["uid"]);
+						logNow("-===");
+						bo_check = 0;
+						from = {
+								dbname : dbname,
+								dbattr : "1",
+								uid : row2["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								if(!result)
+								{
+									alert("보류정보 기록 오류 2");
+									return 0;
+								}
+							}
+						});
+					}
+				}
+					
+			}
+		});
+		// 거래처별 이월금액 기록
+		from = {
+				
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification61",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				if(!result)
+				{
+					alert("거래처 잔액 정보 읽기 오류");
+					return 0;
+				}
+				if(object_num.length)
+				{
+					if(bo_check) // 보류 해제
+					{
+						row = result[object_num];
+						var new_val = row["jana"] - bvalue;
+						if(new_val == 0)
+						{
+							from = {
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/delete_MC_Specification2",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+						else
+						{
+							from = {
+									jana : new_val,
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									if(!result)
+									{
+										alert("기록 오류 (11)");
+										return 0;
+									}
+								}
+							});
+						}
+					}
+					else
+					{
+						row = result[object_num];
+						var new_val = row["jana"] + bvalue;
+						from = {
+								jana : new_val,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								if(!result)
+								{
+									alert("기록 오류 (12)");
+									return 0;
+								}
+							}
+						});
+					}
+				}
+				else
+				{
+					from = {
+							custcode : ccode,
+							bdate : bdate,
+							jana : bvalue
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/insert_MC_Specification4",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							row = result[object_num];
+							if(!result)
+							{
+								alert("기록 오류 (2)");
+								return 0;
+							}
+						}
+					});
+				}
+				
+				from = {
+						dbname : tblname,
+						uid : buid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification62",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						if(bo_check)
+							var new_bolist = row["bolist"].replace(mcode, '');
+						else
+							var new_bolist = row["bolist"] + "*" + mcode;
+						
+						from = {
+								dbname : tblname,
+								bolist : new_bolist,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification12",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+							}
+						});
+					}
+				});
+			}
+		});
+		//SelMCSpecification(String(bdate));
+	}
+}
+
+//제조비명세표 Mv3
+function Mv3(bvalue, bdate, mcode, bname, buid, btag){
+	if(confirm(bname))
+	{
+		var tblname = "JEJOMSTEST";
+		var bo_check;
+		from = {
+				jmfield : mcode
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification59",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				ccode = row["wccode"];
+				if(btag > 4)
+				{
+					from = {
+							dbname : dbname,
+							dbattr : fieldname,
+							uid : buid
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/select_MC_Specification63",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							if(!result)
+							{
+								alert("비용정보 읽기 오류");
+								return 0;
+							}
+							while(i in object_num)
+							{
+								row2 = result[i];
+								if(row2["boryu"])
+								{
+									bo_check = 1;
+									from = {
+											dbname : dbname,
+											dbattr : "0",
+											uid : row2["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											if(!result)
+											{
+												alert("보류정보 기록 오류");
+												return 0;
+											}
+										}
+									});
+								}
+								else
+								{
+									bo_check = 0;
+									from = {
+											dbname : dbname,
+											dbattr : "1",
+											uid : row2["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											if(!result)
+											{
+												alert("보류정보 기록 오류");
+												return 0;
+											}
+										}
+									});
+								}
+							}
+						}
+					});
+				}
+			}
+		});
+		// 거래처별 이월금액 기록
+		from = {
+				bdate : bdate,
+				custcode : ccode
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification61",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				if(!result)
+				{
+					alert("거래처 잔액 정보 읽기 오류");
+					return 0;
+				}
+				if(object_num.length)
+				{
+					if(bo_check)
+					{
+						row = result[object_num];
+						var new_val = row["jana"] - bvalue;
+						if(new_val == 0)
+						{
+							from = {
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/delete_MC_Specification2",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+						else
+						{
+							from = {
+									jana : new_val,
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									if(!result)
+									{
+										alert("기록 오류 (11)");
+										return 0;
+									}
+								}
+							});
+						}
+					}
+					else
+					{
+						row = result[object_num];
+						var new_val = row["jana"] + bvalue;
+						from = {
+								jana : new_val,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								if(!result)
+								{
+									alert("기록 오류 (12)");
+									return 0;
+								}
+							}
+						});
+					}
+				}
+				else
+				{
+					from = {
+							custcode : ccode,
+							bdate : bdate,
+							jana : bvalue
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/insert_MC_Specification4",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							var object_num = Object.keys(result);
+							row = result[object_num];
+							if(!result)
+							{
+								alert("기록 오류 (2)");
+								return 0;
+							}
+						}
+					});
+				}
+				
+				from = {
+						dbname : tblname,
+						uid : buid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification65",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						if(bo_check)
+							var new_bolist = row["bolist"].replace(mcode, '');
+						else
+							var new_bolist = row["bolist"] + "*" + mcode;
+						
+						from = {
+								dbname : tblname,
+								bolist : new_bolist,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification12",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+							}
+						});
+					}
+				});
+			}
+		});
+		}
+	}
+
+// 제조비명세표 Mv4
+function Mv4(bvalue, bdate, mcode, bname, buid, btag)
+{
+	if(confirm(bname))
+	{
+		logNow("bvalue : " + bvalue);
+		logNow("bdate : " + bdate);
+		logNow("mcode : " + mcode);
+		logNow("bname : " + bname);
+		logNow("buid : " + buid);
+		logNow("btag : " + btag);
+		var tblname = "JEJOMSTEST";
+		var dbname = "BITABLE7";
+		var fieldname = "crnum7";
+		var bo_check;
+		from = {
+				jmfield : mcode
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification59",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				var object_num = Object.keys(result);
+				row = result[object_num];
+				ccode = row["wccode"];
+				logNow("ccode" + ccode);
+				from = {
+						dbname : dbname,
+						dbattr : fieldname,
+						uid : buid,
+						ccode : ccode
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification60",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						if(!result)
+						{
+							alert("제본비 정보 읽기 오류");
+							return 0;
+						}
+						row2 = result[object_num];
+						if(row2["boryu"])
+						{
+							bo_check = 1;
+							from = {
+									dbname : dbname,
+									dbattr : "0",
+									uid : row2["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									if(!result)
+									{
+										alert("보류정보 기록 오류 1");
+										return 0;
+									}
+								}
+							});
+						}
+						else
+						{
+							bo_check = 0;
+							from = {
+									dbname : dbname,
+									dbattr : "1",
+									uid : row2["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification10",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									if(!result)
+									{
+										alert("보류정보 기록 오류 2");
+										return 0;
+									}
+								}
+							});
+							
+						}
+					}
+				});
+			}
+		});
+		
+		// 거래처별 이월금액 기록
+		from = {
+				bdate : bdate,
+				custcode : ccode
+		}
+		$.ajax({
+			type : "POST",
+			contentType : "application/json; charset=utf-8;",
+			dataType : "json",
+			url : SETTING_URL + "/monthclosing/select_MC_Specification61",
+			async : false,
+			data : JSON.stringify(from),
+			success : function(result) {
+				logNow(result);
+				if(!result)
+				{
+					alert("거래처 잔액 정보 읽기 오류");
+					return 0;
+				}
+				var object_num = Object.keys(result);
+				if(object_num.length)
+				{
+					if(bo_check) // 보류 해제
+					{
+						row = result[object_num];
+						var new_val = row["jana"] - bvalue;
+						if( new_val == 0){
+								from = {
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/delete_MC_Specification2",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+								}
+							});
+						}
+						else
+						{
+							from = {
+									jana : new_val,
+									uid : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									if(!result)
+									{
+										alert("기록 오류 (11)");
+										return 0;
+									}
+								}
+							});
+						}
+					}
+					else
+					{
+						row = result[object_num];
+						new_val = row["jana"] - bvalue;
+						from = {
+								jana : new_val,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification11",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								if(!result)
+								{
+									alert("기록 오류 (12)");
+									return 0;
+								}
+							}
+						});
+					}
+				}
+				else
+				{
+					from = {
+							custcode : ccode,
+							bdate : tm,
+							jana : bvalue
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json; charset=utf-8;",
+						dataType : "json",
+						url : SETTING_URL + "/monthclosing/insert_MC_Specification4",
+						async : false,
+						data : JSON.stringify(from),
+						success : function(result) {
+							logNow(result);
+							if(!result)
+							{
+								alert("기록 오류 (2)");
+								return 0;;
+							}
+						}
+					});
+				}
+				
+				from = {
+						dbname : tblname,
+						uid : buid
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_MC_Specification62",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						row = result[object_num];
+						if(bo_check)
+							var new_bolist = row["bolist"].replace(mcode, '');
+						else
+							var new_bolist = row["bolist"] + "*" + mcode;
+						from = {
+								dbname : tblname,
+								bolist : new_bolist,
+								uid : row["uid"]
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/update_MC_Specification12",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+							}
+						});
+					}
+				});
+			}
+		});
+		SelMCSpecification(String(bdate));
+		}
+}
+
+// 콤마 소수점 포함
+function numberWithComma(n) {
+    var parts=n.toString().split(".");
+    return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
+}
 
 // 거래처별 지불명세서
-function SelPaymentAccount(bdate){
+function SelPaymentAccount(){
+	var bdate = String(document.getElementsByName('ty')[0].value) + String(document.getElementsByName('tm')[0].value);
+	var tblname = "JEJOMSTEST";
 	
+	function mktime(h, i, s, m, d, y){
+
+		  var mkt = new Date(y, m-1, d, h, i, s);
+
+		  if( mktime.arguments.length == 0 ) mkt = new Date();
+
+		  return Math.floor(mkt.getTime()/1000);
+
+	}
+	
+	var sy = bdate.substring(0,4);
+	var sm = bdate.substring(5,7);
+	logNow(sy);
+	logNow(sm);
+	var tdate1 = String(mktime(0, 0, 0, sm, 1, sy));
+	var tdate2 = String(mktime(23, 59, 59, sm+1, 0, sy));
+	logNow("AA" + tdate1);
+	logNow("AA" + tdate2);
+	htmlString = "";
+	
+	logNow(bdate);
+	var sum1 = 0; // 제조비
+	var sum2 = 0; // 선불
+	var sum3 = 0; // 관리비
+	var sum4 = 0; // 미불
+	var sum5 = 0; // 계
+	var sum6 = 0; // 후불
+	var sum7 = 0; // 공제액
+	var sum8 = 0; // 지불액
+	var sum9 = 0; // 전월이월
+	var sum10 = 0; // 당월이월
+	var t_val;
+	
+	from = {
+			dbattr : "사보"
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for(i in object_num)
+			{
+				crow = result[i];
+				var t_cost1 = 0;
+				from = {
+						dbname : "BITABLE2",
+						ccdoe : crow["wccode"],
+						date1 : tdate1,
+						date2 : tdate2
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_Payment_Account2",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for(i in object_num)
+						{
+							row = result[i];
+							
+							t_val = row["cprice"];
+							t_cost1 += t_val;
+							sum2 += t_val;
+							
+							//계
+							var t_sum = t_cost1;
+							// 지불액
+							var t_sum2 = t_sum;
+							
+							sum5 += t_sum;
+							sum8 += t_sum2;
+							logNow("t_sum1");
+							if (t_sum)
+							{
+								htmlString +=
+									'<tr>'+
+								        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+								        	crow["wcname"] +'</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+								        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+								        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+										'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+										'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								        	'</span></td>'+
+								        '<td style="padding-right:5px;" idth="80" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+								        	if (t_sum2) htmlString += numberWithCommas(t_sum2); htmlString += '</span></td>'+
+								    '</tr>';
+							}
+						}
+					}
+				});
+			}
+		}
+	});
+	
+	// 출력
+	from = {
+			dbattr : "출력"
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for(i in object_num)
+			{
+				crow = result[i];
+				var t_cost1 = 0;
+				from = {
+						dbname : "BITABLE3",
+						ccdoe : crow["wccode"],
+						date1 : tdate1,
+						date2 : tdate2
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_Payment_Account2",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						for( i in object_num )
+						{
+							var row = result[i];
+							t_val = row["cprice"];
+							t_cost1 += t_val;
+							sum2 += t_val;
+						}
+						
+						// 계
+						var t_sum = t_cost1;
+						// 지불액
+						var t_sum2 = t_sum;
+						
+						sum5 += t_sum;
+						sum8 += t_sum2;
+						if (t_sum)
+						{
+							htmlString +=
+								'<tr>'+
+									'<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+										crow["wcname"] +'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;"" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+										if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+										if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+										'</span></td>'+
+									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">';
+										if (t_sum2) htmlString += (t_sum2); htmlString += '</span></td>'+
+								'</tr>';
+						}
+					}
+				});
+			}
+		}
+	});
+	
+	// CD
+	from = {
+			dbattr : "CD"
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for(i in object_num)
+			{
+				crow = result[i];
+				
+				jdate = new Date(Number(String(tdate1) + "000"));
+				jdate = (jdate.getFullYear() + ("0" + (jdate.getMonth()+1)).slice(-2));
+				
+				logNow(crow["jmfield"]);
+				logNow(jdate);
+				
+				
+				var t_cost1 = 0;
+				from = {
+						jmfield : crow["jmfield"],
+						dbname : tblname,
+						jejodate : jdate,
+						dbattr : "0"
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_Payment_Account3",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						if(!result)
+						{
+							alert("제조비 읽기 오류 <CD>");
+							htmlString += "select sum($crow[jmfield]) from $tblname where JEJODATE='$jdate' and JABTAG=0"
+						}
+						row3 = result[object_num];
+						t_cost1 += row3["jmfield"];
+
+						sum1 += row3["jmfield"];
+						//관리비
+						var t_cost2 = 0;
+						
+						from = {
+								jmfield : crow["jmfield"],
+								dbname : tblname,
+								jejodate : jdate,
+								dbattr : "1"
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_Payment_Account3",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								row3 = result[object_num];
+								if(!result)
+								{
+									alert("관리비 읽기 오류 <CD1>");
+									return 0;
+								}
+								t_cost2 += row3["jmfield"];
+								sum3 += row3["jmfield"]
+								// 미불
+								t_cost3 = 0;
+								ty = sy;
+								tm = Number(sm) - 1;
+								
+								if (tm == 0)
+								{
+									ty = Number(ty) - 1;
+									tm = 12;
+								}
+								if (tm < 10)
+								{
+									tm = "0" + String(tm);
+								}
+								else
+									tm = String(tm);
+								
+								from = {
+										bdate : (String(ty) + String(tm)),
+										custcode : crow["wccode"],
+										dbattr : "0"
+								}
+								logNow("너희임?" + (String(ty) + String(tm)));
+								logNow(crow["wccode"]);
+								$.ajax({
+									type : "POST",
+									contentType : "application/json; charset=utf-8;",
+									dataType : "json",
+									url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+									async : false,
+									data : JSON.stringify(from),
+									success : function(result) {
+										logNow(result);
+										var object_num = Object.keys(result);
+										if(!result)
+										{
+											alert("관리비 읽기 오류 <CD2>");
+										}
+										row3 = result[object_num];
+										t_cost3 += row3["jana"];
+										
+										// 후불
+										var t_cost4 = 0;
+										from = {
+												bdate : (String(sy) + String(sm)),
+												custcode : crow["wccode"],
+												dbattr : "0"
+										}
+										$.ajax({
+											type : "POST",
+											contentType : "application/json; charset=utf-8;",
+											dataType : "json",
+											url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+											async : false,
+											data : JSON.stringify(from),
+											success : function(result) {
+												logNow(result);
+												var object_num = Object.keys(result);
+												if(!result)
+												{
+													alert("관리비 읽기 오류 <CD3>");
+												}
+												if (object_num.length)
+												{
+													row3 = result[object_num];
+													t_cost4 += row3["jana"];
+												}
+												
+												// 공제액
+												var t_cost5 = 0;
+												from = {
+														bdate : (String(sy) + String(sm)),
+														custcode : crow["wccode"],
+														dbattr : "1"
+												}
+												$.ajax({
+													type : "POST",
+													contentType : "application/json; charset=utf-8;",
+													dataType : "json",
+													url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+													async : false,
+													data : JSON.stringify(from),
+													success : function(result) {
+														logNow(result);
+														var object_num = Object.keys(result);
+														if(!result)
+														{
+															alert("관리비 읽기 오류 <CD4>");
+														}
+														if (object_num.length)
+														{
+															row3 = result[object_num];
+															t_cost5 = row3["jana"];
+															sum7 += t_cost5;
+														}
+														// 계
+														t_sum = t_cost1 + t_cost2 + t_cost3;
+														// 지불액
+														t_sum2 = t_sum - t_cost4 - t_cost5;
+														
+														sum4 += t_cost3;
+														sum5 += t_sum;
+														sum6 += t_cost4;
+														sum8 += t_sum2;
+														
+														if(t_sum)
+														{
+															htmlString +=
+																'<tr>'+
+															        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+															        	crow["wcname"] +'</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+															        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+															        	'</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+															        	if (t_cost2) htmlString += numberWithCommas(t_cost2); htmlString += '</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+															        	if (t_cost3) htmlString += numberWithCommas(t_cost3); htmlString += '</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+															        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+															        	'</span></td>'+
+																	'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+															        	'</span></td>'+
+																	'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+															        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="jana" onKeypress="if(event.keyCode == 13){javascript:chJan(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="'+ t_cost4 +'"></span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+															        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="dedu" onKeypress="if(event.keyCode == 13){javascript:chDed(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="'+ t_cost5 +'"></span></td>'+
+															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt; padding-left:0pt;">'+
+															        numberWithCommas(t_sum2) +'</span></td>'+
+															    '</tr>';
+														}														
+													}
+												});
+											}
+										});
+										
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		}
+	});
+	
+	// 용지
+	from = {
+			dbattr : "용지"
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for(i in object_num)
+			crow = result[i];
+			var t_cost1 = 0;
+			from = {
+					
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/monthclosing/select_Payment_Account5",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+					logNow(result);
+					var object_num = Object.keys(result);
+					if(!result)
+					{
+						alert("용지구매정보 읽기 오류");
+					}
+					row = result[object_num];
+					t_cost1 = row["sum1"];
+					
+					sum2 += t_cost1;
+					
+					// 계
+					t_sum = t_cost1;
+					// 지불액
+					t_sum2 = t_sum;
+
+					sum5 += t_sum;
+					sum8 += t_sum2;
+					
+					if (t_sum)
+					{
+						htmlString +=
+							'<tr>'+
+								'<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+									'<?=$crow[wcname]?></span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'<?if ($t_cost1) echo(number_format($t_cost1));?></span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'<?if ($t_sum) echo(number_format($t_sum));?></span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+									'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">'+
+									'<?if ($t_sum2) echo(number_format($t_sum2));?></span></td>'+
+							'</tr>';
+					}
+				}
+			});
+		}
+	});
+	
+	// 인쇄, 제판
+	from = {
+			dbattr : "인쇄"
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+			logNow(result);
+			var object_num = Object.keys(result);
+			for(i in object_num)
+			{
+				crow = result[i];
+				// 제조비
+				var t_cost1 = 0;
+				from = {
+						m1 : crow["wccode"],
+						date1 : tdate1,
+						date2 : tdate2
+				}
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/monthclosing/select_Payment_Account6",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+						logNow(result);
+						var object_num = Object.keys(result);
+						if(!result)
+						{
+							alert("제조비 읽기 오류 <1>");
+						}
+						for(j in object_num)
+						{
+							row = result[j];
+							from = {
+									listid5 : row["uid"]
+							}
+							$.ajax({
+								type : "POST",
+								contentType : "application/json; charset=utf-8;",
+								dataType : "json",
+								url : SETTING_URL + "/monthclosing/select_Payment_Account7",
+								async : false,
+								data : JSON.stringify(from),
+								success : function(result) {
+									logNow(result);
+									var object_num = Object.keys(result);
+									if(!result)
+									{
+										alert("제조비 읽기 오류 <1>");
+									}									
+									for(i in object_num)
+									{
+										row3 = result[i];
+										t_cost1 += row3["sum5"];
+										sum1 += row3["sum5"];
+									}
+									from = {
+											listid : row["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_Payment_Account8",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											if(!result)
+											{
+												alert("제조비 읽기 오류 <1>");
+											}
+											for(i in object_num)
+											{
+												row3 = result[object_num];
+												t_cost1 += row3["pcost"];
+												sum1 += row3["pcost"];
+											}
+											
+										}
+									});
+								}
+							});
+						}
+						// 미불
+						var t_cost3 = 0;
+						ty = sy;
+						tm = Number(sm) - 1;
+						if (tm == 0)
+						{
+							ty = Number(ty) - 1;
+							tm = 12;
+						}
+						if (tm < 10)
+						{
+							tm = "0" + String(tm);
+						}
+						else
+							tm = String(tm);
+						from = {
+								bdate : String(ty) + String(tm),
+								custcode : crow["wccode"],
+								dbattr : "0"
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(!result)
+								{
+									alert("관리비 읽기 오류 <제본2>");
+								}
+								row3 = result[object_num];
+								t_cost3 += row3["jana"];
+							}
+						});
+						// 후불
+						var t_cost4 = 0;
+						from = {
+								bdate : String(sy) + String(sm),
+								custcode : crow["wccode"],
+								dbattr : "0"
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(!result)
+								{
+									alert("관리비 읽기 오류 <1>");
+								}
+								if (object_num.length)
+								{
+									row3 = result[object_num];
+									t_cost4 += row3["jana"];
+								}
+							}
+						});
+						// 공제액
+						var t_cost5 = 0;
+						from = {
+								bdate : String(sy) + String(sm),
+								custcode : crow["wccode"],
+								dbattr : "1"
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(!result)
+								{
+									alert("관리비 읽기 오류 <인쇄공제>");
+								}
+								if (object_num.length)
+								{
+									row3 = result[object_num]
+									t_cost5 = row3["jana"];
+									sum7 += t_cost5;
+								}
+							}
+						});
+						// 관리비
+						var t_cost2 = 0;
+						from = {
+								m1 : crow["wccode"],
+								date1 : tdate1,
+								date2 : tdate2
+						}
+						$.ajax({
+							type : "POST",
+							contentType : "application/json; charset=utf-8;",
+							dataType : "json",
+							url : SETTING_URL + "/monthclosing/select_Payment_Account9",
+							async : false,
+							data : JSON.stringify(from),
+							success : function(result) {
+								logNow(result);
+								var object_num = Object.keys(result);
+								if(!result)
+								{
+									alert("관리비 읽기 오류 <1>");
+								}
+								for(i in object_num)
+								{
+									row2 = result[i];
+									from = {
+											dbname : "TMPJAB5",
+											dbattr : row2["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_Payment_Account10",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											if(!result)
+											{
+												alert("관리비 읽기 오류 <1>");
+											}
+											for(i in object_num)
+											{
+												row3 = result[i];
+												t_cost2 += row3["sum5"];
+												sum3 += row3["sum5"];
+											}
+										}
+									});
+									from = {
+											dbname : "TMPJAB3",
+											dbattr : row2["uid"]
+									}
+									$.ajax({
+										type : "POST",
+										contentType : "application/json; charset=utf-8;",
+										dataType : "json",
+										url : SETTING_URL + "/monthclosing/select_Payment_Account10",
+										async : false,
+										data : JSON.stringify(from),
+										success : function(result) {
+											logNow(result);
+											var object_num = Object.keys(result);
+											if(!result)
+											{
+												alert("관리비 읽기 오류 <1>");
+											}
+											for(i in object_num)
+											{
+												row3 = result[i];												
+												t_cost2 += row3["pcost"];
+												sum3 += row3["pcost"];
+											}
+										}
+									});
+								}
+							}
+						});
+						// 계
+						t_sum = t_cost1 + t_cost2 + t_cost3;
+						// 지불액
+						t_sum2 = t_sum - t_cost4 - t_cost5;
+						/*
+						// 계
+						$t_sum = $t_cost1 + $t_cost2;	
+						// 지불액
+						//$t_sum2 = $t_sum;
+						*/
+						t_sum2 = t_sum - t_cost4 - t_cost5;
+						if ((String(sy)+String(sm)) == "201011")
+							t_sum2 -= 20000000;
+
+						sum4 += t_cost3;
+						sum6 += t_cost4;
+						sum5 += t_sum;
+						sum8 += t_sum2;
+						if (t_sum)
+						{
+							htmlString +=
+								'<tr>'+
+						        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+						        	crow["wcname"] +'</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+						        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+						        	'</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+						        	if (t_cost2) htmlString += numberWithCommas(t_cost2); htmlString += '</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+						        	if (t_cost3) htmlString += numberWithCommas(t_cost3); htmlString += '</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+						        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+						        	'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+						        	'</span></td>'+
+								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+								numberWithCommas(t_cost4) +'</span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+						        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="dedu" onKeypress="if(event.keyCode == 13){javascript:chDed(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="<?=$t_cost5?>"></span></td>'+
+						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">'+
+						        numberWithCommas(t_sum2) +'</span></td>'+
+						    '</tr>';
+						}
+					}
+				});
+			}		
+		}
+	});
+	
+	
+	
+	$("#mcPaymentAccount").html(htmlString);
 }
 
 // 저자료 지급 내역(상/하)
 function SelRoyaltyUD(bdate, gubn, gubn2) {
-
 	var resultDate;
 
 	switch (parseInt(gubn)) {
@@ -6526,6 +18146,30 @@ function SelRoyaltyUD(bdate, gubn, gubn2) {
 
 	}
 
+}
+
+// 품목별 원재료 명세서 부가메뉴
+function View_Com(objname)
+{
+	var addLayer = document.getElementById(objname);
+	if (addLayer.style.display == 'none')
+        addLayer.style.display ='block';
+    else
+        addLayer.style.display ='none';
+}
+function View_All(objname1, objname2)
+{
+	var addLayer = document.getElementById(objname1);
+	if (addLayer.style.display == 'none')
+        addLayer.style.display ='block';
+    else
+        addLayer.style.display ='none';
+    
+    addLayer = document.getElementById(objname2);
+	if (addLayer.style.display == 'none')
+        addLayer.style.display ='block';
+    else
+        addLayer.style.display ='none';
 }
 
 // 저자료 지급 내영(상/하) 지출결의서
@@ -8477,4 +20121,6 @@ function SearchMkJueun(date1, date2) {
 
 		(popUp.document.getElementById("popdata")).innerHTML = htmlString;
 	}
+	
+	
 }

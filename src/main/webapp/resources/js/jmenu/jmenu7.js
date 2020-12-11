@@ -113,6 +113,24 @@ function jmenu7(val) { //월결산자료
 			'</div>',
 			].join('');	
 		
+		case "0_상세계산인쇄": //상세 원가계산서 -> jejak/kb/ex_view2.php
+			return [
+				'<center>',
+				'<div id=popdata>',
+				'</div>',
+				'</center>',
+				'</div>',
+			].join('');
+			
+		case "0_상세계산거래처변경": //상세 원가계산서 -> jejak/kb/ch_comm.php
+			return [
+				'<center>',
+				'<div id=popdata>',
+				'</div>',
+				'</center>',
+				'</div>',
+			].join('');
+		
 		case "0_소부대지수정": //소부대지수정-> jejak/kb/ex_view_m1.php
 			return [
 			'<div style="width:810px; height:815px;">',
@@ -213,6 +231,14 @@ function jmenu7(val) { //월결산자료
 			return [
 			'<div id="popdata">',
 			'</div>',
+			].join('');
+			
+		case "1_인쇄지출팝업": //잡물 원가계산서 모두인쇄  jejak/kb/inse_pr5.php
+			return [
+				'<center>',
+			'<div id="popdata">',
+			'</div>',
+			'<center>',
 			].join('');
 
 		case "2": //품목별 원재료명세서(월별) -> jejak/kb/yj_ms.php
@@ -369,7 +395,7 @@ function jmenu7(val) { //월결산자료
 										'</table>',
 										'<table id="mcPumPerData1" border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
 										'<table border="0" cellspacing="1" width="780" bordercolordark="white" bordercolorlight="black" bordercolor="#CCCCCC" cellpadding="0" bgcolor="#CCCCCC">',
-											'<tr style="display:none;" id="in<?=$ii?>">',
+											'<tr style="display:none;" id="in'+ii+'">',
 												'<td width="780" bgcolor="#FFF5F5" colspan="9" align="center" valign="middle" bgcolor="white">',
 													'<table width="520" border="0" cellpadding="0" cellspacing="0">',
 														'<tr>',
@@ -411,7 +437,7 @@ function jmenu7(val) { //월결산자료
 													'</table>',
 												'</td>',
 											'</tr>',
-											'<tr style="display:none;" id="out<?=$ii?>">',
+											'<tr style="display:none;" id="out'+ii +'">',
 												'<td width="780" bgcolor="#F5F5FF" colspan="9" align="center" valign="middle" bgcolor="white">',
 													'<table width="520" border="0" cellpadding="0" cellspacing="0">',
 														'<tr>',
@@ -484,62 +510,114 @@ function jmenu7(val) { //월결산자료
 
 		case "4": //제조비명세표 -> jejak/kb/new_jejo.php
 			return [
-			'<div style="width:810px; height:815px;">',
+				'<div style="width:810px; height:815px;">',
+				'<div style="width:780px; height:194px; margin-left:15px;">',
+					'<div style="width:780px; height:174px; padding:10px 0px 10px 0px;">',
+						'<table border="0" cellpadding="0" cellspacing="0" width="780">',
+							'<form name="dform" method="post" action="yj_ms.php">',
+								'<tr>',
+									'<td width="390" height="40"><p><span style="font-size:9pt;"><b>-&nbsp;',
+										'<select name="ty" size="1" onChange="javascript:ChangeDate(40);">',
+										'</select> 년 &nbsp;',
+										'<select name="tm" size="1" onChange="javascript:ChangeDate(40);">',
+											'<option value="01">01</option>',
+											'<option value="02">02</option>',
+											'<option value="03">03</option>',
+											'<option value="04">04</option>',
+											'<option value="05">05</option>',
+											'<option value="06">06</option>',
+											'<option value="07">07</option>',
+											'<option value="08">08</option>',
+											'<option value="09">09</option>',
+											'<option value="10">10</option>',
+											'<option value="11">11</option>',
+											'<option value="12">12</option>',
+										'</select> &nbsp;월 &nbsp;제조비 명세표&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp',
+								             '<input type="button" value=" 새로 계산 " onClick="javascript:SelMCSpecificationInsert();">',
+								             '&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="btnMCSpecificationPrint" value=" 인 쇄 ">',
+								             '</b></span></td>',
+									'</td>',
+								'</tr>',
+							'</form>',
+								'<tr id="mcSpecification">',
+				
+			/*'<div style="width:810px; height:815px;">',
 				'<div style="width:960px; height:213px; margin-left:15px;">',
 					'<div style="width:960px; height:193px; padding:10px 0px 10px 0px;">',
 						'<div style="width:780px; height:30px; display:table-cell; vertical-align:middle; font-size:13pt;"><b>- 제조비명세표</b></div>',
 						
 					'</div>',
 				'</div>',
+			'</div>',*/
+			].join('');
+			
+		case "4_인쇄팝업": //제조비명세표 인쇄 -> jejak/kb/new_jejp_print.php
+			return [
+				'<div style="width:780px; height:815px;">',
+				'<div style="width:780px; height:100px; margin-left:15px;">',
+					'<div style="width:780px; height:80px; padding:10px 0px 10px 0px;">',
+						'<table id="popdata" border="0" cellpadding="0" cellspacing="0" width="1300"></table>',
+							
+						
+						'</div>',
+				'</div>',
 			'</div>',
 			].join('');
 
 		case "5": //거래처별 지불명세서 -> jejak/kb/jejo2.php
 			return [
-				'<div style="width:810px; height:815px;">',
-				'<div style="width:780px; height:123px; margin-left:15px;">',
-					'<div style="width:780px; height:103px; padding:10px 0px 10px 0px;">',
-						'<table border="0" cellpadding="0" cellspacing="0" width="780">',
-							'<tr>',
-								'<td width="780" height="40">',
-									'<form name="dform" method="post" action="jejo2.php">',
-										'<table border="0" cellpadding="0" cellspacing="0" width="780">',
-											'<tr>',
-												'<td width="10"></td>',
-												'<td width="65">',
-													'<select name="ty" size="1" style="font-family:굴림; font-size:9pt; width:60;" onChange="javascript:ChangeDate(50);">',
-													'</select>',
-												'</td>',
-												'<td width="20" align="left"><span style="font-size:9pt;">년</span></td>',
-												'<td width="65">',
-													'<select name="tm" size="1" style="font-family:굴림; font-size:9pt;  width:60;" onChange="javascript:ChangeDate(50);">',
-														'<option value="01">01</option>',
-														'<option value="02">02</option>',
-														'<option value="03">03</option>',
-														'<option value="04">04</option>',
-														'<option value="05">05</option>',
-														'<option value="06">06</option>',
-														'<option value="07">07</option>',
-														'<option value="08">08</option>',
-														'<option value="09">09</option>',
-														'<option value="10">10</option>',
-														'<option value="11">11</option>',
-														'<option value="12">12</option>',
-													'</select>',
-												'</td>',
-												'<td width="30"><span style="font-size:9pt;">월</span></td>',
-												'<td width="155" align="left"><b><span style="font-size:9pt;">거래처별 지불명세서</span></b></td>',
-												'<td width="340" align="right">',				
-												'<input type="button" value="모두 인쇄" id="btnJMCostStatementPrint"></td>',
-											'</tr>',
-										'</table>',
-									'</form>',
-								'</td>',
-							'</tr>',
-						'</table>',
-					'</div>',
-				'</div>',
-			'</div>',
+				'<table border="0" cellpadding="0" cellspacing="0" width="780">',
+					'<form name="jeform" method="get" action="jejo2.php">',
+					    '<tr>',
+					        '<td width="780" height="40"><span style="font-size:9pt;"><b>-', 
+									'<select name="ty" size="1" style="font-family:굴림; font-size:9pt; width:60;" onChange="javascript:ChangeDate(50);">',
+									'</select>&nbsp;년&nbsp;&nbsp;',
+									'<select name="tm" size="1">',
+							        '<option value="01">01</option>',
+							        '<option value="02">02</option>',
+							        '<option value="03">03</option>',
+							        '<option value="04">04</option>',
+							        '<option value="05">05</option>',
+							        '<option value="06">06</option>',
+							        '<option value="07">07</option>',
+							        '<option value="08">08</option>',
+							        '<option value="09">09</option>',
+							        '<option value="10">10</option>',
+							        '<option value="11">11</option>',
+							        '<option value="12">12</option>',
+							        '</select>&nbsp;월&nbsp;&nbsp;&nbsp;<input type="submit" value=" 보기 " onclick="javascript:SelPaymentAccount();">&nbsp;&nbsp;',
+							        '거래처별 지불명세서</b></span></td>',
+					    '</tr>',
+				    '</form>',
+			    	'<tr>',
+			    		'<td width="930"><table border="0" width="870" cellspacing="1" bordercolordark="white" bordercolorlight="black" cellpadding="0" bgcolor="#CCCCCC" height="30">',
+		    		'<tr>',
+				        '<td width="120" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">&nbsp;</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'제조비</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'선불</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'관리비</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'미불</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'계</span></td>',
+				        '<td width="225" height="30" colspan="3" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'후불</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'공제액</span></td>',
+				        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'지불액</span></td>',
+				    '</tr>',
+					'<tr>',
+						'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'이월</span></td>',
+						'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'당기</span></td>',
+						'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">',
+				        	'합계</span></td>',
+					'</tr id="mcPaymentAccount">',
 			].join('');
 
 		case "6": //저자료 지급내역(상/하) -> jejak/kb/inse.php
