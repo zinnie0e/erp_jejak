@@ -183,7 +183,74 @@ function yongjiBuyOrder(date1, date2){ //거래별원장 출력
 			'<td width="75" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">합계</span></td>'+
 		'</tr>';
 	
+	//검증필요_구현_ 미입력분 수식 수정필요, 할인입력 구현필요
 	var from = { date1: date1, date2: date2 }
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/yongji/select_order_list",
+		data : JSON.stringify(from),
+		success: function (result) {
+			var object_num = Object.keys(result);
+			var cnum1; var cnum2; var cost1; var tax1; 
+			var sum1 = 0; var sum2 = 0; var sum3 = 0;
+			
+			for(var i in object_num){
+				var data = result[object_num[i]]; 
+				
+				var full_date = MsToFulldate(data["date"]);
+				full_date = full_date.substring(2,4) + "/" + full_date.substring(4,6) + "/" + full_date.substring(6,8);
+				
+				if(data["num"] > 0){
+					cnum1 = Math.floor((data["num"]) / 500);
+					cnum2 = data["num"] % 500;
+				}else{
+					cnum1 = Math.floor((data["num"]) / 500) * -1;
+					cnum2 = (data["num"] * -1) % 500;
+				}
+				var danga = Math.round((data["n_fac"] * (100 - data["n_halin"])) / 100);
+				if(data["tprice"] > 0){
+					cost1 = Math.round(data["tprice"] / 1.1);
+					tax1 = data["tprice"] - cost1;
+				}else{
+					cost1 = Math.round((data["tprice"] * -1) / 1.1);
+					tax1 = ((data["tprice"] * -1) - cost1) * -1;
+					cost1 *= -1;
+				}
+				sum1 += cost1;
+				sum2 += tax1;
+				sum3 += data["num"];
+				
+				htmlString += 
+					'<tr>'+
+						'<td height="30" width="60" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 1 + ',' + data["uid"] + ',' + MsToFulldate(data["date"]) +');">'+ full_date +'</a></span></td>'+
+						'<td height="30" width="75.5" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 2 + ',' + data["uid"] + ',' + "'" + data["wcname"] + "'" +');">'+ data["wcname"] +'</a></span></td>'+
+						'<td height="30" width="55" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 3 + ',' + data["uid"] + ',' + "'" + data["wjname"] + '/' + data["jicode"] + "'" +' );">'+ data["jicode"] +'</a></span></td>'+
+						'<td height="30" width="105.7" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:4pt;">'+ data["wjname"] +'</span></td>'+
+						'<td height="30" width="60" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(data["n_fac"]) +'</span></td>'+
+						'<td height="30" width="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+						'<input type="text" style="width:38px;"size="3" name="n_hal[]" value="'+ data["n_halin"].toFixed(1) +'" onKeypress="if(event.keyCode == 13){javascript:buyHalin('+ "'" + data["uid"] + "'," + "'" + data["jicode"] + "'," + 'this.value);}"></span></td>'+
+						'<td height="30" width="70.5" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(danga) +'</span></td>'+
+						'<td height="30"  align="center" valign="middle" bgcolor="white">'+
+							'<table border="0">'+
+								'<tr>'+
+									'<td width="35" align="right"><span style="font-size:9pt; padding-right:3pt;">'+ cnum1 +'</span></td>'+
+									'<td width="11" align="center"><span style="font-size:9pt;">R</span></td>'+
+									'<td width="35" align="left"><span style="font-size:9pt; padding-left:3pt;">'+ cnum2 +'</span></td>'+
+								'</tr>'+
+							'</table>'+
+						'</td>'+
+						'<td height="30" width="76" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(cost1) +'</span></td>'+
+						'<td height="30" width="70" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(tax1) +'</span></td>'+
+						'<td height="30" width="77" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(cost1+tax1) +'</span></td>'+
+						'<input type="hidden" name="uid[]" value="<?=$row[uid]?>">'+
+						'<input type="hidden" name="jcode[]" value="<?=$row[jicode]?>">'+
+					'</tr>';
+			}
+		}
+	});
+	
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
@@ -222,21 +289,13 @@ function yongjiBuyOrder(date1, date2){ //거래별원장 출력
 				sum3 += data["num"];
 				
 				htmlString += 
-					'<tr>'+                
+					'<tr>'+
 						'<td height="30" width="60" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 1 + ',' + data["uid"] + ',' + MsToFulldate(data["date"]) +');">'+ full_date +'</a></span></td>'+
 						'<td height="30" width="75.5" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 2 + ',' + data["uid"] + ',' + "'" + data["wcname"] + "'" +');">'+ data["wcname"] +'</a></span></td>'+
 						'<td height="30" width="55" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><a href="javascript:showPopUp('+ 3 + ',' + data["uid"] + ',' + "'" + data["wjname"] + '/' + data["jicode"] + "'" +' );">'+ data["jicode"] +'</a></span></td>'+
 						'<td height="30" width="105.7" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:4pt;">'+ data["wjname"] +'</span></td>'+
 						'<td height="30" width="60" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(data["n_fac"]) +'</span></td>'+
-						'<td height="30" width="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-						
-						if(new Date().getFullYear() == date1){
-							htmlString += '<input type="text" style="width:38px;"size="3" name="n_hal[]" value="'+ data["n_halin"].toFixed(1) +'" onKeypress="if(event.keyCode == 13){javascript:writeHalin();}"></span></td>';
-						} else {
-							htmlString += data["n_halin"].toFixed(1) + '</span></td>';
-						}
-						
-				htmlString += 
+						'<td height="30" width="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">' + data["n_halin"].toFixed(1) + '</span></td>'+
 						'<td height="30" width="70.5" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:4pt;">'+ numberWithCommas(danga) +'</span></td>'+
 						'<td height="30"  align="center" valign="middle" bgcolor="white">'+
 							'<table border="0">'+
@@ -282,31 +341,55 @@ function yongjiBuyOrder(date1, date2){ //거래별원장 출력
 	});
 }
 
-//검증필요_입력
-function buyOrderInput(json_list_data){
-	logNow(json_list_data);
+//검증필요_ update 포함 - 입 력
+function buyOrderInput(){
+	//uid[] 있음, sum[] 없음, num[] 없음
+	//jcode[]은 있지만 jcode로 파싱됨(jcode는 없음)
+	var input_check = confirm("용지 구입가 입력 하시겠습니까??");
+	if(input_check){
+		var uid = $('input[name="uid[]"]');
+		var jcode = $('input[name="jcode[]"]');
+		var sum = $('input[name="sum[]"]');
+		var num = $('input[name="num[]"]');
+		for(var i = 0; i < sum.length; i++){
+			if(sum[i] != null && sum[i] > 0){
+				var json_data = { uid: uid[i], wjcode: jcode[i], tprice: sum[i], num: num[i] };
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/up_order_input",
+					data: JSON.stringify(json_data),
+					success: function (result) {
+						logNow(result);
+					}
+				});
+			}
+		}
+	}
+}
+
+//검증필요_ update 포함 - 할인
+function buyHalin(uid, jicode, halin){
+	var json_data = { uid: uid, wjcode: jicode, halin: halin };
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
-		dataType: "json",
-		async: false,
-		url : SETTING_URL + "/yongji/up_order_input",
-		data : JSON.stringify(json_list_data),
-		success : function(result) {
+		url: SETTING_URL + "/jpjejak/up_buy_halin",
+		data: JSON.stringify(json_data),
+		success: function (result) {
 			logNow(result);
 			
 			yongjiBuyOrder($('select[name=ty]').val(), $('select[name=tm]').val());
-		},
+		}
 	});
 }
 
-//검증필요_입력
+//검증필요_ insert 포함 - 구 입
 function buyOrder(json_data){
-	logNow(json_data);
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
-		dataType: "json",
 		async: false,
 		url : SETTING_URL + "/yongji/in_order_check_input",
 		data : JSON.stringify(json_data),
@@ -318,13 +401,11 @@ function buyOrder(json_data){
 	});
 }
 
-//검증필요_주문 및 투입
+//검증필요_ insert, update 포함 - 주문 및 투입
 function buyOrderList(json_data){
-	logNow(json_data);
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
-		dataType: "json",
 		async: false,
 		url : SETTING_URL + "/yongji/in_order_check_input_list",
 		data : JSON.stringify(json_data),
@@ -336,7 +417,7 @@ function buyOrderList(json_data){
 	});
 }
 
-//검증필요_용지 계산
+//검증필요_ insert 포함 - 용지 계산
 function inBuyOrder(){
 	$.ajax({
 		type: "POST",
@@ -348,7 +429,7 @@ function inBuyOrder(){
 	});
 }
 
-//검증 필요
+//검증 필요 update 포함
 function upBuyOrder(){
 	$.ajax({
 		type: "POST",
@@ -393,7 +474,7 @@ function showPopUp(code, uid, title){ //거래별원장 구입일, 구입처, �
 					
 					var data = result[object_num[i]]; 
 					
-					var objOption = document.createElement("option");       
+					var objOption = document.createElement("option");
 				    objOption.text = data["wcname"];
 				    objOption.value = data["wccode"];
 				    
@@ -418,7 +499,7 @@ function showPopUp(code, uid, title){ //거래별원장 구입일, 구입처, �
 				for(var i in object_num){
 					var data = result[object_num[i]]; 
 					
-					var objOption = document.createElement("option");       
+					var objOption = document.createElement("option");
 				    objOption.text = data["wjname"] + " - " + data["wjcode"];
 				    objOption.value = data["wjcode"];
 				    
@@ -1564,7 +1645,7 @@ function showPopUpYJ(msdate, yjcode, wjname){ //원재료 링크 팝업
 			htmlString = "";
 			var num1 = 0;
 			for(var i in object_num){
-				var data = result[object_num[i]]; 
+				var data = result[i]; 
 				
 				if (data["comment"] != '入'){
 					num1 = "&nbsp;";
@@ -1621,7 +1702,7 @@ function showPopUpYJ(msdate, yjcode, wjname){ //원재료 링크 팝업
 	(popUp.document.getElementById("sum4")).innerHTML = sum4;
 }
 
-//검증필요_새로 작성
+//검증필요_update 포함 - 새로 작성
 function newYjMonth(){
 	var msdate = $("select[name=ty]").val() + $("select[name=tm]").val();
 	
