@@ -2382,6 +2382,7 @@ function SelKbCoating(date1, date2){
 			'<td width="70" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">회계</span></td>'+
 		'</tr>';
 	
+	//코팅비 디테일 함수 SelBookCostStatementDetail(uid, ty, tm, td, page) -> 변경 필요
 	$.ajax({
 		type: "POST",
 		contentType: "application/json; charset=utf-8;",
@@ -2406,7 +2407,7 @@ function SelKbCoating(date1, date2){
 						'<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["crnum"] +'</span></td>'+
 						'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ full_date +'</span></td>'+
 						'<td width="260" height="30" align="left" valign="middle" bgcolor="white"><p style="margin-left:5px;"><span style="font-size:9pt;">'+
-							'<a href="javascript:SelKbCoatingDetail('+ data["uid"] +')" class="n">'+ data["bname"] + ' - ' + data["bcode"] + '</span></p></a>'+
+							'<a href="javascript:SelBookCostStatementDetail('+ data["uid"] +', '+ $("select[name=ty]").val() +', '+ $("select[name=tm]").val() +', '+ $("select[name=td]").val() +', '+ 1 +')" class="n">'+ data["bname"] + ' - ' + data["bcode"] + '</span></p></a>'+
 						'</td>'+
 						'<td width="77" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["cnum8"] +' R</span></td>'+
 						'<td style="padding-right:10;" width="70" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ numberWithCommas(data["cprice8"]) +'</span></td>'+
@@ -2464,11 +2465,7 @@ function SelKbCoating(date1, date2){
 	$("#kbCoatingData").html(htmlString);
 }
 
-function SelKbCoatingDetail(uid){//코팅비_디테일 //원가계산서 //미완성
-	
-}
-
-function PrintKbCoating(){ //wcname, page -> eval
+function PrintKbCoating(){ 
 	var t_URL = "/popup?print";
 	if(popUp && !popUp.closed){
 		popUp.close();

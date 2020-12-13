@@ -11,8 +11,10 @@
 	
 	<script src="/resources/js/jejakFunction.js"></script>
 	<script src="/resources/js/mfunction/m6_f.js"></script>
+	<script src="/resources/js/mfunction/m7_f.js"></script>
 
 	<script src="/resources/js/jmenu/jmenu6.js"></script>
+	<script src="/resources/js/jmenu/jmenu7.js"></script>
 	<link rel="stylesheet" type="text/css" href="/resources/style/css/jejak.css">
 	<link rel="stylesheet" type="text/css" href="/resources/style/css/jejakContent.css">
 	<link rel="shortcut icon" href="#">

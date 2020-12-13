@@ -16,7 +16,7 @@
 
 
 //폐기관리
-/*function ChkLength1(){
+function ChkLength1(){
 	if($("input[name=date1]").val().length == 6){
 		$("input[name=stype]").val(4);
 		SelDisposalManagement();
@@ -38,16 +38,13 @@ function chkMan1(tcode){
 	if(tcode.length == 6){
 		logNow("나 6임");
 		$("input[name=man1]").val(tcode);
-	    document.frmAdd.man1.value=tcode;
-	    document.frmAdd.target='tFrm';
-	    //document.frmAdd.target='_blank';
-	    document.frmAdd.action='add_man6.php';
-	    document.frmAdd.submit();
+	    //document.man1.value = tcode;
 		SelDisposalManagement();
 	}
 }
 
 function SelDisposalManagement(){
+	logNow("ggggg");
 	var date1 = $("input[name=date1]").val();
 	var pnum = $("input[name=pnum]").val();
 	if (date1.length < 6) return $("input[name=date1]").focus();
@@ -55,8 +52,9 @@ function SelDisposalManagement(){
 		if(pnum.length < 4) return $("input[name=pnum]").focus();
 		else return $("input[name=man1]").focus();
 	}
-	
+	logNow(date1);
 	if(date1 != ""){
+		logNow("zzz");
 		var dbname = date1.substring(0,4);
 		logNow(dbname);
 		
@@ -71,6 +69,7 @@ function SelDisposalManagement(){
 				async: false,
 				data : JSON.stringify(from),
 				success: function (result) {
+					logNow(result);
 					if(!result){
 						alert("QUERY_ERROR");
 						exit;
@@ -83,7 +82,7 @@ function SelDisposalManagement(){
 		}
 		logNow("ready");
 	}
-}*/
+}
 
 //구매일보
 function SelPurchaseDaily(bdate){
@@ -2701,3 +2700,466 @@ function SelDisposalList(){
 }
 
 //구분별도서수불재고현황
+function SelBookPaymentStockStatusByCate(){
+	var ty = $("select[name=ty]").val();
+	var tm = $("select[name=tm]").val();
+	
+	for(var i = 1; i <= 14; i++){
+		eval("var sa_a" + i + " = 0;");
+		eval("var sa_q" + i + " = 0;");
+		//eval("var sq" + i + " = 0;");
+		//eval("var sa" + i + " = 0;");
+	}
+	
+	document.getElementById("Lay1").style.display = 'block';		
+	setTimeout(function(){
+		htmlString = "";
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate1",
+			async: false,
+			success: function (result) {
+				var object_num = Object.keys(result);
+				logNow(result);
+				
+				for(var i in object_num){
+					logNow(i);
+					var sq1 = 0; var sq2 = 0; var sq3 = 0; var sq4 = 0; var sq5 = 0; var sq6 = 0; var sq7 = 0; var sq8 = 0; var sq9 = 0; var sq10 = 0; var sq11 = 0; var sq12 = 0; var sq13 = 0; var sq14 = 0; 
+					var sa1 = 0; var sa2 = 0; var sa3 = 0; var sa4 = 0; var sa5 = 0; var sa6 = 0; var sa7 = 0; var sa8 = 0; var sa9 = 0; var sa10 = 0; var sa11 = 0; var sa12 = 0; var sa13 = 0; var sa14 = 0; 
+					
+					var data = result[object_num[i]]; //b_row
+					
+					var t_mon = parseInt(tm);
+					var ipdan;
+					
+					// 단가
+					var from = {sgbook: data["sbbook"], sgyyyy: parseInt(ty.substring(2,4))}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate2",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if(result2.length != 0){
+								for(var ii = t_mon ; ii >= 0 ; ii--){
+									var var_name = "sgdn" + fillZero(ii, 2);
+									if (result2[0][var_name]> 0){
+										ipdan = result2[0][var_name];
+										break;
+									}
+								}
+							}
+						}
+					});
+					
+					// 전기이월수량
+					var dbname1 = "KTBKS" + ty.substring(2,4) + "0";
+					var from = {dbname: dbname1, tbsbook: data["sbbook"]}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate3",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if(result2.length != 0){
+								sq2 = result2[0]["tbasr"];
+								sa_q2 += sq2;
+								return;
+							}
+						}
+					});
+					
+					// 여기서 에러남 //result2 [null] length->1
+					// 전월이월수량
+					var from = {dbname: dbname1, tbsbook: data["sbbook"], tbmgubn: t_mon}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate4",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							var sum_tbasr = 0; var sum_tbcsr = 0; var sum_tbdsr = 0; var sum_tbesr = 0; var sum_tbfsr = 0; 
+							if(result2[0] != null){
+								sum_tbasr = result2[0]["sum_tbasr"];
+								sum_tbcsr = result2[0]["sum_tbcsr"];
+								sum_tbdsr = result2[0]["sum_tbdsr"];
+								sum_tbesr = result2[0]["sum_tbesr"];
+								sum_tbfsr = result2[0]["sum_tbfsr"];
+							}
+							sq1 = sq2 + sum_tbasr - sum_tbcsr + sum_tbdsr - sum_tbesr - sum_tbfsr;
+							sa_q1 += sq1;
+							sq4 = sum_tbasr;
+							sq6 = sum_tbcsr;
+							sq8 = sum_tbdsr;
+							sq10 = sum_tbesr;
+							sq12 = sum_tbfsr;
+						}
+					});
+					
+					//당월 수량
+					var from = {dbname: dbname1, tbsbook: data["sbbook"], tbmgubn: t_mon}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate5",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if(result2.length != 0){
+								sq3 = result2[0]["tbasr"];
+								sq4 += result2[0]["tbasr"];
+								sq5 = result2[0]["tbcsr"];
+								sq6 += result2[0]["tbcsr"];
+								sq7 = result2[0]["tbdsr"];
+								sq8 += result2[0]["tbdsr"];
+								sq9 = result2[0]["tbesr"];
+								sq10 += result2[0]["tbesr"];
+								sq11 = result2[0]["tbfsr"];
+								sq12 += result2[0]["tbfsr"];
+								sq14 = sq2 + sq4 - sq6 + sq8 - sq10 - sq12;
+								sa_q3 += sq3;
+								sa_q4 += sq4;
+								sa_q5 += sq5;
+								sa_q6 += sq6;
+								sa_q7 += sq7;
+								sa_q8 += sq8;
+								sa_q9 += sq9;
+								sa_q10 += sq10;
+								sa_q11 += sq11;
+								sa_q12 += sq12;
+								sa_q14 += sq14;
+							}
+						}
+					});
+					
+					if((sq1 + sq2 + sq3 + sq4 + sq5 + sq6 + sq7 + sq8 + sq9 + sq10 + sq11 + sq12 + sq14) == 0) continue;
+					
+					// 전기이월금액
+					var dbname2 = "KTBKP" + ty.substring(2,4) + "0";
+					var from = {dbname: dbname2, tbkbook: data["sbbook"]}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate6",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if(result2.length != 0){
+								sa2 = result2[0]["tbakm"];
+								sa_a2 += sa2;
+							}
+						}
+					});
+					
+					// 전월이월금액
+					var from = {dbname: dbname2, tbkbook: data["sbbook"], tbmgubn: t_mon}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							var sum_tbakm = 0; var sum_tbckm = 0; var sum_tbdkm = 0; var sum_tbekm = 0; var sum_tbfkm = 0; 
+							if(result2[0] != null){
+								sum_tbakm = result2[0]["sum_tbakm"];
+								sum_tbckm = result2[0]["sum_tbckm"];
+								sum_tbdkm = result2[0]["sum_tbdkm"];
+								sum_tbekm = result2[0]["sum_tbekm"];
+								sum_tbfkm = result2[0]["sum_tbfkm"];
+							}
+							sa1 = sa2 + sum_tbakm - sum_tbckm + sum_tbdkm - sum_tbekm - sum_tbfkm;
+							sa_a1 += sa1;
+							sa4 = sum_tbakm;
+							sa6 = sum_tbckm;
+							sa8 = sum_tbdkm;
+							sa10 = sum_tbekm;
+							sa12 = sum_tbfkm;
+						}
+					});
+					
+					//당월 금액
+					var from = {dbname: dbname2, tbkbook: data["sbbook"], tbmgubn: t_mon}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate8",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							logNow(result2[0]["tbckm"]);
+							if(result2[0] != null){
+								sa3 = result2[0]["tbakm"];
+								sa4 += result2[0]["tbakm"];
+								sa5 = result2[0]["tbckm"];
+								sa6 += result2[0]["tbckm"];
+								sa7 = result2[0]["tbdkm"];
+								sa8 += result2[0]["tbdkm"];
+								sa9 = result2[0]["tbekm"];
+								sa10 += result2[0]["tbekm"];
+								sa11 = result2[0]["tbfkm"];
+								sa12 += result2[0]["tbfkm"];
+								sa14 = sa2 + sa4 - sa6 + sa8 - sa10 - sa12;
+								sa_a3 += sa3;
+								sa_a4 += sa4;
+								sa_a5 += sa5;
+								sa_a6 += sa6;
+								sa_a7 += sa7;
+								sa_a8 += sa8;
+								sa_a9 += sa9;
+								sa_a10 += sa10;
+								sa_a11 += sa11;
+								sa_a12 += sa12;
+								sa_a14 += sa14;
+							}
+						}
+					});
+					
+					//여기까지 뽑아내야함 -> 인쇄
+					
+					// 수량 0일때 잔액 정리
+					if((sq14 == 0) && (sa14 != 0)){
+						if (sa5 > 0){ // 판매
+							sa5 += sa14;
+							sa6 += sa14;
+							sa_a5 += sa14;
+							sa_a6 += sa14;
+							sa_a14 -= sa14;
+							
+							// 집계 변경
+							var from = {dbname: dbname2, tbckm: sa5, tbkbook: data["sbbook"], tbmgubn: t_mon}
+							$.ajax({
+								type: "POST",
+								contentType: "application/json; charset=utf-8;",
+								dataType: "json",
+								async: false,
+								url: SETTING_URL + "/productio/update_bookpayment_stockstatus_bycate1",
+								data: JSON.stringify(from),
+								success: function (result) {
+									logNow("up1");
+									logNow(result);
+								},
+								error: function () {
+								}
+							});
+							sa14 = 0;
+						}else{
+							if (sa11 > 0){ // 폐기에 +
+								sa11 += sa14;
+								sa12 += sa14;
+								sa_a11 += sa14;
+								sa_a12 += sa14;
+								sa_a14 -= sa14;
+								
+								// 집계 변경
+								var from = {dbname: dbname2, tbfkm: sa11, tbkbook: data["sbbook"], tbmgubn: t_mon}
+								$.ajax({
+									type: "POST",
+									contentType: "application/json; charset=utf-8;",
+									dataType: "json",
+									async: false,
+									url: SETTING_URL + "/productio/update_bookpayment_stockstatus_bycate2",
+									data: JSON.stringify(from),
+									success: function (result) {
+										logNow("up2");
+										logNow(result);
+									},
+									error: function () {
+									}
+								});
+								
+								//전표 변경
+								var tblname = "KS1" + ty.substring(2,4) + tm + "A";
+								var new_val; var new_uid;
+								var from = {dbname: tblname, s1book: data["sbbook"], s1gubn: 'F'}
+								$.ajax({
+									type: "POST",
+									contentType: "application/json; charset=utf-8;",
+									dataType: "json",
+									url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate9",
+									async: false,
+									data : JSON.stringify(from),
+									success: function (result2) {
+										new_val = result2[0]["s1amnt"] + sa14;
+										logNow(result2[0]["s1amnt"]);
+										logNow(sa14);
+										logNow(new_val);
+										new_uid = result2[0]["uid"];
+									}
+								});
+								
+								var from = {dbname: tblname, s1amnt: new_val, uid: new_uid}
+								$.ajax({
+									type: "POST",
+									contentType: "application/json; charset=utf-8;",
+									dataType: "json",
+									async: false,
+									url: SETTING_URL + "/productio/update_bookpayment_stockstatus_bycate3",
+									data: JSON.stringify(from),
+									success: function (result) {
+										logNow("up3");
+										logNow(result);
+									},
+									error: function () {
+									}
+								});
+								sa14 = 0;
+							}else{
+								if (sa9 > 0){ // 증정에 +
+									sa9 += sa14;
+									sa10 += sa14;
+									sa_a9 += sa14;
+									sa_a10 += sa14;
+									sa_a14 -= sa14;
+									
+									// 집계 변경
+									var from = {dbname: dbname2, tbfkm: sa9, tbkbook: data["sbbook"], tbmgubn: t_mon}
+									$.ajax({
+										type: "POST",
+										contentType: "application/json; charset=utf-8;",
+										dataType: "json",
+										async: false,
+										url: SETTING_URL + "/productio/update_bookpayment_stockstatus_bycate2",
+										data: JSON.stringify(from),
+										success: function (result) {
+											logNow("up2-2");
+											logNow(result);
+										},
+										error: function () {
+										}
+									});
+									
+									//전표 변경
+									var tblname = "KS1" + ty.substring(2,4) + tm + "A";
+									var new_val; var new_uid;
+									var from = {dbname: tblname, s1book: data["sbbook"], s1gubn: 'E'}
+									$.ajax({
+										type: "POST",
+										contentType: "application/json; charset=utf-8;",
+										dataType: "json",
+										url: SETTING_URL + "/productio/select_bookpayment_stockstatus_bycate9",
+										async: false,
+										data : JSON.stringify(from),
+										success: function (result2) {
+											new_val = result2[0]["s1amnt"] + sa14;
+											new_uid = result2[0]["uid"];
+										}
+									});
+									
+									var from = {dbname: tblname, s1amnt: new_val, uid: new_uid}
+									$.ajax({
+										type: "POST",
+										contentType: "application/json; charset=utf-8;",
+										dataType: "json",
+										async: false,
+										url: SETTING_URL + "/productio/update_bookpayment_stockstatus_bycate3",
+										data: JSON.stringify(from),
+										success: function (result) {
+											logNow("up3-2");
+											logNow(result);
+										},
+										error: function () {
+										}
+									});
+									sa14 = 0;
+								}
+							}
+						}
+					}
+					//
+					htmlString += 
+						'<tr>'+
+							'<td width="200" colspan="3" height="30" align="left" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-left:2pt;">'+ data["sbname"] +'</span></td>'+
+						    '<td width="30" align="center" valign="middle" bgcolor="WHITE" height="30"><span style="font-size:9pt;">월</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq1) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa1) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq3) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa3) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq5) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa5) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq7) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa7) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq9) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa9) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq11) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa11) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">&nbsp;</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">&nbsp;</span></td>'+
+						'</tr>'+
+						'<tr>'+
+							'<td width="70" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["sbbook"] +'</span></td>'+
+						    '<td width="65" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+ numberWithCommas(data["sbuprc"]) +'</span></td>'+
+						    '<td width="65" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt; padding-right:5pt;">'+ numberWithCommas(ipdan.toFixed(2)) +'</span></td>'+
+						    '<td width="30" align="center" valign="middle" bgcolor="WHITE" height="30"><span style="font-size:9pt;">누</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq2) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa2) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq4) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa4) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq6) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa6) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq8) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa8) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq10) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa10) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq12) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa12) +'</span></td>'+
+						    '<td width="50" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sq14) +'</span></td>'+
+						    '<td width="80" height="30" align="right" valign="middle" bgcolor="WHITE"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa14) +'</span></td>'+
+						'</tr>';
+						
+				}
+				htmlString +=
+					'<tr>'+
+						'<td width="200" colspan="3" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">[[ 합계 ]]</span></td>'+
+						'<td width="30" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">월</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q1) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a1) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q3) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a3) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q5) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a5) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q7) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a7) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q9) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a9) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q11) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a11) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">&nbsp;</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">&nbsp;</span></td>'+
+					'</tr>'+
+					'<tr>'+
+						'<td width="200" colspan="3" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">&nbsp;</span></td>'+
+						'<td width="30" align="center" valign="middle" bgcolor="#F4F4F4" height="30"><span style="font-size:9pt;">누</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q2) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a2) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q4) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a4) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q6) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a6) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q8) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a8) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q10) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a10) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q12) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a12) +'</span></td>'+
+						'<td width="50" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_q14) +'</span></td>'+
+						'<td width="80" height="30" align="right" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt; padding-right:2pt;">'+ numberWithCommas(sa_a14) +'</span></td>'+
+					'</tr>';
+				$("#temp").html(htmlString);
+			}
+		});
+		
+	    document.getElementById("Lay1").style.display = 'none';
+	},0);
+}

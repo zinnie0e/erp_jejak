@@ -1649,7 +1649,7 @@ function SearchBookcode_m9(){
 						'<tr>'+
 							'<td width="40" align="center" style="border-left-width: 1; border-right-width: 1; border-top-width: 1; border-bottom-style: dotted; border-bottom-width: 1" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" bordercolor="#000000"><span style="font-size:9pt;">'+
 								'<font color="'+ font_color +'">'+ data["sbbook"] +'</font></span></td>'+
-							'<td onClick="javascript:testttttttttt_m9('+ "'" + data["sbbook"] + "'" +');" onMouseOver=this.style.backgroundColor="8CFFFE" onMouseOut=this.style.backgroundColor="FFFFFF" width="260" align="left" style="border-left-width: 1; border-right-width: 1; border-top-width: 1; border-bottom-style: dotted; border-bottom-width: 1" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" bordercolor="#000000"><span style="font-size:9pt; padding-left:3pt;">'+
+							'<td onClick="javascript:window.opener.InBookInfo('+ data["sbbook"] +');self.close();" onMouseOver=this.style.backgroundColor="8CFFFE" onMouseOut=this.style.backgroundColor="FFFFFF" width="260" align="left" style="border-left-width: 1; border-right-width: 1; border-top-width: 1; border-bottom-style: dotted; border-bottom-width: 1" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" bordercolor="#000000"><span style="font-size:9pt; padding-left:3pt;">'+
 								'<font color="'+ font_color +'">'+ data["sbname"] +'</font></span></td>'+
 						'</tr>';
 				}
@@ -1659,8 +1659,9 @@ function SearchBookcode_m9(){
     }
 }
 
-function testttttttttt_m9(sbbook){//질문
-	logNow(sbbook);
+function InBookInfo(sbbook){ // m8와 함수 겹침
+	$("input[name=man1]").val(sbbook);
+	SelProductionByBook();
 }
 
 //전기 이월 작업
@@ -2201,6 +2202,7 @@ function MakeBooksNotin(){ //새로계산 버튼
 						}
 					}
 				});
+				SelBooksNotin();
 			}else alert("DB ERROR");
 		}
 	});

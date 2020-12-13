@@ -44,7 +44,7 @@ function selBookList(lm_s, lm_t){
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbbook"] + '</font></span></td>'+
 							'<td width="430" height="25" bgcolor="white" align="left" valign="middle"><p style="line-height:16px; margin-left:5px;"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbname"] + '</font></span></p></td>'+																			
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">'+
-								'<a href="javascript:AddIt(<?=$my_uid?>);" class="n">추가</a></font></span>'+
+								'<a href="javascript:AddBaljuYjJpList(' + data["uid"] + ');" class="n">추가</a></font></span>'+
 							'</td>'+
 						'</tr>';
 				}
@@ -55,14 +55,6 @@ function selBookList(lm_s, lm_t){
 }
 
 function selBook(uid){
-	$("img[name=btn_deasu]").click(function(){
-		SelBookDeasu(data["uid"], data["sbname"], data["sbbook"]);
-	});
-	
-	$("img[name=btn_yong]").click(function(){
-		SelBookYongji(data["uid"], data["sbname"], data["sbbook"]);
-	});
-	
 	var json_data = {uid: uid}
 	
 	$('#jejak_detail_view').html(jmenu2("0-수정"));
@@ -205,6 +197,14 @@ function selBook(uid){
 			$("input[name=SBBOOKP]").val(data["sbbookp"]); //도서판매가
 			$("input[name=SBCDP]").val(data["sbcdp"]); //CD판매가
 			$("select[name=SBJABJI]").val(data["sbjabji"]); //잡지
+			
+			$("img[name=btn_deasu]").click(function(){
+				SelBookDeasu(data["uid"], data["sbname"], data["sbbook"]);
+			});
+			
+			$("img[name=btn_yong]").click(function(){
+				SelBookYongji(data["uid"], data["sbname"], data["sbbook"]);
+			});
 		}
 	});
 }
@@ -598,7 +598,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 
 //검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
 function upDaesu(){
-	var bcode =  $("input[name=sbbook]").val().substring(0,5);
+	var bcode =  $("#sbbook").text().substring(0,5);
 	var json_data = {wdbook: bcode};
 	$.ajax({
 		type: "POST",
@@ -631,10 +631,10 @@ function upDaesu(){
 	var t_4 = 1;
 	
 	var tmp_no = 0;
-	var wdboo9 = $('input[name="WDBOO9[]"]');
+	var wdboo9 = $('select[name="WDBOO9[]"]');
 	for(var i = 0; i < $('input[name="check[]"]').length; i++){
-		
-		switch(wdboo9[i].value){
+		if($('input[name="check[]"]')[i].value == "on"){
+			switch(wdboo9[i].value){
 			case 0 :
 				tmp_no = t_0;
 				t_0++;
@@ -656,26 +656,27 @@ function upDaesu(){
 				t_4++;
 				break;
 				
-		}
-		
-		var json_data = {uid: new_uid,
-				wdbook: bcode.
-				wdboo9: wdboo9[i].value,
-				wdsuns: tmp_no,
-				wddesu: $('input[name="WDDESU[]"]')[i].value,
-				wdpage: $('input[name="WDPAGE[]"]')[i].value,
-				wdcolo: $('input[name="WDCOLO[]"]')[i].value,
-				wdqnty: $('input[name="WDQNTY[]"]')[i].value,};
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			url: SETTING_URL + "/books/insert_daesu3",
-			async: false,
-			data: JSON.stringify(json_data),
-			success: function (result) {
-				logNow(result);
 			}
-		});
+			
+			var json_data = {uid: new_uid,
+					wdbook: bcode,
+					wdboo9: wdboo9[i].value,
+					wdsuns: tmp_no,
+					wddesu: $('input[name="WDDESU[]"]')[i].value,
+					wdpage: $('input[name="WDPAGE[]"]')[i].value,
+					wdcolo: $('input[name="WDCOLO[]"]')[i].value,
+					wdqnty: $('input[name="WDQNTY[]"]')[i].value,};
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				url: SETTING_URL + "/books/insert_daesu3",
+				async: false,
+				data: JSON.stringify(json_data),
+				success: function (result) {
+					logNow(result);
+				}
+			});
+		}
 	}
 }
 
@@ -927,7 +928,7 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 
 //검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
 function upYongji(){
-	var bcode =  $("input[name=sbbook]").val().substring(0,5);
+	var bcode =  $("#sbbook").text().substring(0,5);
 	var json_data = {wybook: bcode};
 	$.ajax({
 		type: "POST",
@@ -947,10 +948,10 @@ function upYongji(){
 	var t_4 = 1;
 	
 	var tmp_no = 0;
-	var wyboo9 = $('input[name="WYBOO9[]"]');
+	var wyboo9 = $('select[name="WYBOO9[]"]');
 	for(var i = 0; i < $('input[name="check[]"]').length; i++){
-		
-		switch(wyboo9[i].value){
+		if($('input[name="check[]"]')[i].value == "on"){
+			switch(wyboo9[i].value){
 			case 0 :
 				tmp_no = t_0;
 				t_0++;
@@ -972,25 +973,26 @@ function upYongji(){
 				t_4++;
 				break;
 				
-		}
-		
-		var json_data = {wybook: bcode.
-				wyboo9: wyboo9[i].value,
-				wysuns: tmp_no,
-				wygubn: $('input[name="$WYGUBN[]"]')[i].value,
-				wyjijl: $('input[name="WYJIJL[]"]')[i].value.substring(0, 6),
-				wycolo: $('input[name="colo[]"]')[i].value,
-				wypage: $('input[name="page[]"]')[i].value,};
-		$.ajax({
-			type: "POST",
-			contentType: "application/json; charset=utf-8;",
-			url: SETTING_URL + "/books/insert_yongji2",
-			async: false,
-			data: JSON.stringify(json_data),
-			success: function (result) {
-				logNow(result);
 			}
-		});
+			
+			var json_data = {wybook: bcode,
+					wyboo9: wyboo9[i].value,
+					wysuns: tmp_no,
+					wygubn: $('input[name="$WYGUBN[]"]')[i].value,
+					wyjijl: $('input[name="WYJIJL[]"]')[i].value.substring(0, 6),
+					wycolo: $('input[name="colo[]"]')[i].value,
+					wypage: $('input[name="page[]"]')[i].value,};
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				url: SETTING_URL + "/books/insert_yongji2",
+				async: false,
+				data: JSON.stringify(json_data),
+				success: function (result) {
+					logNow(result);
+				}
+			});
+		}
 	}
 }
 
@@ -1103,7 +1105,7 @@ function SelSearchBook(lm_s, lm_t){ //도서검색결과 (m4_제작예정리스�
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbbook"] + '</font></span></td>'+
 							'<td width="430" height="25" bgcolor="white" align="left" valign="middle"><p style="line-height:16px; margin-left:5px;"><span style="font-size:9pt;"><font face="돋움" color="#666666">' + data["sbname"] + '</font></span></p></td>'+																			
 							'<td width="140" height="25" bgcolor="white" align="center" valign="middle"><span style="font-size:9pt;"><font face="돋움" color="#666666">'+
-								'<a href="javascript:AddIt(<?=$my_uid?>);" class="n">추가</a></font></span>'+
+								'<a href="javascript:AddBaljuYjJpList(' + data["uid"] + ');" class="n">추가</a></font></span>'+
 							'</td>'+
 						'</tr>';
 				}

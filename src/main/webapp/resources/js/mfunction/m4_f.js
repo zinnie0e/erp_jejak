@@ -28,13 +28,15 @@ function SelJpBaljuYj(signdate, lm_s, lm_t){
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">순번</span></font></td>'+
 									'<td width="50" bgcolor="white" height="40" align="center" valign="middle"><span style="font-size:9pt;">'+ (++i) +'</span></td>'+
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">도서명</span></font></td>'+
-									'<td width="300" bgcolor="white" height="40" align="left" valign="middle" colspan="3"><p style="margin-left:10px;"><span style="font-size:9pt;">'+ data["bname"] +'</span></p></td>'+
+									'<td width="300" bgcolor="white" height="40" align="left" valign="middle" colspan="3"><p style="margin-left:10px;"><span style="font-size:9pt;">';
+										if(data["bcheck"]) htmlString += '<font color=blue>'+ data["bname"] +'</font>'; else htmlString += '<font color=red>'+ data["bname"] +'</font>'; htmlString += '</span></p></td>'+
 									'<td width="50" height="40" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;"><font color="#666666">코드</font></span></td>'+
 									'<td width="50" height="40" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["bcode"] +'</span></td>'+
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">정가</span></font></td>'+
 									'<td width="100" bgcolor="white" height="40" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'+ data["bprice"] +'</span></td>'+
-									'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
-										'<input type="button" value="발주" onClick="javascript:SendIt();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+	
+									'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+										if(data["bcheck"]) htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmStartBalju('+ data["uid"] +', 2, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+										else htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmStartBalju('+ data["uid"] +', 1, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'; htmlString +=
 										'<input type="button" value="삭제" onClick="javascript:DelJpBaljuYj('+ data["uid"] +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 별 실 판 매 수 량</span></font></p>'+
 									'</td>'+
 								'</tr>'+
@@ -256,6 +258,1031 @@ function DelJpBaljuYj(uid){
 			}
 		});
 	}
+}
+
+var Total_Y = new Array(); var Total_B = new Array(); var arr_index = 0; var barr_index = 0; var t_panh;
+function ConfirmStartBalju(uid, mode, bname, bcheck, jdate){
+	var t_str; 
+	if (bcheck == 1) t_str = bname + " 에 대한 제작을 진행합니다.";
+	else t_str = bname + " 에 대한 제작을 진행합니다.";
+	if(confirm(t_str) == false) return;
+	else StartBalju(uid, mode, jdate);
+}
+
+function StartBalju(uid, mode, jdate){
+	$('#jejak_detail_view').html(jmenu4("0_발주버튼"));
+	
+	logNow(uid);
+	logNow(mode);
+	logNow(jdate);
+	logNow("----------------------------------");
+	
+	var t_bcode; var t_num; var t_type;
+	var from = {uid: uid}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak1",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			t_bcode = result[0]["bcode"];
+			t_num = result[0]["bnum"];
+			t_type = result[0]["btype"];
+		}
+	});
+	var tbook = t_bcode.substring(0,5);
+	var from = {sbbook: tbook + '%'}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak2",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			if (result[0]["sbbook"] != t_bcode){
+				alert("구코드!!! 확인바람.");
+				//exit;
+			}
+		}
+	});
+	
+	var t_amount = t_num;
+	
+	$('input[name=bnum]').val(t_num);
+	
+	var data0;
+	var t_janh; var ppp; var t_panh2; var t_jan2; var page_num; var julsu;
+	var bu_panh1; var bu_panh2; var bu_panh3; var bu_panh4; 
+	var bu_janh1; var bu_janh2; var bu_janh3; var bu_janh4; 
+	var from = {sbbook: t_bcode}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak3",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			data0 = result[0];
+			t_janh = data0["sbjanh"];
+			if (data0["sbsbph1"]){
+				bu_panh1 = data0["sbsbph1"];
+				bu_janh1 = data0["sbsbjh1"];
+				if (data0["sbsbph2"]){
+					bu_panh2 = data0["sbsbph2"];
+					bu_janh2 = data0["sbsbjh2"];
+					
+					if (data0["sbsbph3"]){
+						bu_panh3 = data0["sbsbph3"];
+						bu_janh3 = data0["sbsbjh3"];
+						
+						if (data0["sbsbph4"]){
+							bu_panh4 = data0["sbsbph4"];
+							bu_janh4 = data0["sbsbjh4"];
+						}
+					}
+				}
+			}
+			julsu = data0["sbjlsu"];
+			ppp = CheckPANH(data0["sbpanh"]);
+			t_panh = data0["sbpanh"].substring(0,1);
+			if (data0["sbpanh2"])
+			    t_panh2 = data0["sbpanh2"].substring(0,1);
+			else
+			    t_panh2 = "";
+			t_jan2 = CheckJANH(data0["sbjanh"]);
+
+			page_num = data0["sbpage"];
+			
+			htmlString = "";
+			htmlString += 
+				'<input type="hidden" name="mode" value="'+ mode +'">'+
+				'<input type="hidden" name="uid" value="'+ uid +'">'+
+				'<input type="hidden" name="jdate" value="'+ jdate +'">'+
+				'<tr>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data0["sbname"] +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data0["sbbook"] +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ numberWithCommas(data0["sbuprc"]) +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ page_num +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data0["sbpanh"] +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jan2 +'</span></td>'+
+					'<td height="30" align="center" valign="middle" bgcolor="white" colspan="2"><span style="font-size:9pt;">'+ data0["sbbigo"] +'</span></td>'+
+				'</tr>'+
+	        	'<input type="hidden" name="bcode" value="<?=$row[SBBOOK]?>">'+
+	        	'<input type="hidden" name="bname" value="<?=$row[SBNAME]?>">'+
+	        	'<input type="hidden" name="panh" value="<?=$row[SBPANH]?>">'+
+	        	'<input type="hidden" name="myun" value="<?=$row[SBPAGE]?>">';
+			$("#bookjejak").html(htmlString);
+		}
+	});
+	
+	var tmp_code = t_bcode.substring(0,5);
+	var total_amount = 0;
+	var total_yeobun = 0;	
+	
+	var t_yonj;
+	var from = {wybook: tmp_code}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak4",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			t_yonj = result[0]["count_uid"];
+		}
+	});
+	
+	var jijlcode;
+	var from = {wybook: tmp_code}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak5",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			var tgubn; var data2; var data3; 
+			var t_jung1; var t_jung2; var t_yeo1; var t_yeo2;
+			htmlString = "";
+			var object_num = Object.keys(result);
+			for(var i in object_num){
+				var data = result[object_num[i]]; 
+				
+				jijlcode = data["wyjijl"];
+				
+				var jijlname;
+				var from = {wjcode: jijlcode}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_bjyj_jejak6",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						data2 = result[0];
+						jijlname = result2[0]["wjname"] + " (" + jijlcode + ")";
+					}
+				});
+				
+				if ((data["wygubn"] == '01') || (data["wygubn"] == '15')){ // 표지, 속표지 - 2015.07.06
+					if (data["wygubn"] == '01') tgubn = "표지";
+					else tgubn = "속표지";
+					
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					if (t_janh == 4){ // 양장 -- 케이스와 같은 방식 (부수 / 페이지) -- 2009.02.11
+						var f_result = CalcJM(jijlcode, t_num, 0, data3["ye"], data["wycolo"], data["wypage"], t_panh, 0);
+						t_jung1 = f_result.tj1; 
+						t_jung2 = f_result.tj2;
+						t_yeo1 = f_result.ty1; 
+						t_yeo2 = f_result.ty2;
+					}else{
+						if (t_bcode.substring(0,3) == '393'){// 전집류
+							var f_result = CalcJM(jijlcode, t_num * 4, ppp, data3["ye"], data["wycolo"]+1, julsu, t_panh, 0);
+							t_jung1 = f_result.tj1; 
+							t_jung2 = f_result.tj2;
+							t_yeo1 = f_result.ty1; 
+							t_yeo2 = f_result.ty2;
+						}else{
+							if (data["wypage"] == 6) {// 3절, 6면짜리
+								var f_result = CalcJM(jijlcode, t_num * 4, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 1);
+								t_jung1 = f_result.tj1; 
+								t_jung2 = f_result.tj2;
+								t_yeo1 = f_result.ty1; 
+								t_yeo2 = f_result.ty2;
+							}else{
+								if (data["wychek"] == 4){// 4P - 파랑새 창작동요 19집
+									var f_result = CalcJM(jijlcode, t_num * 4, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 2);
+									t_jung1 = f_result.tj1; 
+									t_jung2 = f_result.tj2;
+									t_yeo1 = f_result.ty1; 
+									t_yeo2 = f_result.ty2;
+								}else{
+									if (t_janh == 7){// 스프링
+										var f_result = CalcJM(jijlcode, t_num * 4, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 3);
+										t_jung1 = f_result.tj1; 
+										t_jung2 = f_result.tj2;
+										t_yeo1 = f_result.ty1; 
+										t_yeo2 = f_result.ty2;
+									}else{
+										var f_result = CalcJM(jijlcode, t_num * 4, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+										t_jung1 = f_result.tj1; 
+										t_jung2 = f_result.tj2;
+										t_yeo1 = f_result.ty1; 
+										t_yeo2 = f_result.ty2;
+									}
+								}
+							}
+						}
+					}
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, tgubn, data["wycolo"], data["wyboo9"], 0);
+					htmlString += 
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ tgubn +'</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">4</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+						
+				}
+				if((data["wygubn"] == '02') || (data["wygubn"] == '16') || (data["wygubn"] == '17') || (data["wygubn"] == '09')){ // 면지, 도비라
+					var tmp_do = data["wycolo"];
+					if (tmp_do != 2) tmp_do = 8;
+					
+					var from = {bu: t_amount, do_: tmp_do}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak8",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					var f_result = CalcJM2(jijlcode, t_num * data["wypage"], ppp, data3["ye"], data["wycolo"], julsu, data["wypage"], 1);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					
+					if (data["wygubn"] == '02')
+						CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "면지", data["wycolo"], data["wyboo9"], data["wypage"]);
+					else{
+						if (data["wygubn"] == '16') // 면지2 -- 2016.11.29
+							CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "면지2", data["wycolo"], data["wyboo9"], data["wypage"]);
+						else{
+							if (data["wygubn"] == '17') // 면지1 -- 2016.11.29
+								CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "면지1", data["wycolo"], data["wyboo9"], data["wypage"]);
+							else
+								CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "도비라", data["wycolo"], data["wyboo9"], data["wypage"]);
+						}
+					}
+					htmlString += 
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(data["wygubn"] == "02") htmlString += "면지"; else if(data["wygubn"] == "16") htmlString += "면지2"; else if(data["wygubn"] == "17") htmlString += "면지1"; else htmlString += "도비라"; htmlString += '</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wypage"] +'</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '05'){ // 케이스
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num, 0, data3["ye"], data["wycolo"], data["wypage"], t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "케이스", data["wycolo"], data["wyboo9"], 0);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">케이스</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '06'){ // 화보
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num * data["wypage"], ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "화보", data["wycolo"], data["wyboo9"], data["wypage"]);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">화보</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wypage"] +'</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '07'){ // 엽서
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num*4, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "엽서", data["wycolo"], data["wyboo9"], 0);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">엽서</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '08'){ // 별지
+					var tmp_do = data["wycolo"];
+					if (tmp_do != 2) tmp_do = 8;
+					
+					var from = {bu: t_amount}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak9",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					if (tmp_code == '43171'){// 최광순 플루트 교본(1) - 정미는 부수/4
+						var f_result = CalcJM2(jijlcode, t_num/4, 1, data3["ye"], data["wycolo"], julsu, data0["sbbyul"], t_panh);
+						t_jung1 = f_result.tj1; 
+						t_jung2 = f_result.tj2;
+						t_yeo1 = f_result.ty1; 
+						t_yeo2 = f_result.ty2;
+					}else{// 별지는 표지여분
+						var f_result = CalcJM(jijlcode, t_num * data["wypage"], ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+						t_jung1 = f_result.tj1; 
+						t_jung2 = f_result.tj2;
+						t_yeo1 = f_result.ty1; 
+						t_yeo2 = f_result.ty2;
+					} 
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "별지", data["wycolo"], data["wyboo9"], data["wypage"]);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">별지</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wypage"] +'</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '10'){ // 날개
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "날개", data["wycolo"], data["wyboo9"], 0);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">날개</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '11'){ // 비닐
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "비닐", data["wycolo"], data["wyboo9"], 0);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">비닐</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if (data["wygubn"] == '12'){ // 띠지
+					var from = {bu: t_num}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak7",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							data3 = result3[0];
+						}
+					});
+					
+					var f_result = CalcJM(jijlcode, t_num, ppp, data3["ye"], data["wycolo"], julsu, t_panh, 0);
+					t_jung1 = f_result.tj1; 
+					t_jung2 = f_result.tj2;
+					t_yeo1 = f_result.ty1; 
+					t_yeo2 = f_result.ty2;
+					CalcT(jijlcode, data2["wjname"], t_jung1, t_jung2, t_yeo1, t_yeo2, "띠지", data["wycolo"], data["wyboo9"], 0);
+					
+					htmlString +=
+						'<tr>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">띠지</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">-</span></td>'+
+							'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data["wycolo"] +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jung1 + ' R ' + t_jung2 +'</span></td>'+
+							'<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_yeo1 + ' R ' + t_yeo2 +'</span></td>'+
+							'<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+						'</tr>';
+				}
+				if ((data["wygubn"] == '03') || (data["wygubn"] == '04') || (data["wygubn"] == '13') || (data["wygubn"] == '14')){ // 본문
+					var total_record;
+					var from = {wdbook: tmp_code, wdboo9: data["wyboo9"]}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_bjyj_jejak10",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result3) {
+							total_record = result3[0]["count_uid"]
+						}
+					});
+					if (!total_record)
+						htmlString += 
+							'<tr>'+
+								'<td width="765" height="30" align="center" valign="middle" bgcolor="white" colspan="7"><span style="font-size:9pt;"><b>대수정보가 없습니다. 정보를 입력해 주세요.</b></span></td>'+
+							'</tr>';
+					else{
+						var t_gu1 = "";
+					    if ((data["wyboo9"] > 0) && (data["wyboo9"] < 5))
+							t_gu1 = "부록" + data["wyboo9"] + " ";
+						else if (data["wyboo9"] ==  5){
+						    var tmp_boo = parseInt(data["wyboo9"]) - 3;
+						}
+						switch (data["wygubn"]){
+							case '03':
+								t_gu = "본문1"; break;
+							case '04':
+								t_gu = "본문2"; break;
+							case '13':
+								t_gu = "본문3"; break;
+							case '14':
+								t_gu = "본문4"; break;
+						}
+						var from = {wdbook: tmp_code, wdboo9: data["wyboo9"]}
+						logNow(from);
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_bjyj_jejak11",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result4) {
+								logNow("tttttttt");
+								logNow(result4);
+								var tmp_ye;
+								var object_num4 = Object.keys(result4);
+								for(var k in object_num4){
+									var data4 = result4[object_num4[k]]; 
+									var tmp_do = data4["wdcolo"];
+									if (tmp_do != 2) tmp_do = 8;
+									
+									var from = {bu: t_amount, do_: tmp_do}
+									$.ajax({
+										type: "POST",
+										contentType: "application/json; charset=utf-8;",
+										dataType: "json",
+										url: SETTING_URL + "/jpjejak/select_bjyj_jejak8",
+										async: false,
+										data : JSON.stringify(from),
+										success: function (result5) {
+											switch (data4["wdcolo"]){
+												case 4:
+													tmp_ye = result5[0]["ye"] * 0.8 * 0.85; break;
+												case 6:
+													tmp_ye = result5[0]["ye"] * 0.8; break;
+												default:
+													tmp_ye = result5[0]["ye"]; break;
+											}
+										}
+									});
+									
+									tmp_ye = Math.ceil(tmp_ye);
+
+									if ((data["wyboo9"] == 5) && (t_panh2 == 'B')) // 나도피
+									    tmp_ye = Math.ceil(tmp_ye * 0.9);
+									else if ((parseInt(data["wyboo9"]) > 0) && (eval("bu_panh" + data["wyboo9"]).substring(0,1) == 'B'))
+										tmp_ye = Math.ceil(tmp_ye * 0.9);
+									else if (jijlcode.substring(5,6) == '0')
+										tmp_ye = Math.ceil(tmp_ye * 0.9);
+
+									if ((tmp_code == '47102') || (tmp_code == '47101') || (tmp_code == '47103')) // 즐거운 기악합주 1,2 -- 한대 24p 기준으로
+										tmp_num = (data4["wdpage"] * t_num) / 24;
+									else{
+										if ((data["wyboo9"] > 0) && (data["wyboo9"] < 5)){  // 부록
+											tmp_ppp = CheckPANH(eval("bu_panh" + data["wyboo9"]));
+											tmp_num = (data4["wdpage"] * t_num) / tmp_ppp;
+										}else if (data["wyboo9"] == 5){ // 본서2 본문 (나도피)
+										    tmp_ppp = CheckPANH(t_panh2);
+											tmp_num = (data4["wdpage"] * t_num) / tmp_ppp;
+										}else // 일반
+											tmp_num = (data4["wdpage"] * t_num) / ppp;
+									}
+
+									num1 = Math.floor(tmp_num / 500);
+									num2 = tmp_num % 500;
+									total_amount = total_amount + tmp_num;
+									total_yeobun = total_yeobun + tmp_ye;
+									tnum1 = Math.floor(tmp_ye / 500);
+									tnum2 = tmp_ye % 500;
+									
+									CalcT(jijlcode, data2["wjname"], num1, num2, tnum1, tnum2, t_gu, data4["wdcolo"], data["wyboo9"], 0);
+									if (t_panh == 'B')
+										CalcB(t_gu, data["wyboo9"], data4["wddesu"], data4["wdpage"], data4["wdcolo"], num1, num2, tnum1, tnum2, jijlcode, data2["wjname"], ppp/2);
+									else
+										CalcB(t_gu, data["wyboo9"], data4["wddesu"], data4["wdpage"], data4["wdcolo"], num1, num2, tnum1, tnum2, jijlcode, data2["wjname"], ppp);
+									
+									htmlString +=
+										'<tr>'+
+								            '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_gu1 + t_gu +'</span></td>'+
+								            '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data4["wddesu"] +'</span></td>'+
+								            '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data4["wdpage"] +'</span></td>'+
+								            '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data4["wdcolo"] +'</span></td>'+
+								            '<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(num1) htmlString += num1 + ' R '; if(num2) htmlString += num2; htmlString += '</span></td>'+
+								            '<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(tnum1) htmlString += tnum1 + ' R '; if(tnum2) htmlString += tnum2; htmlString += '</span></td>'+
+								            '<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+								        '</tr>';
+								            
+								    if (data4["wdqnty"] > 1){
+										ttt = 1;
+										while (ttt < data4["wdqnty"]){
+											aa1 = data4["wddesu"] + ttt;
+											total_amount = total_amount + tmp_num;
+											total_yeobun = total_yeobun + tmp_ye;
+											CalcT(jijlcode, data2["wjname"], num1, num2, tnum1, tnum2, t_gu, data4["wdcolo"], data["wyboo9"], 0);
+											if (t_panh == 'B')
+												CalcB(t_gu, data["wyboo9"], aa1, data4["wdpage"], data4["wdcolo"], num1, num2, tnum1, tnum2, jijlcode, data2["wjname"], ppp/2);
+											else
+												CalcB(t_gu, data["wyboo9"], aa1, data4["wdpage"], data4["wdcolo"], num1, num2, tnum1, tnum2, jijlcode, data2["wjname"], ppp);
+									
+											htmlString +=
+												'<tr>'+
+													'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_gu1 + t_gu +'</span></td>'+
+													'<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ aa1 +'</span></td>'+
+												     '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data4["wdpage"] +'</span></td>'+
+												    '<td width="80" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ data4["wdcolo"] +'</span></td>'+
+												    '<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(num1) htmlString += num1 + ' R '; if(num2) htmlString += num2; htmlString += '</span></td>'+
+												    '<td width="135" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'; if(tnum1) htmlString += tnum1 + ' R '; if(tnum2) htmlString += tnum2; htmlString += '</span></td>'+
+												    '<td width="175" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ jijlname +'</span></td>'+
+												'</tr>';
+											
+											ttt++;
+										}
+									}
+								}
+							}
+						});
+					}
+				}
+			}
+			logNow(Total_Y);
+			for(var i = 0 ; i < arr_index ; i++){
+				num3 = Math.floor(Total_Y[i][2] / 500);
+				num4 = Total_Y[i][2] % 500;
+				tnum3 = Math.floor(Total_Y[i][3] / 500);
+				tnum4 = Total_Y[i][3] % 500;
+				num5 = Math.floor((Total_Y[i][2] + Total_Y[i][3]) / 500);
+				num6 = (Total_Y[i][2] + Total_Y[i][3]) % 500;
+				
+				htmlString +=
+					'<tr>'+
+						'<td width="80" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>';
+					if ((Total_Y[i][6] > 0) && (Total_Y[i][6] < 5)){
+					    htmlString += "부록";
+					    htmlString += Total_Y[i][6];
+					}
+					htmlString += Total_Y[i][4];
+					htmlString += 
+							'</b></font></span></td>'+
+		    			    '<td width="240" height="30" align="center" valign="middle" bgcolor="#F4F4F4" colspan="3"><span style="font-size:9pt;"><font color="red"><b>'+ num5 + ' R ' + num6 +'</b></font></span></td>'+
+		    			    '<td width="135" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>'+ num3 + ' R ' + num4 +'</b></font></span></td>'+
+		    			    '<td width="135" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>'+ tnum3 + ' R ' + tnum4 +'</b></font></span></td>'+
+		    			    '<td width="175" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>'+ Total_Y[i][1] +'</b></font></span></td>'+
+		    			'</tr>'+
+		    			'<input type="hidden" name="t3_jcode[]" value="<?=$Total_Y[$i][0]?>">'+
+		    			'<input type="hidden" name="t3_jname[]" value="<?=$Total_Y[$i][1]?>">'+
+		    			'<input type="hidden" name="t3_jm[]" value="<?=$Total_Y[$i][2]?>">'+
+		    			'<input type="hidden" name="t3_yb[]" value="<?=$Total_Y[$i][3]?>">'+
+		    			'<input type="hidden" name="t3_gubn[]" value="<?=$Total_Y[$i][4]?>">'+
+		    			'<input type="hidden" name="t3_colo[]" value="<?=$Total_Y[$i][5]?>">'+
+		    			'<input type="hidden" name="t3_bu[]" value="<?=$Total_Y[$i][6]?>">'+
+		    			'<input type="hidden" name="t3_pg[]" value="<?=$Total_Y[$i][7]?>">';
+			}
+			for(var i = 0 ; i < barr_index ; i++){
+				htmlString +=
+					'<input type="hidden" name="b3_gubn[]" value="<?=$Total_B[$i][0]?>">'+
+					'<input type="hidden" name="b3_bu[]" value="<?=$Total_B[$i][1]?>">'+
+					'<input type="hidden" name="b3_dae[]" value="<?=$Total_B[$i][2]?>">'+
+					'<input type="hidden" name="b3_pg[]" value="<?=$Total_B[$i][3]?>">'+
+					'<input type="hidden" name="b3_do[]" value="<?=$Total_B[$i][4]?>">'+
+					'<input type="hidden" name="b3_jm[]" value="<?=$Total_B[$i][5]?>">'+
+	    			'<input type="hidden" name="b3_yb[]" value="<?=$Total_B[$i][6]?>">'+
+	    			'<input type="hidden" name="b3_jc[]" value="<?=$Total_B[$i][7]?>">'+
+	    			'<input type="hidden" name="b3_jn[]" value="<?=$Total_B[$i][8]?>">',+
+	    			'<input type="hidden" name="b3_bigo[]" value="<?=$Total_B[$i][9]?>">';
+			}
+			$("#bookdeasu").html(htmlString);
+		}
+	});
+	
+	//거래처
+	var wcjob = new Array("인쇄", "코팅", "제본", "용지", "스티커", "CD", "케이스", "비닐", "기타", "증지");
+	for(var i = 0; i < wcjob.length; i++){
+		var from = {wcjob: wcjob[i]}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/select_bjyj_jejak12",
+			async: false,
+			data : JSON.stringify(from),
+			success: function (result) {
+				
+				logNow(result);
+				var object_num = Object.keys(result);
+				for(var j in object_num){
+					var data = result[object_num[j]]; 
+					
+					if(wcjob[i] == "인쇄"){
+						appendString = "<option value='" + data["wccode"] + "'"; if(data["wccode"] == "1001") appendString += " selected"; appendString += ">" + data["wcname"] + "</option>";
+						$("select[name=m1]").append(appendString);
+					}else if(wcjob[i] == "코팅"){
+						appendString = "<option value='" + data["wccode"] + "'"; if(data["wccode"] == "2003") appendString += " selected"; appendString += ">" + data["wcname"] + "</option>";
+						$("select[name=m2]").append(appendString);
+					}else if(wcjob[i] == "제본"){
+						appendString = "<option value='" + data["wccode"] + "'"; 
+							if((data["wccode"] == "3016") && (t_janh == '3')) appendString += " selected";
+							else if((data["wccode"] == "3015") && (t_janh == '5')) appendString += " selected";
+							else if((data["wccode"] == "3006") && (t_janh == '7')) appendString += " selected";
+							else if((data["wccode"] == "3002") && (t_janh == '4')) appendString += " selected";
+						appendString += ">" + data["wcname"] + "</option>";
+						$("select[name=m3]").append(appendString);
+						$("select[name=m31]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+						$("select[name=m32]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+						$("select[name=m33]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+						$("select[name=m34]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "용지"){
+						$("select[name=m4]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "스티커"){
+						$("select[name=m5]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "목형"){
+						$("select[name=m11]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "CD"){
+						$("select[name=m6]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "케이스"){
+						$("select[name=m7]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "비닐"){
+						$("select[name=m8]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "기타"){
+						$("select[name=m9]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}else if(wcjob[i] == "증지"){
+						$("select[name=m10]").append("<option value='" + data["wccode"] + "'>" + data["wcname"] + "</option>");
+					}
+				}
+			}
+		});
+	}
+	
+	var from = {sbbook: t_bcode}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_bjyj_jejak13",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			if(result[0]["sbinji"] == 0) $('select[name=SBINJI]').val("0");
+			if(result[0]["sbinji"] == 1) $('select[name=SBINJI]').val("1");
+		}
+	});
+	
+	logNow(data0);
+	
+	htmlString = "";
+	htmlString +=
+		'<tr>'+
+			'<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBMYUN" value="'+ data0["sbmyun"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBBYUL" value="'+ data0["sbbyul"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBHWBO" value="'+ data0["sbhwbo"] +'"></span></td>'+
+		    '<td width="90" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+		    	'<select name="SBCOTI" size="1">'+
+		    		'<option value="0">=======</option>'+
+		    		'<option value="1"'; if(data0["sbcoti"] == 1) htmlString += "selected"; else htmlString += '>'; htmlString += '>유광</option>'+
+		    		'<option value="2"'; if(data0["sbcoti"] == 2) htmlString += "selected"; else htmlString += '>'; htmlString += '>무광</option>'+
+					'<option value="7"'; if(data0["sbcoti"] == 7) htmlString += "selected"; else htmlString += '>'; htmlString += '>무광(에폭시)</option>'+
+					'<option value="8"'; if(data0["sbcoti"] == 8) htmlString += "selected"; else htmlString += '>'; htmlString += '>유광(에폭시)</option>'+
+		    		'<option value="3"'; if(data0["sbcoti"] == 3) htmlString += "selected"; else htmlString += '>'; htmlString += '>홀로그램</option>'+
+					'<option value="4"'; if(data0["sbcoti"] == 4) htmlString += "selected"; else htmlString += '>'; htmlString += '>홀로그램(크리스탈)</option>'+
+		    		'<option value="5"'; if(data0["sbcoti"] == 5) htmlString += "selected"; else htmlString += '>'; htmlString += '>엠보싱</option>'+
+				'</select></span>'+
+			'</td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBJLSU" value="'+ data0["sbjlsu"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBJNJI" value="'+ data0["sbjnji"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBSTIC" value="'+ data0["sbstic"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBCD" value="'+ data0["sbcd"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBWING2" value="'+ data0["sbwing2"] +'"></span></td>'+
+		    '<td width="40" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBCASE2" value="'+ data0["sbcase2"] +'"></span></td>'+
+		    '<td width="90" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+				'<select name="SBCOTI2" size="1">'+
+					'<option value="0">=======</option>'+
+					'<option value="7"'; if(data0["sbcoti2"] == 7) htmlString += "selected"; else htmlString += '>'; htmlString += '>유광에폭시</option>'+
+					'<option value="8"'; if(data0["sbcoti2"] == 7) htmlString += "selected"; else htmlString += '>'; htmlString += '>무광에폭시</option>'+
+					'<option value="4"'; if(data0["sbcoti2"] == 4) htmlString += "selected"; else htmlString += '>'; htmlString += '>오바코팅</option>'+
+				'</select></span>'+
+			'</td>'+
+		    '<td width="60" height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:30px;" name="SBMUSN" value="'+ data0["sbmusn"] +'"></span></td>'+
+		    '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><INPUT style="font-family:굴림; text-align:center; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:28px;" name="SBBINB" value="'+ data0["sbbinb"] +'"></span></td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td width="40" height="60" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;">비고</span></td>'+
+		    '<td width="600" height="60" align="center" valign="middle" bgcolor="white" colspan="11"><span style="font-size:9pt;"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:580px;" name="SBBIGO" value="'+ data0["sbbigo"] +'"></span></td>'+
+		    '<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;"><input type="image" src="/resources/style/images/jejak/btn_modify.gif" onClick=""></span></td>'+
+		'</tr>';
+	
+	$("#bookinfo").html(htmlString);
+}
+
+function CheckPANH(pancode){
+	var ppp;
+	switch(pancode){
+		case "A3" :
+			ppp = 8; break;
+		case "A4" :
+			ppp = 16; break;
+		case "A5" :
+			ppp = 32; break;
+		case "A6" :
+			ppp = 64; break;
+		case "B4" :
+			ppp = 16; break;
+		case "B5" :
+			ppp = 32; break;
+		case "B6" :
+			ppp = 64; break;
+		default :
+			ppp = 16; break;
+	}
+	return ppp;
+}
+
+function CalcJM(jcode, tn, pp, t_yeo, colo, jul, panh, btype){ // 표지여분
+	if(!pp){ // 케이스
+	    if (jul) // 2008-10-02 : PAGE있으면 PAGE수로 없으면 1/10
+	        t_jung = Math.ceil(tn / jul);
+	    else t_jung = Math.ceil(tn / 10);
+	    
+    }else{
+		t_jung = tn / pp;
+		if(jul == 3) t_jung = t_jung * 8 / 9;
+		else{
+			if (((jcode.substring(5,6) == '0') || (jcode.substring(5,6) == '3')) && (panh == "A")) // 4*6 -- 2009.01.30
+				t_jung = Math.ceil(t_jung / 2);
+		}
+	}
+	if (btype == 1) // (한국가곡 200곡선 - 52201, 52202, 52103 : 표지가 3절이지만 6장만 나옴) - KSWYONJ0 - WYPAGE : 6
+		t_jung = tn / 24;
+	if (btype == 2) // (파랑새 동요 19집 - 56509 : 표지가 4장 나옴) - KSWYONJ0 - WYCHEK : 4
+		t_jung = tn / 16;
+	if (btype == 3){ // 스프링은 4*6일때도 1/2 안함
+		if ((jcode.substring(5,6) == '0') || (jcode.substring(5,6) == '3')) // 4*6
+			t_jung = t_jung * 2;
+	}
+	t_jung = Math.ceil(t_jung);
+	switch (colo){
+		case 3:
+			t_yeo = t_yeo * 1.4; break;
+		case 4:
+			t_yeo = t_yeo * 1.4 * 1.3; break;
+		case 5:
+			t_yeo = t_yeo * 1.4 * 1.3 * 1.2; break;
+		case 9:
+			t_yeo = t_yeo * 1.4 * 1.3 * 1.2 * 1.2; break;
+	}
+	/* 여분 60 미만은 60으로 고정 --- 15.08.04 */
+	if (t_yeo < 60)
+		t_yeo = 60;
+	/* ---- */
+	if ((jcode.substring(5,6) == '0') || (jcode.substring(5,6) == '3')) // 4*6 - 10%차감
+		t_yeo = t_yeo * 0.9;
+
+	tj1 = Math.floor(t_jung / 500);
+	tj2 = Math.floor(t_jung % 500);
+	ty1 = Math.floor(t_yeo / 500);
+	ty2 = Math.floor(t_yeo % 500);
+	
+	return {
+		tj1: tj1,
+		tj2: tj2,
+		ty1: ty1,
+		ty2: ty2
+    };
+}
+
+function CalcJM2(jcode, tn, pp, t_yeo, colo, jul, page, panh){ // 본문여분
+	t_jung = Math.ceil(tn / pp);
+	switch(colo){
+		case 4:
+			t_yeo = t_yeo * 0.8 * 0.85; break;
+		case 6:
+			t_yeo = t_yeo * 0.8; break;
+		default:
+			t_yeo = t_yeo; break;
+	}
+	
+	if (colo == 0) // 본문과 같은 면지, 색도 0이면 25
+		t_yeo = 25;
+	
+	if (panh == 1) // 면지는 본문여분 + 10%
+		t_yeo *= 1.1;
+
+	if ((jcode.substring(5,6) == '0') || (jcode.substring(5,6) == '3')) // 4*6 - 10%차감
+		t_yeo = t_yeo * 0.9;
+	
+	t_yeo = Math.ceil(t_yeo);
+
+	tj1 = Math.floor(t_jung / 500);
+	tj2 = Math.floor(t_jung % 500);
+	ty1 = Math.floor($t_yeo / 500);
+	ty2 = Math.floor(t_yeo % 500);
+	
+	return {
+		tj1: tj1,
+		tj2: tj2,
+		ty1: ty1,
+		ty2: ty2
+    };
+}
+
+function CalcT(jcode, jname, j1, j2, y1, y2, gubn, col, bu, pg){
+	logNow("CalcT");
+	logNow(jname);
+	var bb = -1;
+	for(var i = 0 ; i < arr_index; i++){
+		if ((Total_Y[i][0] == jcode) && (Total_Y[i][4] == gubn) && (Total_Y[i][6] == bu) && (Total_Y[i][5] == col)){
+			bb = i;
+			break;
+		}
+	}
+	if(bb > -1){
+		t1 = (j1 * 500) + j2;
+		t2 = (y1 * 500) + y2;
+		Total_Y[bb][2] += t1;
+		Total_Y[bb][3] += t2;
+	}else{
+		t1 = (j1 * 500) + j2;
+		t2 = (y1 * 500) + y2;
+		Total_Y[arr_index] = new Array(jcode, jname, t1, t2, gubn, col, bu, pg);
+		arr_index++;
+	}
+}
+
+function CalcB(gubn, bu, dae, pg, do_, j1, j2, y1, y2, jcode, jname, pp){
+	var t1 = (j1 * 500) + j2;
+	var t2 = (y1 * 500) + y2;
+	if (pp != pg) tbigo = "돈땡 (" + pg + " p)";
+    else tbigo = " ";
+	Total_B[barr_index] = new Array(gubn, bu, dae, pg, do_, t1, t2, jcode, jname, tbigo);
+	barr_index++;
+}
+
+function ChBu(){
+	var t_num = $('input[name=bnum]').val();
+	var t_type = $('select[name=jetype]').val();
+	var tmp_id = $('input[name=uid]').val();
+	var mode = $('input[name=mode]').val();
+	var jdate = $('input[name=jdate]').val();
+	
+	if (confirm("수량을 변경하시겠습니까?") == false) return;
+	
+	var from = {bnum: t_num, btype: t_type, uid: tmp_id}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/update_jp_bjyjjejak1",
+		data: JSON.stringify(from),
+		success: function (result) {
+			StartBalju(tmp_id, mode, jdate);
+		},
+		error: function () {
+		}
+	});
+}
+
+function balju_all(){
+	if($('select[name=m1]').val() == 'N'){
+		alert("인쇄 선택하세요");
+		return $("select[name=m1]").focus();
+	}
+	if (confirm("발주작업 진행하시겠습니까?") == false) return;
+	
+	logNow("발주스타트");
 }
 
 //제작계획표
@@ -2382,8 +3409,476 @@ function DelJpJejakYejung(uid){
 	}
 }
 
-//제작예정리스트 등록
+//제작예정리스트 등록 //여기
+function AddBaljuYjJpList(uid){
+	logNow(uid);
+	if (!confirm("발주예정상품 목록에 추가하시겠습니까?")) return;
+	
+	logNow("ok");
+	
+	var dur_pan = 35;
 
+	var tday = new Date().getTime()/1000;
+	var bday = tday - (60 * 60 * 24 * 365); // 시작 - 1년전
+	var bdate = MsToFulldate(bday).substring(2,4) + MsToFulldate(bday).substring(4,6) + MsToFulldate(bday).substring(6,8);
+	
+	var sday = bday;
+	var sdate = bdate;
+	var sum_all = 0; var tmp_book; var tbl_e;
+	
+	var row_book;
+	var from = {uid : uid.toString()}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add1",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			row_book = result[0];
+			tmp_book = row_book["sbbook"].substring(0,5);
+			
+			if((row_book["sbbook"].substring(0,2) == '03') || (row_book["sbbook"].substring(0,2) == '04')) tbl_e = "D";
+			else tbl_e = "0";	
+		}
+	});
+	
+	var new_colo;
+	
+	var from = {wdbook : tmp_book}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add2",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			if (result[0] != null){
+				new_colo = result[0]["max_wdcolo"]
+			}else{
+				alert("대수정보 읽기 오류.");
+			}
+		}
+	});
+	
+	var from = {yjdate : bday, yjbook: row_book["sbbook"]}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add3",
+		async: false,
+		data : JSON.stringify(from),
+		success: function (result) {
+			if(result.length > 0){ // 발매 1년 이내
+				var pdate = dur_pan;
+				var p_qnty = result[0]["yjqnty"];
+				var pnum2 = 0;
+				
+				// 현재고 - 유통
+				var from = {sqbook : row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add4",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] != null){
+							pnum2 += result2[0]["sqcrnm0"];
+						}else{
+							alert("유통 현재고 읽기 오류");
+						}
+					}
+				});
+				
+				// 현재고 - 출판사, DT
+				if(tbl_e == 'D') var from = {database : "dtjejak", sqbook: row_book["sbbook"]};
+				else var from = {database : "jejak", sqbook: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add5",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] != null || result2.length != 0){
+							pnum2 += result2[0]["sqcrnm"];
+						}else{
+							alert("현재고 읽기 오류");
+						}
+					}
+				});
+				
+				// 가입고
+				if(tbl_e == 'D') var from = {database : "dtjejak", bookcode: row_book["sbbook"]};
+				else var from = {database : "jejak", bookcode: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add6",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] != null){
+							if(result2[0]["xnum"] > 0) pnum2 += result2[0]["xnum"];
+						}else{
+							alert("가입고 읽기 오류");
+						}
+					}
+				});
+				
+				var pan_s = 0;
+				var ban_s = 0;
+				var p1 = 0; var p2 = 0; var p3 = 0; var p4 = 0; var p5 = 0; var p6 = 0;
+				var p7 = 0; var p8 = 0; var p9 = 0; var p10 = 0; var p11 = 0; var p12 = 0;
+				var bk_db = "KTBKS" + MsToFulldate(bday).substring(2,4) + "0";
+				var b_index = parseInt(MsToFulldate(bday).substring(4,6));
+				var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index};
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add7",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						logNow(result2);
+						if (result2.length == 0) alert("도서집계 읽기 오류");
+						
+						for(var ii = (b_index + 1) ; ii < 13 ; ii++){
+							if(result2[0]["tbcsr"]) eval("p" + ii + " = " + (result2[0]["tbcsr"] - result2[0]["tbdsr"]) + ";");
+							else eval("p" + ii + " = 0;");
+							eval("pan_s += p" + ii + ";");
+							ban_s += result2[0]["tbdsr"];
+						}
+						if(b_index > 1){ //다음해
+							bk_db = "KTBKS" + MsToFulldate(bday).substring(2,4) + "0";
+							var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index}
+							$.ajax({
+								type: "POST",
+								contentType: "application/json; charset=utf-8;",
+								dataType: "json",
+								url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add8",
+								async: false,
+								data : JSON.stringify(from),
+								success: function (result3) {
+									if (result3.length == 0) alert("도서집계 읽기 오류");
+									else{
+										for (var ii = 1 ; ii < b_index ; ii++){
+											if(result3[0]["tbcsr"]) eval("p" + ii + " = " + (result3[0]["tbcsr"] - result3[0]["tbdsr"]) + ";");
+											else eval("p" + ii + " = 0;");
+											eval("pan_s += p" + ii + ";");
+											ban_s += result3[0]["tbdsr"];
+										}
+									}
+								}
+							});
+						}
+						
+						// 이번달 오늘까지
+						/*여기 아직 미작업*/
+						var pan_s2 = 0;
+						
+						//266
+						// 다음해 이후
+						
+						if(pan_s2) new_yinc = Math.round((pan_s / pan_s2), 2);
+						else new_yinc = 0;
+						
+						var signdate = MsToFulldate(new Date().getTime()/1000);
+						new_ppan = Math.ceil(pan_s / 12);
+						
+						b_index--;
+						if (b_index == 0) b_index = 12;
+						eval("p" + b_index + ">= 20500")
+						if (eval("p" + b_index + ">= 20500")) // 1개월 20500 이상
+							bnum = 20500;
+						else{// 3개월 10500 이상
+							psum = 0;
+							for (var ii = b_index ; ii > (b_index - 3) ; ii--){
+								if (ii < 1) new_i = 12 + ii;
+								else new_i = ii;
+								eval("psum += p" + new_i);
+							}if (psum >= 10500) bnum = 10500;
+							else{// 6개월 5500 이상
+								psum = 0;
+								for (var ii = b_index ; ii > (b_index - 6) ; ii--){
+									if (ii < 1) new_i = 12 + ii;
+									else new_i = ii;
+									eval("psum += p" + new_i);					
+								}if (psum >= 5500) bnum = 5500;
+								else{// 9개월 3500 이상
+									psum = 0;
+									for (var ii = b_index ; ii > (b_index - 9) ; ii--){
+										if (ii < 1) new_i = 12 + ii;
+										else new_i = ii;
+										eval("psum += p" + new_i);	
+									}if (psum >= 3500) bnum = 3500;
+									else{// 12개월 2500 이상							
+										if (pan_s >= 2500) bnum = 2500;
+										else{
+											if ((pan_s + pan_s2) >= 1050) bnum = 1050;
+											else bnum = 500;
+										}
+									}
+								}
+							}
+						}
+						
+						switch (row_sbcoti){
+						    case 1:
+						        tbigo = "유광"; break;
+						    case 2:
+						        tbigo = "무광"; break;
+						    case 3:
+						        tbigo = "홀로그램"; break;
+						    case 5:
+						        tbigo = "엠보싱";  break;
+						}
+					    bjulsu = parseInt(row_book["sbjlsu"]);
+					    
+					    //isnert
+					    var from = {
+					    	signdate: signdate, bname: row_book["sbname"], bcode: row_book["sbbook"], bpanh: row_book["sbpanh"], bprice: row_book["sbuprc"], 
+					    	bmyun: row_book["sbpage"], pnum1: sum_all, pnum2: pnum2, ppan: new_ppan, pfirst: row_book["sbapdt"], pdate: pdate, bcolor: new_colo,
+					    	yinc: new_yinc, bnum: bnum, bjulsu: bjulsu, p1: p1, p2: p2, p3: p3, p4: p4, p5: p5, p6: p6, p7: p7, p8: p8, p9: p9, p10: p10, p11: p11, p12: p12,
+					    	ypan: pan_s, yban: ban_s, tbigo: tbigo
+					    } 
+					    $.ajax({
+					    	type: "POST",
+					   		contentType: "application/json; charset=utf-8;",
+					   		dataType: "json",
+					   		url: SETTING_URL + "/jpjejak/insert_jp_jejak_yjlist_add1",
+					   		async: false,
+				    		data: JSON.stringify(from),
+				    		success: function (result) {
+				    			alert('데이터 입력 완료');
+				    		},
+				    		error: function () {
+					    	}
+					    });
+					}
+				});
+				
+			}else{
+				logNow("1년 이후");
+				
+				var plus_d;
+				if (row_book["sbjanh"] == '4') plus_d = 50; // 양장 - 50일
+				else plus_d = dur_pan; // 기타 35일
+					
+				var eday = sday + (60 * 60 * 24 * plus_d);
+				var edate = MsToFulldate(eday).substring(2,8);
+				var jpdb2 = "KS1" + MsToFulldate(eday).substring(2,6) + "0";
+				
+				// 첫달 판매
+				var jpdb1 = "KS1" + MsToFulldate(sday).substring(2,6) + "0";
+				var from = {dbname : jpdb1, s1ilja: sdate, s1gubn: "C", s1book: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add17",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (1)");
+						else sum_all += result2[0]["psum"];
+					}
+				});
+				var from = {dbname : jpdb1, s1ilja: sdate, s1gubn: "D", s1book: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add17",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (1-1)");
+						else sum_all -= result2[0]["psum"];
+					}
+				});
+				
+				// 중간 판매
+				sday = sday + (60 * 60 * 24 * 30);
+				jpdb1 = "KS1" + MsToFulldate(sday).substring(2,6) + "0";
+				if (jpdb1 < jpdb2){
+					var from = {dbname : jpdb1, s1gubn: 'C', s1book: row_book["sbbook"]}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add18",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (2)");
+							else sum_all += result2[0]["psum"];
+						}
+					});
+					var from = {dbname : jpdb1, s1gubn: 'D', s1book: row_book["sbbook"]}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add18",
+						async: false,
+						data : JSON.stringify(from),
+						success: function (result2) {
+							if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (2-1)");
+							else sum_all -= result2[0]["psum"];
+						}
+					});
+				}
+				// 마지막달 판매
+				var from = {dbname : jpdb2, s1ilja: edate, s1gubn: 'C', s1book: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add19",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (3)");
+						else sum_all += result2[0]["psum"];
+					}
+				});
+				var from = {dbname : jpdb2, s1ilja: edate, s1gubn: 'D', s1book: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add19",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (3)");
+						else sum_all -= result2[0]["psum"];
+					}
+				});
+				var pnum2 = 0;
+				// 현재고 - 유통
+				var from = {sqbook : row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add4",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] == null) alert("유통 현재고 읽기 오류");
+						else pnum2 += result2[0]["sqcrnm0"];
+					}
+				});
+				
+				// 현재고 - 출판사, DT
+				if(tbl_e == 'D') var from = {database : "dtjejak", sqbook: row_book["sbbook"]};
+				else var from = {database : "jejak", sqbook: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add5",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] == null || result2.length == 0) alert("현재고 읽기 오류");
+						else pnum2 += result2[0]["sqcrnm"];
+					}
+				});
+				
+				// 가입고
+				if(tbl_e == 'D') var from = {database : "dtjejak", bookcode: row_book["sbbook"]};
+				else var from = {database : "jejak", bookcode: row_book["sbbook"]}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add20",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						if (result2[0] == null || result2.length == 0) alert("가입고 읽기 오류");
+						else{ if(result2[0]["xnum"] > 0) pnum2 += result2[0]["xnum"]; }
+					}
+				});
+				
+				if(sum_all > 0) pdate = Math.round((pnum2 * dur_pan) / sum_all);
+				else pdate = 45;
+				
+				// 연간 판매량 계산
+				var pan_s = 0; var ban_s = 0;
+				var p1 = 0; var p2 = 0; var p3 = 0; var p4 = 0; var p5 = 0; var p6 = 0; var p7 = 0; var p8 = 0; var p9 = 0; var p10 = 0; var p11 = 0; var p12 = 0;
+				var bk_db = "KTBKS" + MsToFulldate(bday).substring(2,4) + "0";
+				b_index = parseInt(MsToFulldate(bday).substring(4,6));
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add7",
+					async: false,
+					data : JSON.stringify(from),
+					success: function (result2) {
+						logNow(result2);
+						if (result2.length == 0) alert("도서집계 읽기 오류");
+						
+						for(var ii = (b_index + 1) ; ii < 13 ; ii++){
+							if (result2[0]["tbcsr"]) tbcsr = result2[0]["tbcsr"];
+							else tbcsr = 0;
+							if (result2[0]["tbdsr"]) tbdsr = result2[0]["tbdsr"];
+							else tbdsr = 0;
+								
+							eval("p" + ii + "= tbcsr - tbdsr;");
+							eval("pan_s += p" + ii + ";");
+							ban_s += tbdsr;
+						}
+						if(b_index > 1){ //다음해
+							var day = new Date().getFullYear();
+							bk_db = "KTBKS" + day.substring(2,4) + "0";
+							var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index}
+							$.ajax({
+								type: "POST",
+								contentType: "application/json; charset=utf-8;",
+								dataType: "json",
+								url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add8",
+								async: false,
+								data : JSON.stringify(from),
+								success: function (result3) {
+									if (result3.length == 0) alert("도서집계 읽기 오류");
+									else{
+										for (var ii = 1 ; ii < b_index ; ii++){
+											if (result3[0]["tbcsr"]) tbcsr = result3[0]["tbcsr"];
+											else tbcsr = 0;
+											if (result3[0]["tbdsr"]) tbdsr = result3[0]["tbdsr"];
+											else tbdsr = 0;
+												
+											eval("p" + ii + "= tbcsr - tbdsr");
+											eval("pan_s += p" + ii + ";");
+											ban_s += tbdsr;
+										}
+									}
+								}
+							});
+						}
+						// 이번달 오늘까지
+						
+					}
+				});
+			}
+		}
+	});
+	
+}
 
 //제품정가인상리스트
 function SelJpPriceupList(){
