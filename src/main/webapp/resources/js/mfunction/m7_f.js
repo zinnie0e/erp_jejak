@@ -9994,7 +9994,7 @@ function SelMCSpecification(bdate){
 							logNow(result);
 							var object_num = Object.keys(result);
 							var row = result[object_num];
-							
+							logNow(row);
 							var jp_array = new Array();
 							var jps_array = new Array();
 							var jps2_array = new Array();
@@ -16867,11 +16867,38 @@ function SelPaymentAccount(){
 	logNow(sy);
 	logNow(sm);
 	var tdate1 = String(mktime(0, 0, 0, sm, 1, sy));
-	var tdate2 = String(mktime(23, 59, 59, sm+1, 0, sy));
+	var tdate2 = String(mktime(23, 59, 59, sm, 0, sy-1));
 	logNow("AA" + tdate1);
 	logNow("AA" + tdate2);
 	htmlString = "";
-	
+	htmlString += 
+		'<tr>'+
+        '<td width="120" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">&nbsp;</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'제조비</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'선불</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'관리비</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'미불</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'계</span></td>'+
+        '<td width="225" height="30" colspan="3" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'후불</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'공제액</span></td>'+
+        '<td width="75" height="30" rowspan="2" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'지불액</span></td>'+
+    '</tr>'+
+	'<tr>'
+		'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'이월</span></td>'+
+		'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'당기</span></td>'+
+		'<td width="75" height="30" align="center" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+        	'합계</span></td>'+
+	'</tr>';
 	logNow(bdate);
 	var sum1 = 0; // 제조비
 	var sum2 = 0; // 선불
@@ -16904,7 +16931,7 @@ function SelPaymentAccount(){
 				var t_cost1 = 0;
 				from = {
 						dbname : "BITABLE2",
-						ccdoe : crow["wccode"],
+						ccode : crow["wccode"],
 						date1 : tdate1,
 						date2 : tdate2
 				}
@@ -16933,118 +16960,35 @@ function SelPaymentAccount(){
 							
 							sum5 += t_sum;
 							sum8 += t_sum2;
-							logNow("t_sum1");
-							if (t_sum)
-							{
-								htmlString +=
-									'<tr>'+
-								        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
-								        	crow["wcname"] +'</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-								        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-								        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-										'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-										'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-								        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								        	'</span></td>'+
-								        '<td style="padding-right:5px;" idth="80" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-								        	if (t_sum2) htmlString += numberWithCommas(t_sum2); htmlString += '</span></td>'+
-								    '</tr>';
-							}
+							logNow("t_sum1" + t_sum);
+							logNow(crow["wcname"]);
 						}
-					}
-				});
-			}
-		}
-	});
-	
-	// 출력
-	from = {
-			dbattr : "출력"
-	}
-	$.ajax({
-		type : "POST",
-		contentType : "application/json; charset=utf-8;",
-		dataType : "json",
-		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
-		async : false,
-		data : JSON.stringify(from),
-		success : function(result) {
-			logNow(result);
-			var object_num = Object.keys(result);
-			for(i in object_num)
-			{
-				crow = result[i];
-				var t_cost1 = 0;
-				from = {
-						dbname : "BITABLE3",
-						ccdoe : crow["wccode"],
-						date1 : tdate1,
-						date2 : tdate2
-				}
-				$.ajax({
-					type : "POST",
-					contentType : "application/json; charset=utf-8;",
-					dataType : "json",
-					url : SETTING_URL + "/monthclosing/select_Payment_Account2",
-					async : false,
-					data : JSON.stringify(from),
-					success : function(result) {
-						logNow(result);
-						var object_num = Object.keys(result);
-						for( i in object_num )
-						{
-							var row = result[i];
-							t_val = row["cprice"];
-							t_cost1 += t_val;
-							sum2 += t_val;
-						}
-						
-						// 계
-						var t_sum = t_cost1;
-						// 지불액
-						var t_sum2 = t_sum;
-						
-						sum5 += t_sum;
-						sum8 += t_sum2;
 						if (t_sum)
 						{
 							htmlString +=
-								'<tr>'+
-									'<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
-										crow["wcname"] +'</span></td>'+
+							        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
+							        	crow["wcname"] +'</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							        	'</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+							        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							        	'</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							        	'</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+							        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							        	'</span></td>'+
 									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;"" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-										if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
+							        	'</span></td>'+
 									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-										if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-										'</span></td>'+
-									'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">';
-										if (t_sum2) htmlString += (t_sum2); htmlString += '</span></td>'+
-								'</tr>';
+							        	'</span></td>'+
+							        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
+							        	'</span></td>'+
+							        '<td style="padding-right:5px;" idth="80" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
+							        	if (t_sum2) htmlString += numberWithCommas(t_sum2); htmlString += '</span></td>'+
+							    '</tr>';
 						}
 					}
 				});
@@ -17052,630 +16996,7 @@ function SelPaymentAccount(){
 		}
 	});
 	
-	// CD
-	from = {
-			dbattr : "CD"
-	}
-	$.ajax({
-		type : "POST",
-		contentType : "application/json; charset=utf-8;",
-		dataType : "json",
-		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
-		async : false,
-		data : JSON.stringify(from),
-		success : function(result) {
-			logNow(result);
-			var object_num = Object.keys(result);
-			for(i in object_num)
-			{
-				crow = result[i];
-				
-				jdate = new Date(Number(String(tdate1) + "000"));
-				jdate = (jdate.getFullYear() + ("0" + (jdate.getMonth()+1)).slice(-2));
-				
-				logNow(crow["jmfield"]);
-				logNow(jdate);
-				
-				
-				var t_cost1 = 0;
-				from = {
-						jmfield : crow["jmfield"],
-						dbname : tblname,
-						jejodate : jdate,
-						dbattr : "0"
-				}
-				$.ajax({
-					type : "POST",
-					contentType : "application/json; charset=utf-8;",
-					dataType : "json",
-					url : SETTING_URL + "/monthclosing/select_Payment_Account3",
-					async : false,
-					data : JSON.stringify(from),
-					success : function(result) {
-						logNow(result);
-						var object_num = Object.keys(result);
-						if(!result)
-						{
-							alert("제조비 읽기 오류 <CD>");
-							htmlString += "select sum($crow[jmfield]) from $tblname where JEJODATE='$jdate' and JABTAG=0"
-						}
-						row3 = result[object_num];
-						t_cost1 += row3["jmfield"];
-
-						sum1 += row3["jmfield"];
-						//관리비
-						var t_cost2 = 0;
-						
-						from = {
-								jmfield : crow["jmfield"],
-								dbname : tblname,
-								jejodate : jdate,
-								dbattr : "1"
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json; charset=utf-8;",
-							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_Payment_Account3",
-							async : false,
-							data : JSON.stringify(from),
-							success : function(result) {
-								logNow(result);
-								var object_num = Object.keys(result);
-								row3 = result[object_num];
-								if(!result)
-								{
-									alert("관리비 읽기 오류 <CD1>");
-									return 0;
-								}
-								t_cost2 += row3["jmfield"];
-								sum3 += row3["jmfield"]
-								// 미불
-								t_cost3 = 0;
-								ty = sy;
-								tm = Number(sm) - 1;
-								
-								if (tm == 0)
-								{
-									ty = Number(ty) - 1;
-									tm = 12;
-								}
-								if (tm < 10)
-								{
-									tm = "0" + String(tm);
-								}
-								else
-									tm = String(tm);
-								
-								from = {
-										bdate : (String(ty) + String(tm)),
-										custcode : crow["wccode"],
-										dbattr : "0"
-								}
-								logNow("너희임?" + (String(ty) + String(tm)));
-								logNow(crow["wccode"]);
-								$.ajax({
-									type : "POST",
-									contentType : "application/json; charset=utf-8;",
-									dataType : "json",
-									url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-									async : false,
-									data : JSON.stringify(from),
-									success : function(result) {
-										logNow(result);
-										var object_num = Object.keys(result);
-										if(!result)
-										{
-											alert("관리비 읽기 오류 <CD2>");
-										}
-										row3 = result[object_num];
-										t_cost3 += row3["jana"];
-										
-										// 후불
-										var t_cost4 = 0;
-										from = {
-												bdate : (String(sy) + String(sm)),
-												custcode : crow["wccode"],
-												dbattr : "0"
-										}
-										$.ajax({
-											type : "POST",
-											contentType : "application/json; charset=utf-8;",
-											dataType : "json",
-											url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-											async : false,
-											data : JSON.stringify(from),
-											success : function(result) {
-												logNow(result);
-												var object_num = Object.keys(result);
-												if(!result)
-												{
-													alert("관리비 읽기 오류 <CD3>");
-												}
-												if (object_num.length)
-												{
-													row3 = result[object_num];
-													t_cost4 += row3["jana"];
-												}
-												
-												// 공제액
-												var t_cost5 = 0;
-												from = {
-														bdate : (String(sy) + String(sm)),
-														custcode : crow["wccode"],
-														dbattr : "1"
-												}
-												$.ajax({
-													type : "POST",
-													contentType : "application/json; charset=utf-8;",
-													dataType : "json",
-													url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-													async : false,
-													data : JSON.stringify(from),
-													success : function(result) {
-														logNow(result);
-														var object_num = Object.keys(result);
-														if(!result)
-														{
-															alert("관리비 읽기 오류 <CD4>");
-														}
-														if (object_num.length)
-														{
-															row3 = result[object_num];
-															t_cost5 = row3["jana"];
-															sum7 += t_cost5;
-														}
-														// 계
-														t_sum = t_cost1 + t_cost2 + t_cost3;
-														// 지불액
-														t_sum2 = t_sum - t_cost4 - t_cost5;
-														
-														sum4 += t_cost3;
-														sum5 += t_sum;
-														sum6 += t_cost4;
-														sum8 += t_sum2;
-														
-														if(t_sum)
-														{
-															htmlString +=
-																'<tr>'+
-															        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
-															        	crow["wcname"] +'</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-															        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-															        	'</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-															        	if (t_cost2) htmlString += numberWithCommas(t_cost2); htmlString += '</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-															        	if (t_cost3) htmlString += numberWithCommas(t_cost3); htmlString += '</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-															        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-															        	'</span></td>'+
-																	'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-															        	'</span></td>'+
-																	'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-															        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="jana" onKeypress="if(event.keyCode == 13){javascript:chJan(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="'+ t_cost4 +'"></span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-															        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="dedu" onKeypress="if(event.keyCode == 13){javascript:chDed(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="'+ t_cost5 +'"></span></td>'+
-															        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt; padding-left:0pt;">'+
-															        numberWithCommas(t_sum2) +'</span></td>'+
-															    '</tr>';
-														}														
-													}
-												});
-											}
-										});
-										
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		}
-	});
 	
-	// 용지
-	from = {
-			dbattr : "용지"
-	}
-	$.ajax({
-		type : "POST",
-		contentType : "application/json; charset=utf-8;",
-		dataType : "json",
-		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
-		async : false,
-		data : JSON.stringify(from),
-		success : function(result) {
-			logNow(result);
-			var object_num = Object.keys(result);
-			for(i in object_num)
-			crow = result[i];
-			var t_cost1 = 0;
-			from = {
-					
-			}
-			$.ajax({
-				type : "POST",
-				contentType : "application/json; charset=utf-8;",
-				dataType : "json",
-				url : SETTING_URL + "/monthclosing/select_Payment_Account5",
-				async : false,
-				data : JSON.stringify(from),
-				success : function(result) {
-					logNow(result);
-					var object_num = Object.keys(result);
-					if(!result)
-					{
-						alert("용지구매정보 읽기 오류");
-					}
-					row = result[object_num];
-					t_cost1 = row["sum1"];
-					
-					sum2 += t_cost1;
-					
-					// 계
-					t_sum = t_cost1;
-					// 지불액
-					t_sum2 = t_sum;
-
-					sum5 += t_sum;
-					sum8 += t_sum2;
-					
-					if (t_sum)
-					{
-						htmlString +=
-							'<tr>'+
-								'<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
-									'<?=$crow[wcname]?></span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'<?if ($t_cost1) echo(number_format($t_cost1));?></span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'<?if ($t_sum) echo(number_format($t_sum));?></span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-									'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">'+
-									'<?if ($t_sum2) echo(number_format($t_sum2));?></span></td>'+
-							'</tr>';
-					}
-				}
-			});
-		}
-	});
-	
-	// 인쇄, 제판
-	from = {
-			dbattr : "인쇄"
-	}
-	$.ajax({
-		type : "POST",
-		contentType : "application/json; charset=utf-8;",
-		dataType : "json",
-		url : SETTING_URL + "/monthclosing/select_Payment_Account1",
-		async : false,
-		data : JSON.stringify(from),
-		success : function(result) {
-			logNow(result);
-			var object_num = Object.keys(result);
-			for(i in object_num)
-			{
-				crow = result[i];
-				// 제조비
-				var t_cost1 = 0;
-				from = {
-						m1 : crow["wccode"],
-						date1 : tdate1,
-						date2 : tdate2
-				}
-				$.ajax({
-					type : "POST",
-					contentType : "application/json; charset=utf-8;",
-					dataType : "json",
-					url : SETTING_URL + "/monthclosing/select_Payment_Account6",
-					async : false,
-					data : JSON.stringify(from),
-					success : function(result) {
-						logNow(result);
-						var object_num = Object.keys(result);
-						if(!result)
-						{
-							alert("제조비 읽기 오류 <1>");
-						}
-						for(j in object_num)
-						{
-							row = result[j];
-							from = {
-									listid5 : row["uid"]
-							}
-							$.ajax({
-								type : "POST",
-								contentType : "application/json; charset=utf-8;",
-								dataType : "json",
-								url : SETTING_URL + "/monthclosing/select_Payment_Account7",
-								async : false,
-								data : JSON.stringify(from),
-								success : function(result) {
-									logNow(result);
-									var object_num = Object.keys(result);
-									if(!result)
-									{
-										alert("제조비 읽기 오류 <1>");
-									}									
-									for(i in object_num)
-									{
-										row3 = result[i];
-										t_cost1 += row3["sum5"];
-										sum1 += row3["sum5"];
-									}
-									from = {
-											listid : row["uid"]
-									}
-									$.ajax({
-										type : "POST",
-										contentType : "application/json; charset=utf-8;",
-										dataType : "json",
-										url : SETTING_URL + "/monthclosing/select_Payment_Account8",
-										async : false,
-										data : JSON.stringify(from),
-										success : function(result) {
-											logNow(result);
-											var object_num = Object.keys(result);
-											if(!result)
-											{
-												alert("제조비 읽기 오류 <1>");
-											}
-											for(i in object_num)
-											{
-												row3 = result[object_num];
-												t_cost1 += row3["pcost"];
-												sum1 += row3["pcost"];
-											}
-											
-										}
-									});
-								}
-							});
-						}
-						// 미불
-						var t_cost3 = 0;
-						ty = sy;
-						tm = Number(sm) - 1;
-						if (tm == 0)
-						{
-							ty = Number(ty) - 1;
-							tm = 12;
-						}
-						if (tm < 10)
-						{
-							tm = "0" + String(tm);
-						}
-						else
-							tm = String(tm);
-						from = {
-								bdate : String(ty) + String(tm),
-								custcode : crow["wccode"],
-								dbattr : "0"
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json; charset=utf-8;",
-							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-							async : false,
-							data : JSON.stringify(from),
-							success : function(result) {
-								logNow(result);
-								var object_num = Object.keys(result);
-								if(!result)
-								{
-									alert("관리비 읽기 오류 <제본2>");
-								}
-								row3 = result[object_num];
-								t_cost3 += row3["jana"];
-							}
-						});
-						// 후불
-						var t_cost4 = 0;
-						from = {
-								bdate : String(sy) + String(sm),
-								custcode : crow["wccode"],
-								dbattr : "0"
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json; charset=utf-8;",
-							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-							async : false,
-							data : JSON.stringify(from),
-							success : function(result) {
-								logNow(result);
-								var object_num = Object.keys(result);
-								if(!result)
-								{
-									alert("관리비 읽기 오류 <1>");
-								}
-								if (object_num.length)
-								{
-									row3 = result[object_num];
-									t_cost4 += row3["jana"];
-								}
-							}
-						});
-						// 공제액
-						var t_cost5 = 0;
-						from = {
-								bdate : String(sy) + String(sm),
-								custcode : crow["wccode"],
-								dbattr : "1"
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json; charset=utf-8;",
-							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_Payment_Account4",
-							async : false,
-							data : JSON.stringify(from),
-							success : function(result) {
-								logNow(result);
-								var object_num = Object.keys(result);
-								if(!result)
-								{
-									alert("관리비 읽기 오류 <인쇄공제>");
-								}
-								if (object_num.length)
-								{
-									row3 = result[object_num]
-									t_cost5 = row3["jana"];
-									sum7 += t_cost5;
-								}
-							}
-						});
-						// 관리비
-						var t_cost2 = 0;
-						from = {
-								m1 : crow["wccode"],
-								date1 : tdate1,
-								date2 : tdate2
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json; charset=utf-8;",
-							dataType : "json",
-							url : SETTING_URL + "/monthclosing/select_Payment_Account9",
-							async : false,
-							data : JSON.stringify(from),
-							success : function(result) {
-								logNow(result);
-								var object_num = Object.keys(result);
-								if(!result)
-								{
-									alert("관리비 읽기 오류 <1>");
-								}
-								for(i in object_num)
-								{
-									row2 = result[i];
-									from = {
-											dbname : "TMPJAB5",
-											dbattr : row2["uid"]
-									}
-									$.ajax({
-										type : "POST",
-										contentType : "application/json; charset=utf-8;",
-										dataType : "json",
-										url : SETTING_URL + "/monthclosing/select_Payment_Account10",
-										async : false,
-										data : JSON.stringify(from),
-										success : function(result) {
-											logNow(result);
-											var object_num = Object.keys(result);
-											if(!result)
-											{
-												alert("관리비 읽기 오류 <1>");
-											}
-											for(i in object_num)
-											{
-												row3 = result[i];
-												t_cost2 += row3["sum5"];
-												sum3 += row3["sum5"];
-											}
-										}
-									});
-									from = {
-											dbname : "TMPJAB3",
-											dbattr : row2["uid"]
-									}
-									$.ajax({
-										type : "POST",
-										contentType : "application/json; charset=utf-8;",
-										dataType : "json",
-										url : SETTING_URL + "/monthclosing/select_Payment_Account10",
-										async : false,
-										data : JSON.stringify(from),
-										success : function(result) {
-											logNow(result);
-											var object_num = Object.keys(result);
-											if(!result)
-											{
-												alert("관리비 읽기 오류 <1>");
-											}
-											for(i in object_num)
-											{
-												row3 = result[i];												
-												t_cost2 += row3["pcost"];
-												sum3 += row3["pcost"];
-											}
-										}
-									});
-								}
-							}
-						});
-						// 계
-						t_sum = t_cost1 + t_cost2 + t_cost3;
-						// 지불액
-						t_sum2 = t_sum - t_cost4 - t_cost5;
-						/*
-						// 계
-						$t_sum = $t_cost1 + $t_cost2;	
-						// 지불액
-						//$t_sum2 = $t_sum;
-						*/
-						t_sum2 = t_sum - t_cost4 - t_cost5;
-						if ((String(sy)+String(sm)) == "201011")
-							t_sum2 -= 20000000;
-
-						sum4 += t_cost3;
-						sum6 += t_cost4;
-						sum5 += t_sum;
-						sum8 += t_sum2;
-						if (t_sum)
-						{
-							htmlString +=
-								'<tr>'+
-						        '<td height="30" align="left" style="padding-left:10" valign="middle" bgcolor="#F6F6F6"><span style="font-size:9pt;">'+
-						        	crow["wcname"] +'</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-						        	if (t_cost1) htmlString += numberWithCommas(t_cost1); htmlString += '</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-						        	'</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-						        	if (t_cost2) htmlString += numberWithCommas(t_cost2); htmlString += '</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-						        	if (t_cost3) htmlString += numberWithCommas(t_cost3); htmlString += '</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">';
-						        	if (t_sum) htmlString += numberWithCommas(t_sum); htmlString += '</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-						        	'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-						        	'</span></td>'+
-								'<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-								numberWithCommas(t_cost4) +'</span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+
-						        	'<INPUT style="text-align:right; font-family:굴림; font-size:9pt; border-width:0px; border-color:rgb(204,204,204); border-style:solid; width:64px;" name="dedu" onKeypress="if(event.keyCode == 13){javascript:chDed(this.value,\''+ crow["wccode"] +'\',\''+String(sy)+String(sm) +'\');}" value="<?=$t_cost5?>"></span></td>'+
-						        '<td style="padding-right:5px;" height="30" align="right" valign="middle" bgcolor="white" width="75"><span style="font-size:9pt;">'+
-						        numberWithCommas(t_sum2) +'</span></td>'+
-						    '</tr>';
-						}
-					}
-				});
-			}		
-		}
-	});
 	
 	
 	
