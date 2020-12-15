@@ -134,7 +134,7 @@ function jmenu2(val) { //제품등록
 										'</tr>',
 									'</table>',
 									'<table id="u_table" border=0 width=720></table>',
-									'<p><input type="hidden" name="my_uid">',
+									'<p><input type="hidden" name="my_uid" value="">',
 									'<table border="0" cellpadding="0" cellspacing="0" width="720" style="border-width:1px; border-color:rgb(222,222,222); border-style:solid;">',
 										'<tr>',
 											'<td width="80" align="center" valign="middle" bgcolor="#F4F4F4" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;"><p style="margin-top:5px; margin-bottom:5px;"><span style="font-size:9pt;">도서코드</span></p></td>',

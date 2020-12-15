@@ -3419,6 +3419,7 @@ function AddBaljuYjJpList(uid){
 	var dur_pan = 35;
 
 	var tday = new Date().getTime()/1000;
+	logNow(new Date().getTime());
 	var bday = tday - (60 * 60 * 24 * 365); // 시작 - 1년전
 	var bdate = MsToFulldate(bday).substring(2,4) + MsToFulldate(bday).substring(4,6) + MsToFulldate(bday).substring(6,8);
 	
@@ -3445,7 +3446,7 @@ function AddBaljuYjJpList(uid){
 	});
 	
 	var new_colo;
-	
+	var hey;
 	var from = {wdbook : tmp_book}
 	$.ajax({
 		type: "POST",
@@ -3456,6 +3457,7 @@ function AddBaljuYjJpList(uid){
 		data : JSON.stringify(from),
 		success: function (result) {
 			if (result[0] != null){
+				hey = result[Object.keys(result)];
 				new_colo = result[0]["max_wdcolo"]
 			}else{
 				alert("대수정보 읽기 오류.");
@@ -3486,11 +3488,12 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add4",
 					async: false,
 					data : JSON.stringify(from),
+					error : function (){
+						alert("유통 현재고 읽기 오류");
+					},
 					success: function (result2) {
 						if (result2[0] != null){
 							pnum2 += result2[0]["sqcrnm0"];
-						}else{
-							alert("유통 현재고 읽기 오류");
 						}
 					}
 				});
@@ -3505,11 +3508,12 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add5",
 					async: false,
 					data : JSON.stringify(from),
+					error : function (){
+						alert("현재고 읽기 오류 (1)");
+					},
 					success: function (result2) {
 						if (result2[0] != null || result2.length != 0){
 							pnum2 += result2[0]["sqcrnm"];
-						}else{
-							alert("현재고 읽기 오류");
 						}
 					}
 				});
@@ -3528,7 +3532,7 @@ function AddBaljuYjJpList(uid){
 						if (result2[0] != null){
 							if(result2[0]["xnum"] > 0) pnum2 += result2[0]["xnum"];
 						}else{
-							alert("가입고 읽기 오류");
+							alert("가입고 2 읽기 오류");
 						}
 					}
 				});
@@ -3547,10 +3551,10 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add7",
 					async: false,
 					data : JSON.stringify(from),
+					error : function (){
+						alert("도서집계 읽기 오류");
+					},
 					success: function (result2) {
-						logNow(result2);
-						if (result2.length == 0) alert("도서집계 읽기 오류");
-						
 						for(var ii = (b_index + 1) ; ii < 13 ; ii++){
 							if(result2[0]["tbcsr"]) eval("p" + ii + " = " + (result2[0]["tbcsr"] - result2[0]["tbdsr"]) + ";");
 							else eval("p" + ii + " = 0;");
@@ -3559,7 +3563,7 @@ function AddBaljuYjJpList(uid){
 						}
 						if(b_index > 1){ //다음해
 							bk_db = "KTBKS" + MsToFulldate(bday).substring(2,4) + "0";
-							var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index}
+							var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index};
 							$.ajax({
 								type: "POST",
 								contentType: "application/json; charset=utf-8;",
@@ -3567,16 +3571,17 @@ function AddBaljuYjJpList(uid){
 								url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add8",
 								async: false,
 								data : JSON.stringify(from),
+								error : function (){
+									alert("도서집계 읽기 오류");
+								},
 								success: function (result3) {
-									if (result3.length == 0) alert("도서집계 읽기 오류");
-									else{
 										for (var ii = 1 ; ii < b_index ; ii++){
-											if(result3[0]["tbcsr"]) eval("p" + ii + " = " + (result3[0]["tbcsr"] - result3[0]["tbdsr"]) + ";");
+											if(!(result3.length == 0 || result3 == null)) eval("p" + ii + " = " + (result3[0]["tbcsr"] - result3[0]["tbdsr"]) + ";");
 											else eval("p" + ii + " = 0;");
 											eval("pan_s += p" + ii + ";");
+											if(!(result3.length == 0 || result3 == null))
 											ban_s += result3[0]["tbdsr"];
 										}
-									}
 								}
 							});
 						}
@@ -3631,7 +3636,7 @@ function AddBaljuYjJpList(uid){
 							}
 						}
 						
-						switch (row_sbcoti){
+						switch (row["sbcoti"]){
 						    case 1:
 						        tbigo = "유광"; break;
 						    case 2:
@@ -3679,6 +3684,7 @@ function AddBaljuYjJpList(uid){
 				
 				// 첫달 판매
 				var jpdb1 = "KS1" + MsToFulldate(sday).substring(2,6) + "0";
+				
 				var from = {dbname : jpdb1, s1ilja: sdate, s1gubn: "C", s1book: row_book["sbbook"]}
 				$.ajax({
 					type: "POST",
@@ -3687,9 +3693,11 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add17",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("매출기록을 읽어올 수 없습니다. (1)");
+					},
 					success: function (result2) {
-						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (1)");
-						else sum_all += result2[0]["psum"];
+						if(result[0] != null) sum_all += result2[0]["psum"];
 					}
 				});
 				var from = {dbname : jpdb1, s1ilja: sdate, s1gubn: "D", s1book: row_book["sbbook"]}
@@ -3700,9 +3708,12 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add17",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("매출기록을 읽어올 수 없습니다. (1-1)");
+					},
 					success: function (result2) {
-						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (1-1)");
-						else sum_all -= result2[0]["psum"];
+						sumData = result2[Object.keys(result2)];
+						if(result[0] != null) sum_all -= sumData["psum"];
 					}
 				});
 				
@@ -3718,9 +3729,11 @@ function AddBaljuYjJpList(uid){
 						url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add18",
 						async: false,
 						data : JSON.stringify(from),
+						error : function () {
+							alert("매출기록을 읽어올 수 없습니다. (2)");
+						},
 						success: function (result2) {
-							if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (2)");
-							else sum_all += result2[0]["psum"];
+							if(result[0] != null) sum_all += result2[0]["psum"];
 						}
 					});
 					var from = {dbname : jpdb1, s1gubn: 'D', s1book: row_book["sbbook"]}
@@ -3731,9 +3744,11 @@ function AddBaljuYjJpList(uid){
 						url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add18",
 						async: false,
 						data : JSON.stringify(from),
+						error : function () {
+							alert("매출기록을 읽어올 수 없습니다. (2-1)");
+						},
 						success: function (result2) {
-							if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (2-1)");
-							else sum_all -= result2[0]["psum"];
+							if(result[0] != null) sum_all -= result2[0]["psum"];
 						}
 					});
 				}
@@ -3746,10 +3761,12 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add19",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("매출기록을 읽어올 수 없습니다. (3)");
+					},
 					success: function (result2) {
-						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (3)");
-						else sum_all += result2[0]["psum"];
-					}
+						if(result[0] != null) sum_all += result2[0]["psum"];
+					},
 				});
 				var from = {dbname : jpdb2, s1ilja: edate, s1gubn: 'D', s1book: row_book["sbbook"]}
 				$.ajax({
@@ -3759,9 +3776,11 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add19",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("매출기록을 읽어올 수 없습니다. (3)");
+					},
 					success: function (result2) {
-						if (result2.length == 0) alert("매출기록을 읽어올 수 없습니다. (3)");
-						else sum_all -= result2[0]["psum"];
+						if(result[0] != null) sum_all -= result2[0]["psum"];
 					}
 				});
 				var pnum2 = 0;
@@ -3774,9 +3793,11 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add4",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("유통 현재고 읽기 오류");
+					},
 					success: function (result2) {
-						if (result2[0] == null) alert("유통 현재고 읽기 오류");
-						else pnum2 += result2[0]["sqcrnm0"];
+						if(result[0] != null) pnum2 += result2[0]["sqcrnm0"];
 					}
 				});
 				
@@ -3790,9 +3811,11 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add5",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("현재고 읽기 오류 (2)");
+					},
 					success: function (result2) {
-						if (result2[0] == null || result2.length == 0) alert("현재고 읽기 오류");
-						else pnum2 += result2[0]["sqcrnm"];
+						if(result[0] != null) pnum2 += result2[0]["sqcrnm"];
 					}
 				});
 				
@@ -3806,9 +3829,12 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add20",
 					async: false,
 					data : JSON.stringify(from),
+					error : function (){
+						alert("가입고 1 읽기 오류");
+					},
 					success: function (result2) {
-						if (result2[0] == null || result2.length == 0) alert("가입고 읽기 오류");
-						else{ if(result2[0]["xnum"] > 0) pnum2 += result2[0]["xnum"]; }
+						if(result2[0] != null)
+							if(result2[0]["xnum"] > 0) pnum2 += result2[0]["xnum"]; 
 					}
 				});
 				
@@ -3818,9 +3844,10 @@ function AddBaljuYjJpList(uid){
 				// 연간 판매량 계산
 				var pan_s = 0; var ban_s = 0;
 				var p1 = 0; var p2 = 0; var p3 = 0; var p4 = 0; var p5 = 0; var p6 = 0; var p7 = 0; var p8 = 0; var p9 = 0; var p10 = 0; var p11 = 0; var p12 = 0;
+				var p = [0,0,0,0,0,0,0,0,0,0,0,0];
 				var bk_db = "KTBKS" + MsToFulldate(bday).substring(2,4) + "0";
 				b_index = parseInt(MsToFulldate(bday).substring(4,6));
-				
+				var from = { dbname : bk_db, tbsbook : row_book["sbbook"], tbmgubn : b_index }
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8;",
@@ -3828,9 +3855,10 @@ function AddBaljuYjJpList(uid){
 					url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add7",
 					async: false,
 					data : JSON.stringify(from),
+					error : function () {
+						alert("도서집계 읽기 오류");
+					},
 					success: function (result2) {
-						logNow(result2);
-						if (result2.length == 0) alert("도서집계 읽기 오류");
 						
 						for(var ii = (b_index + 1) ; ii < 13 ; ii++){
 							if (result2[0]["tbcsr"]) tbcsr = result2[0]["tbcsr"];
@@ -3844,6 +3872,7 @@ function AddBaljuYjJpList(uid){
 						}
 						if(b_index > 1){ //다음해
 							var day = new Date().getFullYear();
+							day = String(day);
 							bk_db = "KTBKS" + day.substring(2,4) + "0";
 							var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index}
 							$.ajax({
@@ -3853,25 +3882,346 @@ function AddBaljuYjJpList(uid){
 								url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add8",
 								async: false,
 								data : JSON.stringify(from),
+								error : function (){
+									alert("도서집계 읽기 오류");
+								},
 								success: function (result3) {
-									if (result3.length == 0) alert("도서집계 읽기 오류");
-									else{
-										for (var ii = 1 ; ii < b_index ; ii++){
+									var tbcsr = 0;
+									var tbdsr = 0;
+									for (var ii = 1 ; ii < b_index ; ii++){
+										if(result[0] != null)
 											if (result3[0]["tbcsr"]) tbcsr = result3[0]["tbcsr"];
 											else tbcsr = 0;
+										if(result[0] != null)
 											if (result3[0]["tbdsr"]) tbdsr = result3[0]["tbdsr"];
 											else tbdsr = 0;
 												
-											eval("p" + ii + "= tbcsr - tbdsr");
-											eval("pan_s += p" + ii + ";");
-											ban_s += tbdsr;
+										eval("p" + ii + "= "+tbcsr+" - " +  tbdsr);											
+										eval("pan_s += p" + ii + ";");
+										ban_s += tbdsr;
+										}
+									}
+								});
+							}
+						// 이번달 오늘까지
+						var mon = Number(String(parseInt(tday))+"000");
+						cdate = new Date(mon); 
+						tm = new Date(mon).getMonth()+1;
+						tf = new Date();
+						tf = tf.getFullYear() + String(tf.getMonth()+1) + String(tf.getDate());
+						var temp = String(cdate.getFullYear());
+						dk_db = "KS1" + String(temp.substring(0,2)) + String(cdate.getMonth()+1)+ "0";
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], s1ilja: tf}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add9",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (1)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+										eval("p" + tm + " += row[\"s1qnty\"]");
+								}
+							}
+						});
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], tmp : "D", s1ilja: tf}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add10",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (2)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+									{
+										eval("p" + tm + " -= row[\"s1qnty\"]");
+										ban_s += row["s1qnty"];
+									}
+								}
+							}
+						});
+						dk_db = "KS1" + String(temp.substring(0,2)) + String(cdate.getMonth()+1) + "B";
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], tmp: "D", s1ilja: tf}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add10",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (3)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+									{
+										eval("p" + tm + " += row[\"s1qnty\"]");
+										ban_s += row["s1qnty"];
+									}
+								}
+							}
+						});
+						// 작년 오늘부터 끝까지
+						dk_db = "KS1" + bdate.substring(0, 4) + "0";
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], tmp: "C", bdate: bdate}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add11",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (11)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+										eval("p" + tm + " += row[\"s1qnty\"]");
+								}
+							}
+						});
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], tmp: "D", bdate: bdate}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add11",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (12)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+									{
+										eval("p" + tm + " -= row[\"s1qnty\"]");
+										ban_s += row["s1qnty"];
+									}
+								}
+							}
+						});
+						dk_db = "KS1" + bdate.substring(0, 4) + "B";
+						var from = {dbname : dk_db, s1book: row_book["sbbook"], tmp: "D", bdate: bdate}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add11",
+							async: false,
+							data : JSON.stringify(from),
+							success: function (result) {
+								if (result.length == 0){ //alert("전표 읽기 오류 (13)");
+								}
+								else
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+									{
+										eval("p" + tm + " -= row[\"s1qnty\"]");
+										ban_s += row["s1qnty"];
+									}
+								}
+							}
+						});
+						
+						eval("pan_s += p" + tm);
+						pan_s2 = 0;
+						bday = String(parseInt(bday));
+						bday2 = parseInt(bday) - (60*60*24*365);
+						bk_db = "KTBKS" + bday.substring(0,2) + "0";
+						adate = new Date(bday2); 
+						b_index = Number(adate.getMonth()+1);
+						var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tmp: b_index}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add12",
+							async: false,
+							data : JSON.stringify(from),
+							error : function () {
+								alert("도서집계 읽기 오류");
+							},
+							success: function (result) {
+								for (ii = b_index ; ii < 13 ; ii++)
+								{
+									var row = result[Object.keys(result)];
+									if(result[0] != null)
+									pan_s2 += row["tbcsr"] - row["tbdsr"];
+								}
+								if (b_index > 1) // 다음해
+								{
+									bk_db = "KTBKS" + bday.substring(0,2) + "0";
+									var from = {dbname : bk_db, tbsbook: row_book["sbbook"], tbmgubn: b_index}
+									$.ajax({
+										type: "POST",
+										contentType: "application/json; charset=utf-8;",
+										dataType: "json",
+										url: SETTING_URL + "/jpjejak/select_jp_jejak_yjlist_add13",
+										async: false,
+										data : JSON.stringify(from),
+										error : function () {
+											alert("도서집계 읽기 오류");
+										},
+										success: function (result) {
+											for (ii = 1 ; ii < b_index ; ii++)
+											{
+												row = result[Object.keys(result)];
+												if(result[0] != null)
+												pan_s2 += row["tbcsr"] - row["tbdsr"];
+											}
+										}
+									});
+								}
+								if (pan_s2)
+									new_yinc = Math.round((pan_s / pan_s2), 2);
+								else
+									new_yinc = 0;
+								var current = String(tf) + "000";
+								signdate = tf;
+								new_ppan = Math.ceil(pan_s / 12);
+								
+								b_index--;
+								if (b_index == 0)
+									b_index = 12;
+								if (eval("p"+ b_index + ">= 20500")) // 1개월 20500 이상
+									bnum = 20500;
+								else
+								{	// 3개월 10500 이상
+									psum = 0;
+									for (ii = b_index ; ii > (b_index - 3) ; ii--)
+									{
+										if (ii < 1)
+											new_i = 12 + ii;
+										else
+											new_i = ii;
+										eval("psum += p"+new_i);
+									}
+									if (psum >= 10500)
+										bnum = 10500;
+									else
+									{	// 6개월 5500 이상
+										psum = 0;
+										for (ii = b_index ; ii > (b_index - 6) ; ii--)
+										{
+											if (ii < 1)
+												new_i = 12 + ii;
+											else
+												new_i = ii;
+											eval("psum += p" + new_i);
+										}
+										if (psum >= 5500)
+											bnum = 5500;
+										else
+										{	// 9개월 3500 이상
+											psum = 0;
+											for (ii = b_index ; ii > (b_index - 9) ; ii--)
+											{
+												if (ii < 1)
+													new_i = 12 + ii;
+												else
+													new_i = ii;
+												eval("psum += p" + new_i);
+											}
+											if (psum >= 3500)
+												bnum = 3500;
+											else
+											{	// 12개월 2500 이상							
+												if (pan_s >= 2500)
+													bnum = 2500;
+												else
+												{
+													if ((pan_s + pan_s2) >= 1050)
+														bnum = 1050;
+													else
+														bnum = 500;
+												}
+											}
 										}
 									}
 								}
-							});
-						}
-						// 이번달 오늘까지
-						
+								var tbigo;
+								switch (row_book["sbcoti"])
+								{
+								    case 1:
+								        tbigo = "유광";
+								        break;
+								    case 2:
+								        tbigo = "무광";
+								        break;
+								    case 3:
+								        tbigo = "홀로그램";
+								        break;
+								    case 5:
+								        tbigo = "엠보싱";
+								        break;
+								}
+								bjulsu = parseInt(row_book["sbjlsu"]);
+								var from = {
+										signdate: signdate,
+										bname: row_book["sbname"],
+										bcode: row_book["sbbook"],
+										bpanh: row_book["sbpanh"],
+										bprice: row_book["sbuprc"],
+										bmyun: row_book["sbpage"], 
+										pnum1: sum_all, 
+										pnum2: pnum2,  
+										ppan: new_ppan, 
+										pfirst: row_book["sbapdt"], 
+										pdate: pdate, 
+										bcolor: new_colo,
+										yinc: new_yinc, 
+										bnum: bnum, 
+										bjulsu: bjulsu, 
+										p1: p1, 
+										p2: p2, 
+										p3: p3, 
+										p4: p4, 
+										p5: p5, 
+										p6: p6, 
+										p7: p7, 
+										p8: p8, 
+										p9: p9, 
+										p10: p10,  
+										p11: p11,  
+										p12: p12, 
+										ypan: pan_s, 
+										yban: ban_s, 
+										tbigo: tbigo
+								}
+								$.ajax({
+									type: "POST",
+									contentType: "application/json; charset=utf-8;",
+									dataType: "json",
+									url: SETTING_URL + "/jpjejak/insert_jp_jejak_yjlist_add1",
+									async: false,
+									data : JSON.stringify(from),
+									error : function () {
+										alert("예정테이블 기록 오류");
+									},
+									success: function (result) {
+									}
+								});
+							}
+						});
 					}
 				});
 			}
@@ -3879,6 +4229,7 @@ function AddBaljuYjJpList(uid){
 	});
 	
 }
+
 
 //제품정가인상리스트
 function SelJpPriceupList(){

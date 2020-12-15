@@ -16571,7 +16571,7 @@ function Mv3(bvalue, bdate, mcode, bname, buid, btag){
 		});
 		}
 	}
-
+	
 // 제조비명세표 Mv4
 function Mv4(bvalue, bdate, mcode, bname, buid, btag)
 {

@@ -98,6 +98,7 @@ function selBook(uid){
 			});
 			
 			(document.getElementById("SBNAME")).innerHTML = data["sbname"];
+			$("input[name=my_uid]").val(uid);
 			$("input[name=SBBOOK]").val(data["sbbook"]); //도서코드
 			$("input[name=SBNAME]").val(data["sbname"]); //도서명
 			$("input[name=SBUPRC]").val(data["sbuprc"]); //정가
@@ -211,6 +212,7 @@ function selBook(uid){
 
 //검증필요_ update 포함됨
 function upBook(){ //도서정보
+	var uid = document.getElementsByName('my_uid')[0].value;
 	var SBGUBN = $("input[name=SBGUBN]").val(); //보류구분
 	var SBJLSU = $("input[name=SBJLSU]").val(); //절수
 	var SBDSPG = $("input[name=SBDSPG]").val(); //대수당페이지
@@ -535,7 +537,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 											'<option value=4'; if(data["wdboo9"] == 4) htmlString += " selected"; htmlString += '>부록 4</option>'+
 										'</select>'+
 									'</td>'+
-									'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check[] checked></td>'+
+									'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check checked></td>'+
 								'</tr>';
 						}
 						if(total_record < 20){
@@ -558,7 +560,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 												'<option value=4>부록 4</option>'+
 											'</select>'+
 										'</td>'+
-										'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check[]></td>'+
+										'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check></td>'+
 									'</tr>';
 							}
 						}
@@ -587,7 +589,7 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 									'<option value=4>부록 4</option>'+
 								'</select>'+
 							'</td>'+
-							'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check[]></td>'+
+							'<td width="50" style="border-bottom-width:1px; border-bottom-color:rgb(222,222,222); border-bottom-style:solid;" align="center" valign="middle" height="24"><input type=checkbox name=check></td>'+
 						'</tr>';
 				}
 				$("#BooksDeasuData1").html(htmlString);
@@ -598,7 +600,9 @@ function SelBookDeasu(uid, sbname, sbbook){ //대수정보
 
 //검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
 function upDaesu(){
-	var bcode =  $("#sbbook").text().substring(0,5);
+	var bcode =  $("input[name=sbbook]").val().substring(0,5);
+	logNow($("#sbbook").text().substring(0,5));
+	logNow("bcode" + bcode);
 	var json_data = {wdbook: bcode};
 	$.ajax({
 		type: "POST",
@@ -632,8 +636,10 @@ function upDaesu(){
 	
 	var tmp_no = 0;
 	var wdboo9 = $('select[name="WDBOO9[]"]');
-	for(var i = 0; i < $('input[name="check[]"]').length; i++){
-		if($('input[name="check[]"]')[i].value == "on"){
+	logNow("개수 : " + $('input[name="check"]').length);
+	for(var i = 0; i < $('input[name="check"]').length; i++){
+		//if($('input:checkbox[name="check"]')[i].is(":checked") == true){
+		if(document.getElementsByName('check')[i].checked == true){
 			switch(wdboo9[i].value){
 			case 0 :
 				tmp_no = t_0;
@@ -658,7 +664,8 @@ function upDaesu(){
 				
 			}
 			
-			var json_data = {uid: new_uid,
+			var json_data = {
+					uid: new_uid,
 					wdbook: bcode,
 					wdboo9: wdboo9[i].value,
 					wdsuns: tmp_no,
@@ -673,9 +680,11 @@ function upDaesu(){
 				async: false,
 				data: JSON.stringify(json_data),
 				success: function (result) {
+					logNow("??");
 					logNow(result);
 				}
 			});
+			new_uid = new_uid + 1;	
 		}
 	}
 }
@@ -729,6 +738,7 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 								'<tr>'+
 									'<td width="60" align="center" valign="middle" bgcolor="#F9F9F9" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;"><p style="margin-top:5px; margin-bottom:5px;"><span style="font-size:9pt;">'+ (++i) +'</span></p></td>'+
 									'<td width="135" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;" align="center" valign="middle">'+
+										'<input type="hidden" name="uid" value="'+ uid +'">'+
 										'<select name=WYBOO9[] size="1" style="font-family:굴림; font-size:9pt; color:rgb(102,102,102); width:100px;">'+
 											'<option value=9 selected> </option>'+
 											'<option value=0'; if(data["wyboo9"] == 0) htmlString += ' selected'; htmlString += '>본책</option>'+
@@ -794,6 +804,7 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 									'<tr>'+
 										'<td width="60" align="center" valign="middle" bgcolor="#F9F9F9" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;"><p style="margin-top:5px; margin-bottom:5px;"><span style="font-size:9pt;">'+ i +'</span></p></td>'+
 										'<td width="135" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;" align="center" valign="middle">'+
+										'<input type="hidden" name="uid" value="'+ uid +'">'+
 											'<select name=WYBOO9[] size="1" style="font-family:굴림; font-size:9pt; color:rgb(102,102,102); width:100px;">'+
 												'<option value=9 selected> </option>'+
 												'<option value=0>본책</option>'+
@@ -863,6 +874,7 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 						'<tr>'+
 							'<td width="60" align="center" valign="middle" bgcolor="#F9F9F9" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;"><p style="margin-top:5px; margin-bottom:5px;"><span style="font-size:9pt;">'+ i +'</span></p></td>'+
 							'<td width="135" style="border-right-width:1px; border-bottom-width:1px; border-right-color:rgb(222,222,222); border-bottom-color:rgb(222,222,222); border-right-style:solid; border-bottom-style:solid;" align="center" valign="middle">'+
+							'<input type="hidden" name="uid" value="'+ uid +'">'+
 								'<select name=WYBOO9[] size="1" style="font-family:굴림; font-size:9pt; color:rgb(102,102,102); width:100px;">'+
 									'<option value=9> </option>'+
 									'<option value=0>본책</option>'+
@@ -928,7 +940,13 @@ function SelBookYongji(uid, sbname, sbbook){//용지정보
 
 //검증필요_ delete, insert 포함됨. 로딩 이미지 표시 필요
 function upYongji(){
+	var uid = $('input[name="uid"]')[0].value;
+	var sbname = $('a[id="sbname"')[0].text;
+	var sbbook = $("#sbbook").text();
+	logNow("uid : " + uid);
+	logNow("sbname : " + sbname);
 	var bcode =  $("#sbbook").text().substring(0,5);
+	logNow("bcode : " + bcode);
 	var json_data = {wybook: bcode};
 	$.ajax({
 		type: "POST",
@@ -950,7 +968,7 @@ function upYongji(){
 	var tmp_no = 0;
 	var wyboo9 = $('select[name="WYBOO9[]"]');
 	for(var i = 0; i < $('input[name="check[]"]').length; i++){
-		if($('input[name="check[]"]')[i].value == "on"){
+		if(document.getElementsByName('check[]')[i].checked == true){
 			switch(wyboo9[i].value){
 			case 0 :
 				tmp_no = t_0;
@@ -974,12 +992,12 @@ function upYongji(){
 				break;
 				
 			}
-			
+			logNow($('select[name="WYGUBN[]"]')[i].value);
 			var json_data = {wybook: bcode,
 					wyboo9: wyboo9[i].value,
 					wysuns: tmp_no,
-					wygubn: $('input[name="$WYGUBN[]"]')[i].value,
-					wyjijl: $('input[name="WYJIJL[]"]')[i].value.substring(0, 6),
+					wygubn: $('select[name="WYGUBN[]"]')[i].value,
+					wyjijl: $('select[name="WYJIJL[]"]')[i].value.substring(0, 6),
 					wycolo: $('input[name="colo[]"]')[i].value,
 					wypage: $('input[name="page[]"]')[i].value,};
 			$.ajax({
@@ -994,6 +1012,7 @@ function upYongji(){
 			});
 		}
 	}
+	SelBookYongji(uid, sbname, sbbook);
 }
 
 function delBook(uid){
@@ -1405,3 +1424,5 @@ function soldOutList(){
 	
 	$("#data1").html(htmlString);
 }
+
+
