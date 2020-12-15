@@ -3225,7 +3225,7 @@ function SearchCust(btag, tag){ //사보검색 팝업
 	}
 }
 
-function SearchBook(){ //도서검색 팝업
+function SearchBookPopup(){ //도서검색 팝업
 	var t_URL = "/popup?print";
 	if(popUp && !popUp.closed){
 		popUp.close();
