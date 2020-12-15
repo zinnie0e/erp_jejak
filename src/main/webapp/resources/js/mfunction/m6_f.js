@@ -2978,7 +2978,7 @@ function SelKbManagementDetail(ccode9, tag){ //비닐비, 케이스대, CD음반
 			'<tr>'+
 		        '<td width="50" align="center" valign="middle" bgcolor="white" height="30"></td>'+
 		        '<td width="80" align="center" valign="middle" bgcolor="white" height="30"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:70px;" name="cdate" maxlength="6"></td>'+
-		        '<td width="270" align="center" valign="middle" bgcolor="white" height="30"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:260px;" name="bname" onFocus="blur();" onClick="javascript:SearchBook();"></td>'+
+		        '<td width="270" align="center" valign="middle" bgcolor="white" height="30"><INPUT style="font-family:굴림; font-size:9pt; border-width:1px; border-color:rgb(204,204,204); border-style:solid; width:260px;" name="bname" onFocus="blur();" onClick="javascript:SearchBookPopup();"></td>'+
 		            '<input type="hidden" name="bcode">'+
 		            '<input type="hidden" name="ccode" value="<?=$cc?>">'+
 		            '<input type="hidden" name="tag" value="<?=$tag?>">'+
@@ -3225,7 +3225,7 @@ function SearchCust(btag, tag){ //사보검색 팝업
 	}
 }
 
-function SearchBook(){ //도서검색 팝업
+function SearchBookPopup(){ //도서검색 팝업
 	var t_URL = "/popup?print";
 	if(popUp && !popUp.closed){
 		popUp.close();

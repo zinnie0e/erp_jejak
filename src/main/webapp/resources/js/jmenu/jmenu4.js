@@ -307,7 +307,7 @@ function jmenu4(val) { //제품제작진행
 					        '<td width="194" align="center" valign="middle" bgcolor="white"></td>',
 					    '</tr>',
 						'<tr>',
-					    	'<td width="780" height="80" align="center" valign="middle"><a href="javascript:balju_all();"><img src="/resources/style/images/jejak/btn_baljoo.gif" width="100" height="30" border="0"></a></td>',
+					    	'<td width="780" height="80" align="center" valign="middle"><div onclick="javascript:StartBalju();m4(this);" value="0"><img src="/resources/style/images/jejak/btn_baljoo.gif" width="100" height="30" border="0"></div></td>',
 					    '</tr>',
 					'</table>',
 					'</form>',

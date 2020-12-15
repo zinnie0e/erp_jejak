@@ -46,6 +46,12 @@ function Enter_Check(code){
 	}
 }
 
+function inArray(needle, haystack) {
+	var len = haystack.length;
+	for(var i=0; i<len; i++) if(haystack[i] == needle) return true;
+	return false;
+}
+
 function pasing(total_record, page, lm_t){ 
 	htmlString = "";
 	htmlString += 

@@ -35,8 +35,8 @@ function SelJpBaljuYj(signdate, lm_s, lm_t){
 									'<td width="50" bgcolor="#F6F6F6" height="40" align="center" valign="middle"><font color="#666666"><span style="font-size:9pt;">정가</span></font></td>'+
 									'<td width="100" bgcolor="white" height="40" align="center" valign="middle" colspan="2"><span style="font-size:9pt;">'+ data["bprice"] +'</span></td>'+
 									'<td width="700" bgcolor="#F6F6F6" height="40" align="left" valign="middle" colspan="14"><p><font color="#666666"><span style="font-size:9pt;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-										if(data["bcheck"]) htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmStartBalju('+ data["uid"] +', 2, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-										else htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmStartBalju('+ data["uid"] +', 1, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'; htmlString +=
+										if(data["bcheck"]) htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmReadyBalju('+ data["uid"] +', 2, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+										else htmlString += '<input type="button" value="발주" onClick="javascript:ConfirmReadyBalju('+ data["uid"] +', 1, '+ "'" + data["bname"] + "', " + data["bcheck"] + ", '" + signdate + "'" +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'; htmlString +=
 										'<input type="button" value="삭제" onClick="javascript:DelJpBaljuYj('+ data["uid"] +');">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 별 실 판 매 수 량</span></font></p>'+
 									'</td>'+
 								'</tr>'+
@@ -261,21 +261,16 @@ function DelJpBaljuYj(uid){
 }
 
 var Total_Y = new Array(); var Total_B = new Array(); var arr_index = 0; var barr_index = 0; var t_panh;
-function ConfirmStartBalju(uid, mode, bname, bcheck, jdate){
+function ConfirmReadyBalju(uid, mode, bname, bcheck, jdate){
 	var t_str; 
 	if (bcheck == 1) t_str = bname + " 에 대한 제작을 진행합니다.";
 	else t_str = bname + " 에 대한 제작을 진행합니다.";
 	if(confirm(t_str) == false) return;
-	else StartBalju(uid, mode, jdate);
+	else ReadyBalju(uid, mode, jdate);
 }
 
-function StartBalju(uid, mode, jdate){
+function ReadyBalju(uid, mode, jdate){
 	$('#jejak_detail_view').html(jmenu4("0_발주버튼"));
-	
-	logNow(uid);
-	logNow(mode);
-	logNow(jdate);
-	logNow("----------------------------------");
 	
 	var t_bcode; var t_num; var t_type;
 	var from = {uid: uid}
@@ -292,6 +287,11 @@ function StartBalju(uid, mode, jdate){
 			t_type = result[0]["btype"];
 		}
 	});
+	
+	if (t_type == 2) $('select[name=jetype]').val("2");
+	else if (t_type == 1) $('select[name=jetype]').val("1");
+	else if (t_type == 3) $('select[name=jetype]').val("3");
+		
 	var tbook = t_bcode.substring(0,5);
 	var from = {sbbook: tbook + '%'}
 	$.ajax({
@@ -371,10 +371,10 @@ function StartBalju(uid, mode, jdate){
 					'<td height="30" align="center" valign="middle" bgcolor="white"><span style="font-size:9pt;">'+ t_jan2 +'</span></td>'+
 					'<td height="30" align="center" valign="middle" bgcolor="white" colspan="2"><span style="font-size:9pt;">'+ data0["sbbigo"] +'</span></td>'+
 				'</tr>'+
-	        	'<input type="hidden" name="bcode" value="<?=$row[SBBOOK]?>">'+
-	        	'<input type="hidden" name="bname" value="<?=$row[SBNAME]?>">'+
-	        	'<input type="hidden" name="panh" value="<?=$row[SBPANH]?>">'+
-	        	'<input type="hidden" name="myun" value="<?=$row[SBPAGE]?>">';
+	        	'<input type="hidden" name="bcode" value="'+ data0["sbbook"] +'">'+
+	        	'<input type="hidden" name="bname" value="'+ data0["sbname"] +'">'+
+	        	'<input type="hidden" name="panh" value="'+ data0["sbpanh"] +'">'+
+	        	'<input type="hidden" name="myun" value="'+ data0["sbpage"] +'">';
 			$("#bookjejak").html(htmlString);
 		}
 	});
@@ -398,6 +398,7 @@ function StartBalju(uid, mode, jdate){
 	});
 	
 	var jijlcode;
+	var data2; var data3; 
 	var from = {wybook: tmp_code}
 	$.ajax({
 		type: "POST",
@@ -407,7 +408,7 @@ function StartBalju(uid, mode, jdate){
 		async: false,
 		data : JSON.stringify(from),
 		success: function (result) {
-			var tgubn; var data2; var data3; 
+			var tgubn; 
 			var t_jung1; var t_jung2; var t_yeo1; var t_yeo2;
 			htmlString = "";
 			var object_num = Object.keys(result);
@@ -426,7 +427,7 @@ function StartBalju(uid, mode, jdate){
 					async: false,
 					data : JSON.stringify(from),
 					success: function (result2) {
-						data2 = result[0];
+						data2 = result2[0];
 						jijlname = result2[0]["wjname"] + " (" + jijlcode + ")";
 					}
 				});
@@ -823,7 +824,6 @@ function StartBalju(uid, mode, jdate){
 								t_gu = "본문4"; break;
 						}
 						var from = {wdbook: tmp_code, wdboo9: data["wyboo9"]}
-						logNow(from);
 						$.ajax({
 							type: "POST",
 							contentType: "application/json; charset=utf-8;",
@@ -832,8 +832,6 @@ function StartBalju(uid, mode, jdate){
 							async: false,
 							data : JSON.stringify(from),
 							success: function (result4) {
-								logNow("tttttttt");
-								logNow(result4);
 								var tmp_ye;
 								var object_num4 = Object.keys(result4);
 								for(var k in object_num4){
@@ -939,7 +937,9 @@ function StartBalju(uid, mode, jdate){
 					}
 				}
 			}
+			logNow("Total_Y");
 			logNow(Total_Y);
+			
 			for(var i = 0 ; i < arr_index ; i++){
 				num3 = Math.floor(Total_Y[i][2] / 500);
 				num4 = Total_Y[i][2] % 500;
@@ -963,27 +963,27 @@ function StartBalju(uid, mode, jdate){
 		    			    '<td width="135" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>'+ tnum3 + ' R ' + tnum4 +'</b></font></span></td>'+
 		    			    '<td width="175" height="30" align="center" valign="middle" bgcolor="#F4F4F4"><span style="font-size:9pt;"><font color="red"><b>'+ Total_Y[i][1] +'</b></font></span></td>'+
 		    			'</tr>'+
-		    			'<input type="hidden" name="t3_jcode[]" value="<?=$Total_Y[$i][0]?>">'+
-		    			'<input type="hidden" name="t3_jname[]" value="<?=$Total_Y[$i][1]?>">'+
-		    			'<input type="hidden" name="t3_jm[]" value="<?=$Total_Y[$i][2]?>">'+
-		    			'<input type="hidden" name="t3_yb[]" value="<?=$Total_Y[$i][3]?>">'+
-		    			'<input type="hidden" name="t3_gubn[]" value="<?=$Total_Y[$i][4]?>">'+
-		    			'<input type="hidden" name="t3_colo[]" value="<?=$Total_Y[$i][5]?>">'+
-		    			'<input type="hidden" name="t3_bu[]" value="<?=$Total_Y[$i][6]?>">'+
-		    			'<input type="hidden" name="t3_pg[]" value="<?=$Total_Y[$i][7]?>">';
+		    			'<input type="hidden" name="t3_jcode[]" value="'+ Total_Y[i][0] +'">'+
+		    			'<input type="hidden" name="t3_jname[]" value="'+ Total_Y[i][1] +'">'+
+		    			'<input type="hidden" name="t3_jm[]" value="'+ Total_Y[i][2] +'">'+
+		    			'<input type="hidden" name="t3_yb[]" value="'+ Total_Y[i][3] +'">'+
+		    			'<input type="hidden" name="t3_gubn[]" value="'+ Total_Y[i][4] +'">'+
+		    			'<input type="hidden" name="t3_colo[]" value="'+ Total_Y[i][5] +'">'+
+		    			'<input type="hidden" name="t3_bu[]" value="'+ Total_Y[i][6] +'">'+
+		    			'<input type="hidden" name="t3_pg[]" value="'+ Total_Y[i][7] +'">';
 			}
 			for(var i = 0 ; i < barr_index ; i++){
 				htmlString +=
-					'<input type="hidden" name="b3_gubn[]" value="<?=$Total_B[$i][0]?>">'+
-					'<input type="hidden" name="b3_bu[]" value="<?=$Total_B[$i][1]?>">'+
-					'<input type="hidden" name="b3_dae[]" value="<?=$Total_B[$i][2]?>">'+
-					'<input type="hidden" name="b3_pg[]" value="<?=$Total_B[$i][3]?>">'+
-					'<input type="hidden" name="b3_do[]" value="<?=$Total_B[$i][4]?>">'+
-					'<input type="hidden" name="b3_jm[]" value="<?=$Total_B[$i][5]?>">'+
-	    			'<input type="hidden" name="b3_yb[]" value="<?=$Total_B[$i][6]?>">'+
-	    			'<input type="hidden" name="b3_jc[]" value="<?=$Total_B[$i][7]?>">'+
-	    			'<input type="hidden" name="b3_jn[]" value="<?=$Total_B[$i][8]?>">',+
-	    			'<input type="hidden" name="b3_bigo[]" value="<?=$Total_B[$i][9]?>">';
+					'<input type="hidden" name="b3_gubn[]" value="'+ Total_B[i][0] +'">'+
+					'<input type="hidden" name="b3_bu[]" value="'+ Total_B[i][1] +'">'+
+					'<input type="hidden" name="b3_dae[]" value="'+ Total_B[i][2] +'">'+
+					'<input type="hidden" name="b3_pg[]" value="'+ Total_B[i][3] +'">'+
+					'<input type="hidden" name="b3_do[]" value="'+ Total_B[i][4] +'">'+
+					'<input type="hidden" name="b3_jm[]" value="'+ Total_B[i][5] +'">'+
+	    			'<input type="hidden" name="b3_yb[]" value="'+ Total_B[i][6] +'">'+
+	    			'<input type="hidden" name="b3_jc[]" value="'+ Total_B[i][7] +'">'+
+	    			'<input type="hidden" name="b3_jn[]" value="'+ Total_B[i][8] +'">'+
+	    			'<input type="hidden" name="b3_bigo[]" value="'+ Total_B[i][9] +'">';
 			}
 			$("#bookdeasu").html(htmlString);
 		}
@@ -1001,8 +1001,6 @@ function StartBalju(uid, mode, jdate){
 			async: false,
 			data : JSON.stringify(from),
 			success: function (result) {
-				
-				logNow(result);
 				var object_num = Object.keys(result);
 				for(var j in object_num){
 					var data = result[object_num[j]]; 
@@ -1060,8 +1058,6 @@ function StartBalju(uid, mode, jdate){
 			if(result[0]["sbinji"] == 1) $('select[name=SBINJI]').val("1");
 		}
 	});
-	
-	logNow(data0);
 	
 	htmlString = "";
 	htmlString +=
@@ -1207,7 +1203,7 @@ function CalcJM2(jcode, tn, pp, t_yeo, colo, jul, page, panh){ // 본문여분
 
 	tj1 = Math.floor(t_jung / 500);
 	tj2 = Math.floor(t_jung % 500);
-	ty1 = Math.floor($t_yeo / 500);
+	ty1 = Math.floor(t_yeo / 500);
 	ty2 = Math.floor(t_yeo % 500);
 	
 	return {
@@ -1219,8 +1215,6 @@ function CalcJM2(jcode, tn, pp, t_yeo, colo, jul, page, panh){ // 본문여분
 }
 
 function CalcT(jcode, jname, j1, j2, y1, y2, gubn, col, bu, pg){
-	logNow("CalcT");
-	logNow(jname);
 	var bb = -1;
 	for(var i = 0 ; i < arr_index; i++){
 		if ((Total_Y[i][0] == jcode) && (Total_Y[i][4] == gubn) && (Total_Y[i][6] == bu) && (Total_Y[i][5] == col)){
@@ -1268,14 +1262,14 @@ function ChBu(){
 		url: SETTING_URL + "/jpjejak/update_jp_bjyjjejak1",
 		data: JSON.stringify(from),
 		success: function (result) {
-			StartBalju(tmp_id, mode, jdate);
+			ReadyBalju(tmp_id, mode, jdate);
 		},
 		error: function () {
 		}
 	});
 }
 
-function balju_all(){
+function StartBalju(){
 	if($('select[name=m1]').val() == 'N'){
 		alert("인쇄 선택하세요");
 		return $("select[name=m1]").focus();
@@ -1283,9 +1277,1540 @@ function balju_all(){
 	if (confirm("발주작업 진행하시겠습니까?") == false) return;
 	
 	logNow("발주스타트");
+	
+	var listid = $('input[name=uid]').val();
+	var m1 = $('select[name=m1]').val();
+	var m2 = $('select[name=m2]').val();
+	var m3 = $('select[name=m3]').val();
+	var m4 = $('select[name=m4]').val();
+	var m5 = $('select[name=m5]').val();
+	var m6 = $('select[name=m6]').val();
+	var m7 = $('select[name=m7]').val();
+	var m8 = $('select[name=m8]').val();
+	var m9 = $('select[name=m9]').val();
+	var m10 = $('select[name=m10]').val();
+	var m11 = $('select[name=m11]').val();
+	var m12 = $('select[name=m12]').val();
+	var m13 = $('select[name=m13]').val();
+	
+	var bcode = $('input[name=bcode]').val();
+	var jetype = $('select[name=jetype]').val();
+	
+	var data0;
+	
+	var from = {sbbook: bcode}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj1",
+		data : JSON.stringify(from),
+		success: function (result) {
+			data0 = result[0];
+		}
+	});
+	
+	var bookprice = data0["sbuprc"];
+	var inse = 0; var sach = 0;
+	if (data0["sbinse"] > 0) inse = data0["sbinse"];
+	else{
+		if (data0["sbhj04"] > 0) inse = data0["sbhj04"];
+	}
+	if (data0["sbjnji"]) var jnji = data0["sbjnji"];
+	else jnji = 0;
+	if (bcode.substring(0,3) == "918") jnji = 0; // 캠프는 증지 신청만 하고 붙이지 않음
+	if (data0["sbinji"]) var inji = 1;
+	if (data0["sbstic"]) var stic = data0["sbstic"];
+	if (data0["sbmyun"]) var myunji = 1;
+	else myunji = 0;
+	if (data0["sbbyul"]) var byulji = 1;
+	else byulji = 0;
+	if (data0["sbcd"]) var cdgo = parseInt(data0["sbcd"]);
+	else if (data0["sbcd"] == 2) cdgo = 2;
+	if (data0["sbmusn"]) var musn = 1;
+	if (data0["sbwing2"]) var wing = 1;
+	if (data0["sbbinb"]) var binb = 1;
+	if (data0["sbsach"]) sach = 1;
+	var coating = data0["sbcoti"];
+	if (!coating) coating = 1;
+	overcoating = data0["sbcoti2"];
+	var case_ = data0["sbcase2"];
+	
+	var muji_page = 0; var byji_page = 0; var hwbo_page = 0;
+	var myun_num = 0; var byji_num = 0; var hwbo_num = 0;
+
+	var bbco = bcode.substring(0,5);
+	var ex_bu = 0;
+
+	var t_myun = data0["sbpage"];
+	if (data0["sbpage2"]){
+	    t_myun += data0["sbpage2"];
+		var bon2 = 1;
+	}else bon2 = 0;
+
+	// 출판사, 데테 구분
+	var t_com = data0["sbbook"].substring(0,2);
+	if ((t_com == '03') || (t_com == '04')) t_com = 1; // DT
+	else t_com = 0; // 출판
+
+	// 신간여부 구분
+	var tyear = parseInt(data0["sbapdt"].substring(0,1));
+	if (tyear > 0) tyear = "19" + data0["sbapdt"].substring(0,2);
+	else tyear = "20" + data0["sbapdt"].substring(0,1);
+
+	if (jetype == 2) var is_new = 0; // 재판
+	else is_new = 1;
+
+	var t_panh2 = data0["sbpanh"];
+	var t_janh2 = data0["sbjanh"];
+	
+	var ppp;
+	switch (data0["sbpanh"]) {
+		case "A3" :
+			ppp = 8; break;
+		case "A4" :
+			ppp = 16; break;
+		case "A5" :
+			ppp = 32; break;
+		case "A6" :
+			ppp = 64; break;
+		case "B4" :
+			ppp = 8; break;
+		case "B5" :
+			ppp = 16; break;
+		case "B6" :
+			ppp = 32; break;		
+		default :
+			ppp = 16; break;
+	}
+
+	var t_janh;
+	switch (data0["sbjanh"]){
+		case 1:
+			t_janh = "무선"; break;
+		case 2:
+			t_janh = "반양장"; break;
+		case 3:
+			t_janh = "절공"; break;
+		case 4:
+			t_janh = "양장"; break;
+		case 5:
+			t_janh = "중철"; break;
+		case 6:
+			t_janh = "중미싱"; break;
+		case 7:
+			t_janh = "스프링"; break;
+		case 8:
+			t_janh = "PUR무선"; break;
+	}
+	
+	// 발주완료표시
+	var from = { uid : listid }
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/jpjejak/update_startbj1",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+		},
+		error : function() {
+		}
+	});
+	
+	var ipdate; var jejakdate;
+	var from = {uid: listid}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj2",
+		data : JSON.stringify(from),
+		success: function (result) {
+			ipdate = parseInt(new Date().getTime()/1000 + (parseInt(result[0]["pdate"]) * 60 * 60 * 24));
+			jejakdate = result[0]["signdate"];
+		}
+	});
+	
+	// 인쇄완료일. 입고완료일 등록 --> 발주일 기준 40일, 45일 - 2014.09.24
+	var pwan = new Date().getTime()/1000 + (60*60*24*40);
+	var iwan = new Date().getTime()/1000 + (60*60*24*45);
+	pwan = MsToFulldate(pwan).substring(4,8);
+	iwan = MsToFulldate(iwan).substring(4,8);
+	
+	//신간등록
+	if (jetype == 1){
+		var sk_arr = new Array("911", "913", "912", "711");
+		var tcode = bcode.substring(0,3);
+		if (!inArray(tcode, sk_arr)) {
+			var ddd = new Date().getTime()/1000 + 3024000;
+			var from = { yjbook : bcode, yjdate: ddd }
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/jpjejak/insert_startbj1",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+				},
+				error : function() {
+				}
+			});
+		}
+	}
+	
+	// 발주정보
+	var new_uid;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_startbj3",
+		async: false,
+		success: function (result) {
+			if (result[0]["max_uid"]) new_uid = result[0]["max_uid"] + 1;
+			else new_uid = 1;
+		}
+	});
+	
+	var bon_uid = new_uid;
+	
+	var bdate = new Date(parseInt("20" + jejakdate.substring(0,2)), parseInt(jejakdate.substring(2,4))-1, parseInt(jejakdate.substring(4,6)), 0, 0, 1).getTime()/1000;
+	var tdate = new Date(parseInt(MsToFulldate(bdate).substring(0,4)), parseInt(MsToFulldate(bdate).substring(4,6)), 1, 0, 0, 1).getTime()/1000;
+	
+	var new_crnum;
+	var from = {bdate: tdate}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj4",
+		data : JSON.stringify(from),
+		success: function (result) {
+			if (result[0] != null) new_crnum = result[0]["max_crnum"] + 10;
+			else new_crnum = 10;
+		}
+	});
+	
+
+	var from = {	
+		uid: new_uid, listid: listid, bdate: bdate, m1: m1, m2: m2, m3: m3, m4: m4, m5: m5, m6: m6, m7: m7, m8: m8, m9: m9, 
+		m10: m10, m11: m11, m12: m12, m13: m13, crnum: new_crnum, ipdate: ipdate, pwan: pwan, iwan: iwan
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/jpjejak/insert_startbj2",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+		},
+		error : function() {
+			alert("제작예정 error 1");
+		}
+	});
+
+	// 입고테이블 작성
+	var new_b;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_startbj5",
+		async: false,
+		success: function (result) {
+			if (result[0]["max_uid"]) new_b = result[0]["max_uid"] + 1;
+			else new_b = 1;
+		}
+	});
+	var from = {uid: listid}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj6",
+		data : JSON.stringify(from),
+		success: function (result) {
+			data0 = result[0];
+		}
+	});
+	var from = {	
+		uid: new_b, bookname: data0["bname"], bookcode: data0["bcode"], jdate: bdate, juid: new_uid, 
+		ccode: m3, jnum: data0["bnum"], jgubn: data0["btype"], m3: m3, xnum: data0["bnum"]
+	}
+	$.ajax({
+		type : "POST",
+		contentType : "application/json; charset=utf-8;",
+		dataType : "json",
+		url : SETTING_URL + "/jpjejak/insert_startbj3",
+		async : false,
+		data : JSON.stringify(from),
+		success : function(result) {
+		},
+		error : function() {
+			alert("입고테이블 error 1");
+		}
+	});
+	
+	var tuid = new_uid;
+	var tuid2 = tuid;
+	var b_index = new Array();
+	b_index[0] = new Array(new_uid, 0);
+
+	// 사용용지별
+	var tmp_uid = 0; var new_u; var new_u5; var pyo_jijl; var pyo_jm; var t_filmcost;
+	var bnum = $('input[name=bnum]').val();
+	
+	var t_colo2;
+	for (var i = 0 ; i < $('input[name="t3_jcode[]"]').length ; i++){
+		//여기
+		var t3_jcode = $('input[name="t3_jcode[]"]')[i].value;
+		var t3_gubn = $('input[name="t3_gubn[]"]')[i].value;
+		var t3_pg = $('input[name="t3_pg[]"]')[i].value;
+		var t3_bu = $('input[name="t3_bu[]"]')[i].value;
+		var t3_jm = $('input[name="t3_jm[]"]')[i].value;
+		var t3_colo = $('input[name="t3_colo[]"]')[i].value;
+		var t_colo = parseInt($('input[name="t3_colo[]"]')[i].value);///
+		var t3_jname = $('input[name="t3_jname[]"]')[i].value;
+		var t3_yb = $('input[name="t3_yb[]"]')[i].value;
+		
+		if ((t3_gubn == '면지') || (t3_gubn == '면지1') || (t3_gubn == '면지2')){
+			muji_page += t3_pg;
+			myun_num++;
+		}
+		if (t3_gubn == '별지'){
+			byji_page += t3_pg;
+			byji_num++;
+		}
+		if (t3_gubn == '화보'){
+			hwbo_page += t3_pg;
+			hwbo_num++;
+		}
+		// 2008-12-03 나도피 추가
+	    if (t3_bu == 5) {
+	        tuid = bon_uid;
+			var ttt = t3_bu;
+			b_index[ttt] = new Array(new_uid, 0);
+	    }
+	    if ((t3_bu > 0) && (t3_bu < 5)){
+	    	var ex_bu = 1; // 부록있음 check
+	    	$.ajax({
+	    		type: "POST",
+	    		dataType: "json",
+	    		url: SETTING_URL + "/jpjejak/select_startbj3",
+	    		async: false,
+	    		success: function (result) {
+	    			new_uid = result[0]["max_uid"] + 1;
+	    			
+	    		}
+	    	});
+	    	var from = {bdate: tdate}
+	    	$.ajax({
+	    		type: "POST",
+	    		contentType: "application/json; charset=utf-8;",
+	    		dataType: "json",
+	    		async: false,
+	    		url: SETTING_URL + "/jpjejak/select_startbj4",
+	    		data : JSON.stringify(from),
+	    		success: function (result) {
+	    			new_crnum = result[0]["max_crnum"] + 10;
+	    		}
+	    	});
+	    	eval("var custcode = m3" + t3_bu + ";");
+	    	
+	    	var from = {	
+	    		uid: new_uid, 
+	    		listid: listid, 
+	    		bdate: bdate, 
+	    		m1: m1, 
+	    		m2: "0", 
+	    		m3: custcode, 
+	    		m4: m4,
+	    		bucode: t3_bu, 
+	    		crnum: new_crnum, 
+	    		ipdate: ipdate,
+	    		pwan: pwan, 
+	    		iwan: iwan
+	    	}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/jpjejak/insert_startbj4",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+				},
+				error : function() {
+					alert("입고테이블 error 1");
+				}
+			});
+	    	
+	    	tuid = new_uid;
+			ttt = t3_bu;
+			b_index[ttt] = new Array(new_uid, 0);
+		}
+	    $.ajax({
+    		type: "POST",
+    		dataType: "json",
+    		url: SETTING_URL + "/jpjejak/select_startbj7",
+    		async: false,
+    		success: function (result) {
+    			if(result[0]["max_uid"]) new_u = result[0]["max_uid"] + 1;
+    			else new_u = 1;
+    		}
+    	});
+	    $.ajax({
+    		type: "POST",
+    		dataType: "json",
+    		url: SETTING_URL + "/jpjejak/select_startbj8",
+    		async: false,
+    		success: function (result) {
+    			if(result[0]["max_uid"]) new_u5 = result[0]["max_uid"] + 1;
+    			else new_u5 = 1;
+    		}
+    	});
+	    
+	    var t_amount = Math.ceil(bnum / 500);
+		if (t_amount > 21) t_amount = 21; // 인쇄비 : 10500부 이상 동일
+		var t_panh = ($('input[name=panh]').val()).substring(0,1);
+		
+		if ((t3_gubn == '면지') || (t3_gubn == '면지1') || (t3_gubn == '면지2') || (t3_gubn == '도비라')){
+			var wygubn;
+			switch (t3_gubn){
+				case "면지" :
+				case "도비라" :
+					wygubn = '03'; break;
+				case "면지1" :
+					wygubn = '17'; break;
+				case "면지2" :
+					wygubn = '16'; break;
+			}
+			//row query문 보내서 결과값을 안씀 > SELECT * FROM jejak.KSWYONJ0 WHERE wybook = #{wybook} AND wygubn = #{wygubn} LIMIT 1
+		}
+		if ((t3_gubn == '표지') || (t3_gubn == '속표지')){ //-- 2015.07.06
+			pyo_jijl = t3_jcode.substring(5,6);
+			if ((pyo_jijl == '1') || (pyo_jijl == '4') || (t3_jcode == "080120")) pyo_jijl = 'A';
+			else pyo_jijl = 'B';
+		}
+		
+		t_colo2 = 0;
+		logNow(t_colo);
+		if ((t3_gubn == '표지') || (t3_gubn == '속표지') || (t3_gubn == '화보') || (t3_gubn == '별지') || (t3_gubn == '케이스') || (t3_gubn == '면지') || (t3_gubn == '면지1') || (t3_gubn == '면지2') || (t3_gubn == '도비라')){
+			if ((t3_gubn == '표지') && ((bcode.substring(0,3) == '393')||(bcode.substring(0,5) == '41201')||(bcode.substring(0,5) == '41202')||(bcode.substring(0,5) == '41203')||(bcode.substring(0,5) == '41204')||(bcode.substring(0,5) == '41206')||(bcode.substring(0,5) == '41207')||(bcode.substring(0,5) == '41208')||(bcode.substring(0,5) == '41209')||(bcode.substring(0,5) == '41210')))
+				t_colo2 = t_colo + 2;
+			else{					
+				if (t_colo > 1) t_colo2 = t_colo + 1;
+				else t_colo2 = 0;
+			}
+			if ((t3_gubn == '표지') || (t3_gubn == '속표지')) //-- 2015.07.06
+				pyo_jm = t3_jm;
+		}else{
+			if (t_colo > 2) t_colo2 = 8;
+			else t_colo2 = 2;
+		}
+		
+		var yj_pan = t3_jcode.substring(5,6);
+		if ((yj_pan == '1') || (yj_pan == '4') || (t3_jcode == "080120")) yj_pan = 'A';
+		else yj_pan = 'B';
+		
+		if (t3_gubn.indexOf("본문") != -1 || (t3_gubn == '면지') || (t3_gubn == '면지1') || (t3_gubn == '면지2') || (t3_gubn == '도비라'))
+			var from = {pbu: t_amount, ppan: t_panh, pcolo: t_colo2, option: ", pcolo desc"};
+		else 
+			var from = {pbu: t_amount, ppan: yj_pan, pcolo: 1, option: ""};
+		
+		logNow(from);
+		var pdanga;
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			async: false,
+			url: SETTING_URL + "/jpjejak/select_startbj9",
+			data : JSON.stringify(from),
+			success: function (result2) {
+				logNow(result2);
+				pdanga = result2[0]["pprice"];
+			}
+		});
+		var t_jm1 = Math.floor(t3_jm / 500);
+		var t_jm2 = t3_jm % 500;	
+		var rnum = t_jm1;
+		
+		if (t_jm2 > 1){
+			if (t_jm2 < 251) rnum += 0.5;
+			else rnum += 1;
+		}
+		if (rnum < 1) rnum = 1; // 최소 1R
+		
+		var pcost;
+		if (t3_gubn.indexOf("본문") != -1 || (t3_gubn == '면지') || (t3_gubn == '면지1') || (t3_gubn == '면지2') || (t3_gubn == '도비라')){
+			if (t3_gubn.indexOf("본문") != -1) pcost = rnum * pdanga * t_colo * 1.1;
+			else pcost = rnum * pdanga * (t_colo + 1) * 1.1;
+		}else{
+			pcost = rnum * pdanga * t_colo2 * 1.1;
+		}
+		
+		if ((i > 0) && (t3_gubn == $('input[name="t3_gubn[]"]')[i-1].value) && (t3_bu == $('input[name="t3_bu[]"]')[i-1].value) && (t3_gubn.indexOf("본문") != -1)){
+			if (!tmp_uid) tmp_uid = new_u - 1;
+			
+			var t5_jm; var t5_yb;
+			var from = {uid: tmp_uid}
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				async: false,
+				url: SETTING_URL + "/jpjejak/select_startbj10",
+				data : JSON.stringify(from),
+				success: function (result) {
+					t5_jm = result[0]["jm"] + t3_jm;
+					t5_yb = result[0]["yb"] + t3_yb;
+				}
+			});
+			
+			var from = { jm: t5_jm, yb: t5_yb, uid: tmp_uid }
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				url: SETTING_URL + "/jpjejak/update_startbj2",
+				async: false,
+				data: JSON.stringify(from),
+				success: function (result) {
+				},
+				error: function () {
+				}
+			});
+			
+
+			var from = {
+				uid : new_u,
+				listid : tuid,
+				jcode : t3_jcode,
+				jname : t3_jname,
+				jm : 0,
+				yb : 0,
+				gubn : t3_gubn,
+				colo : t3_colo,
+				bucode : t3_bu,
+				pcost : pcost,
+				pdanga : pdanga,
+				rnum : rnum
+			}
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				url: SETTING_URL + "/jpjejak/insert_startbj5",
+				async: false,
+				data: JSON.stringify(from),
+				success: function (result) {
+				},
+				error: function () {
+				}
+			});
+		}else{
+			var from = {
+				uid : new_u,
+				listid : tuid,
+				jcode : t3_jcode,
+				jname : t3_jname,
+				jm : t3_jm,
+				yb : t3_yb,
+				gubn : t3_gubn,
+				colo : t3_colo,
+				bucode : t3_bu,
+				pcost : pcost,
+				pdanga : pdanga,
+				rnum : rnum
+			}
+			$.ajax({
+				type : "POST",
+				contentType : "application/json; charset=utf-8;",
+				dataType : "json",
+				url : SETTING_URL + "/jpjejak/insert_startbj5",
+				async : false,
+				data : JSON.stringify(from),
+				success : function(result) {
+				},
+				error : function() {
+				}
+			});
+		}
+		// 필름, 소부비 계산  - 본문 제외
+		if (t3_gubn.indexOf("본문") == -1){
+			var from = {fpanh: t_panh2}
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				async: false,
+				url: SETTING_URL + "/jpjejak/select_startbj11",
+				data : JSON.stringify(from),
+				success: function (result) {
+					t_filmcost = result[0]["fprice"];
+				}
+			});
+			
+			var t_pan; var t_film;
+			switch (t3_gubn){
+				case '표지':
+					t_pan = t3_colo;
+					if (bbco == '31121') t_pan += 1; // 31121 표지판수 +1
+					if (t_com || is_new || (t_pan == 0)) t_film = 0;
+					else t_film = 3;
+					break;
+				case '화보':
+					t_pan = t3_colo;
+					t_film = 0;
+					// 2015.03.16 추가 -- 4p 경우 도수/2
+					if (t3_pg == 4) t_pan = t_pan / 2;
+					break;
+				case '면지':
+				case '면지1':
+				case '면지2':
+				case '도비라':
+					// 면지는 도수/2 - 2008.12.19
+					t_pan = Math.ceil(t3_colo / 2);
+					t_film = 0;
+					// 2015.03.16 추가 - 8p, 16p 경우 도수와 같음
+					if (t3_pg > 4) t_pan = t3_colo;
+					break;
+				case '별지':
+					t_pan = t3_colo;
+					// 2015.03.16 추가 - 4p 경우 도수/2 -- 한국가곡 200선(하)는 예외 - 2016.09.02
+					if ((t3_pg == 4) && (bbco != '52202')) t_pan = t_pan / 2;
+					t_film = 0;
+					if ((bbco == '12504') || (bbco == '33115')){ // 톡톡튀는 팬더동요 (삽지 2p 약물코팅), 나도피4 별지 코팅
+						if (t_jm2 > 375) t_jm1 += 1;
+						else{
+							if (t_jm2 > 250) t_jm1 += 0.75;
+							else{
+								if (t_jm2 > 125) t_jm1 += 0.5;
+								else t_jm1 += 0.25;
+							}
+						}
+						var coa_dan; var coat_cost;
+						$.ajax({
+							type: "POST",
+							dataType: "json",
+							url: SETTING_URL + "select_startbj12",
+							async: false,
+							success: function (result8) {
+								coa_dan = result8[0]["ccost"];
+								coat_cost = t_jm1 * result8[0]["ccost"];
+							}
+						});
+						
+						var new_uid8;
+						$.ajax({
+							type: "POST",
+							dataType: "json",
+							url: SETTING_URL + "select_startbj13",
+							async: false,
+							success: function (result8) {
+								if (result8[0]["max_uid"]) new_uid8 = result8[0]["max_uid"] + 1;
+								else new_uid8 = 1;
+							}
+						});
+
+						var from = {
+							uid : new_uid8,
+							ccode8 : m2,
+							bcode8 : bcode,
+							cdate8 : bdate,
+							cnum8 : t_jm1,
+							cprice8 : coa_dan,
+							totcost8 : coat_cost,
+							crnum8 : tuid2
+						}
+						$.ajax({
+							type: "POST",
+							contentType: "application/json; charset=utf-8;",
+							dataType: "json",
+							url: SETTING_URL + "/jpjejak/insert_startbj6",
+							async: false,
+							data: JSON.stringify(from),
+							success: function (result) {
+							},
+							error: function () {
+								alert("코팅비 error");
+							}
+						});
+					}
+					break;
+				case '케이스':
+					t_pan = t3_colo;
+					t_film = 0;
+					break;
+				default:
+					t_pan = t3_colo;
+					t_film = 0;
+					break;
+			}
+			var ttp = t_pan * 7000;
+			var ttl = t_film * t_filmcost;
+			var tt_sum = (ttl + ttp) * 1.1;
+			
+			if (myun_num > 1){
+				var from = {listid5: tuid}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					async: false,
+					url: SETTING_URL + "/jpjejak/select_startbj14",
+					data : JSON.stringify(from),
+					success: function (result) {
+						if (result[0]["pannum5"] < t_pan){
+							mod_uid = result[0]["uid"];
+							
+							var from = { pannum5: t_pan, sobu5: ttp, sum5: tt_sum, uid: mod_uid };
+							$.ajax({
+								type: "POST",
+								contentType: "application/json; charset=utf-8;",
+								dataType: "json",
+								url: SETTING_URL + "/jpjejak/update_startbj3",
+								async: false,
+								data: JSON.stringify(from),
+								success: function (result) {
+								},
+								error: function () {
+									alert("필름,소부비 error 1");
+								}
+							});
+						}
+					}
+				});
+				
+			}else{
+				var daeji = 0;
+				if (is_new){
+					daeji = t_pan * 2000;
+					tt_sum += daeji * 1.1;
+				}
+				var from = {
+					uid: new_u5, 
+					listid5: tuid, 
+					gubn5: t3_gubn, 
+					panst5: 'PS판', 
+					pannum5: t_pan, 
+					filmnum5: t_film, 
+					filmdan5: t_filmcost, 
+					filmcost5: ttl, 
+					daeji5: daeji, 
+					sobudan5: 7000, 
+					sobu5: ttp, 
+					sum5: tt_sum
+				}
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8;",
+					dataType: "json",
+					url: SETTING_URL + "/jpjejak/insert_startbj7",
+					async: false,
+					data: JSON.stringify(from),
+					success: function (result) {
+					},
+					error: function () {
+						alert("필름,소부비 error 2");
+					}
+				});
+				new_u5 += 1;
+			}
+		}
+	}
+	
+	//대수정보
+	var t_pan = 0;
+	for (var i = 0 ; i < $('input[name="b3_jc[]"]').length ; i++){
+		var b3_gubn = $('input[name="b3_gubn[]"]')[i].value;
+		var b3_bu = $('input[name="b3_bu[]"]')[i].value;
+		var b3_dae = $('input[name="b3_dae[]"]')[i].value;
+		var b3_pg = $('input[name="b3_pg[]"]')[i].value;
+		var b3_do = $('input[name="b3_do[]"]')[i].value;
+		var b3_jm = $('input[name="b3_jm[]"]')[i].value;
+		var b3_yb = $('input[name="b3_yb[]"]')[i].value;
+		var b3_jc = $('input[name="b3_jc[]"]')[i].value;
+		var b3_jn = $('input[name="b3_jn[]"]')[i].value;
+		var b3_bigo = $('input[name="b3_bigo[]"]')[i].value;
+		
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: SETTING_URL + "select_startbj13",
+			async: false,
+			success: function (result) {
+				if (result[0]["max_uid"]) new_uid = result[0]["max_uid"] + 1;
+				else new_uid = 1;
+			}
+		});
+		tid = b3_bu;
+		ta = b_index[tid][0];
+		var tbigo = 0;
+		
+		var from = {
+			uid: new_uid, 
+			listid: ta, 
+			gb: b3_gubn, 
+			bu: b3_bu, 
+			dae: b3_dae, 
+			pg: b3_pg, 
+			colo: b3_do, 
+			jm: b3_jm, 
+			yb: b3_yb, 
+			jc: b3_jc, 
+			jn: b3_jn, 
+			t4bigo: b3_bigo
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj8",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+			}
+		});
+		
+		if (b3_do == 2) t_pan += 2;  // 2도(양면) ---> 판수 = 도수
+		else{
+			var tmp_pan = (b3_pg * 100) / ppp;
+			var t_mod = tmp_pan % 100;
+			if ((t_mod == 25) || (t_mod == 75)) tmp_pan += 25;
+			tmp_pan = (tmp_pan * b3_do) / 100;
+			t_pan += Math.ceil(tmp_pan);
+		}
+		if (bbco == '31326') t_pan = 43; // 세광부르크뮐러 연습곡
+	}
+	
+	// 본문 필름.소부비
+	ttp = t_pan * 7000;
+	if (t_com || is_new) t_film = 0;
+	else t_film = 2;
+	ttl = t_film * t_filmcost;
+	tt_sum = (ttl + ttp) * 1.1;
+	
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_startbj8",
+		async: false,
+		success: function (result) {
+			if(result[0]["max_uid"]) new_u5 = result[0]["max_uid"] + 1;
+			else new_u5 = 1;
+		}
+	});
+	
+	var daeji = 0;
+	if (is_new){
+		daeji = t_pan * 2000;
+		tt_sum += daeji * 1.1;
+	}
+	var from = {
+		uid: new_u5, 
+		listid5: tuid, 
+		gubn5: $('input[name="b3_gubn[]"]')[0].value, 
+		panst5: 'PS판', 
+		pannum5: t_pan, 
+		filmnum5: t_film, 
+		filmdan5: t_filmcost, 
+		filmcost5: ttl, 
+		daeji5: daeji, 
+		sobudan5: 7000, 
+		sobu5: ttp, 
+		sum5: parseInt(tt_sum)
+	}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/insert_startbj7",
+		async: false,
+		data: JSON.stringify(from),
+		success: function (result) {
+		},
+		error: function () {
+			alert("필름,소부비 error 3");
+		}
+	});
+	
+	// 제본
+
+	// 본서제본
+	var t_myunsu = t_myun;
+	if (t_janh2 != 7) t_myunsu += 8; // 표지 -- 스프링은 표지 포함 안 함 - 2015.09.06
+	
+	if (t_myunsu < 100) t_myunsu = 100;
+
+	var tmp_inji = 0;
+	if (jnji){
+		if (m3 == "3006") tmp_inji += 20; //성일사 - 수량에 상관없이 20원 . 2016.06.23
+		else tmp_inji += (20 * jnji);
+	}
+	if (inji) tmp_inji += 20;
+	// 스티커, 화보, 별지, 면지, 평가지, 오리꼬미는 무조선 10원 - 2015.09.06
+	if (stic) tmp_inji += 10;
+	if (cdgo) tmp_inji += 20; //tmp_inji += 20 * cdgo; -- CD는 무조건 20원
+	if (wing) tmp_inji += 20; // 표지오리꼬미
+	if (binb) tmp_inji += 20; // 책속의책 (스즈키V시리즈) - 기타단가 +20
+	// 면지는 수량 상관없이 추가 10원 - 2016.06.15
+	if (myunji) tmp_inji += 10;
+	if (byulji) tmp_inji += 10; // 별지 10원 - 2016.06.15
+	if (!binb && ex_bu) tmp_inji += 20; // 책속의 책 아닌 부록 있을경우 갯수에 상관없이 20원  - 2016.07.19
+	if (t_janh2 < 4) t_janh3 = 4;
+	else t_janh3 = t_janh2;
+	
+	var jdanga;
+	switch (t_janh2){
+		case 7 : // 스프링 - 2015.09.06
+			if (tmyunsu >= 208) var addi = 208;
+			else var addi = 207;
+			
+			var pdanga7;
+			var from = {addi: addi, pnum: bnum}
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				async: false,
+				url: SETTING_URL + "/jpjejak/select_startbj16",
+				data : JSON.stringify(from),
+				success: function (result7) {
+					pdanga7 = result7[0]["jcost"];
+				}
+			});
+			
+			if (tmp_inji) sum_4 = (pdanga7 + tmp_inji) * bnum;
+			else sum_4 = pdanga7 * bnum;
+			jdanga = 0;
+			break;
+		case 5 : // 중철 - 판형 무관하게 꼭지당 6원 - 2015.09.06
+			var jdan;
+			if (bcode.substring(0,3) == "918") jdan = 30; // 캠프는 30원 - 2015.09.06
+			else{
+				if (bcode.substring(0,3) == "982") jdan = 10; // 진도카드는 10원 - 2015.09.06
+				else{
+					tcode = bcode.substring(0,5);
+					// 중철 꼭지수 계산 변경 - 2016.05.09
+					
+					var from = {wdbook: tcode}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						async: false,
+						url: SETTING_URL + "/jpjejak/select_startbj17",
+						data : JSON.stringify(from),
+						success: function (result7) {
+							ppan = result7[0]["sum_wdqnty"] + 1; // 표지 1꼭지 추가=
+						}
+					});
+					jdan = ppan * 6; // 꼭지당 6원
+				}
+			}
+			if (tmp_inji) sum_4 = (jdan + tmp_inji) * bnum;
+			else sum_4 = jdan * bnum;
+			jdanga = 0;
+			pdanga7 = jdan;
+			break;
+	    case 8 : // PUR
+	    	var from = {pgubn: t_panh2, jgubn: 8}
+	    	$.ajax({
+	    		type: "POST",
+	    		contentType: "application/json; charset=utf-8;",
+	    		dataType: "json",
+	    		async: false,
+	    		url: SETTING_URL + "/jpjejak/select_startbj18",
+	    		data : JSON.stringify(from),
+	    		success: function (result7) {
+	    			jdanga = result7[0]["jcost"];
+	    		}
+	    	});
+			if (t_myun < 100){
+				jdanga += 0.05;
+				pdanga7 = jdanga * 100;
+			}else{
+				pdanga7 = jdanga * t_myunsu;
+			}
+			if (tmp_inji) sum_4 = (pdanga7 + tmp_inji) * bnum;
+			else sum_4 = pdanga7 * bnum;
+	        break;
+	    case 4 : // 양장
+	    	var from = {tcode: bcode, jgubn: 2}
+	    	$.ajax({
+	    		type: "POST",
+	    		contentType: "application/json; charset=utf-8;",
+	    		dataType: "json",
+	    		async: false,
+	    		url: SETTING_URL + "/jpjejak/select_startbj19",
+	    		data : JSON.stringify(from),
+	    		success: function (result7) {
+	    			if(result7.length != 0){
+	    				pdanga7 = result7[0]["jcost"];
+	    			}else pdanga7 = 900;
+	    		}
+	    	});
+			if (tmp_inji) sum_4 = (pdanga7 + tmp_inji) * bnum;
+			else sum_4 = pdanga7 * bnum;
+			jdanga = 0;
+			break;
+		default: // 기타
+			var from = {pgubn: t_panh2, jgubn: t_janh3}
+	    	$.ajax({
+	    		type: "POST",
+	    		contentType: "application/json; charset=utf-8;",
+	    		dataType: "json",
+	    		async: false,
+	    		url: SETTING_URL + "/jpjejak/select_startbj18",
+	    		data : JSON.stringify(from),
+	    		success: function (result7) {
+	    			jdanga = result7[0]["jcost"];
+	    		}
+	    	});
+			// 키즈도시락은 90전 - 15.11.03
+			t_arr = new Array("32516", "32517", "32518", "32519");
+			tcode = bcode.substring(0,5);
+			if (inArray(tcode, t_arr)) jdanga = 0.9;
+			// 상철제본운 0.8 -- 16.07.04
+			if (sach){
+				jdanga = 0.8;
+				// 스마트8은 0.4 추가
+				t_arr = new Array("11031", "11032", "11033", "11034", "11035", "11036");
+				tcode = bcode.substring(0,5);
+				if (inArray(tcode, t_arr)) jdanga += 0.4;
+			}
+
+			pdanga7 = jdanga * t_myunsu;
+			if (tmp_inji) sum_4 = ((jdanga * t_myunsu) + tmp_inji) * bnum;
+			else sum_4 = jdanga * t_myunsu * bnum;
+			// 최저금액 80,000 적용
+			if (sum_4 < 80000) sum_4 = 80000;
+			break;
+	}
+	sum_4 *= 1.1;
+	sum_4 = Math.round(sum_4);
+	
+	var new_uid7;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/select_startbj20",
+		async: false,
+		success: function (result7) {
+			if(result7[0]["max_uid"]) new_uid7 = result7[0]["max_uid"] + 1;
+			else new_uid7 = 1;
+		}
+	});
+	
+	var from = {
+		uid: new_uid7, 
+		ccode7: m3, 
+		bcode7: bcode, 
+		cdate7: bdate, 
+		cgubn7: t_janh2, 
+		cnum7: bnum, 
+		cpage7: t_myunsu, 
+		cprice17: jdanga, 
+		cprice27: tmp_inji, 
+		crnum7: tuid2, 
+		totcost7: sum_4, 
+		pdanga7: pdanga7
+	}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/insert_startbj9",
+		async: false,
+		data: JSON.stringify(from),
+		success: function (result) {
+			logNow(result);		
+		},
+		error: function () {
+			alert("제본비 error");			
+		}
+	});
+	
+	// 부록제본
+	var from = {wdbook: bbco}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj21",
+		data : JSON.stringify(from),
+		success: function (result) {
+			//if (result[0]["wdboo9c"] == 5) row9 = mysql_fetch_row($result);
+			if (result[0]["wdboo9"] > 0){
+				for (var i = 1 ; i <= result[0]["wdboo9"] ; i++){
+					var data8;
+					var from = {sbbook: bcode}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						async: false,
+						url: SETTING_URL + "/jpjejak/select_startbj1",
+						data : JSON.stringify(from),
+						success: function (result) {
+							if(result.length != 0) alert("KSCBOOK error");
+							data8 = result[0];
+						}
+					});
+					
+					eval("var field_namep = SBSBPH" + i + ";");
+					eval("var field_namej = SBSBJH" + i + ";");
+					eval("var field_nameg = SBSBPG" + i + ";");
+					
+					var t_myunsu = data8[field_nameg];
+					var t_janhb = data8[field_namej];
+					var t_panhb = data8[field_namep];
+					
+					if (t_myunsu < 100) t_myunsu = 100;
+					
+					if (t_janhb < 4) t_janh3 = 4;
+					else t_janh3 = t_janhb;
+					
+					var jdanga;
+					switch (t_janhb){
+						case 7 : // 스프링
+							var from = {tcode: bcode, jgubn: 7}
+					    	$.ajax({
+					    		type: "POST",
+					    		contentType: "application/json; charset=utf-8;",
+					    		dataType: "json",
+					    		async: false,
+					    		url: SETTING_URL + "/jpjejak/select_startbj19",
+					    		data : JSON.stringify(from),
+					    		success: function (result7) {
+					    			if(result7.length != 0){
+					    				pdanga7 = result7[0]["jcost"];
+					    			}else pdanga7 = 970;
+					    		}
+					    	});
+							sum_4 = pdanga7 * bnum;
+							sum_4 *= 1.1;
+							sum_4 = Math.round(sum_4);
+							jdanga = 0;
+							break;
+						case 5 : // 중철
+							var from = {pgubn: t_panhb, jgubn: 5}
+					    	$.ajax({
+					    		type: "POST",
+					    		contentType: "application/json; charset=utf-8;",
+					    		dataType: "json",
+					    		async: false,
+					    		url: SETTING_URL + "/jpjejak/select_startbj18",
+					    		data : JSON.stringify(from),
+					    		success: function (result7) {
+					    			pdanga7 = result7[0]["jcost"];
+					    		}
+					    	});
+							sum_4 = pdanga7 * bnum;
+							// 부록중철 최저단가 50000 -- 2016.07.19
+							sum_4 = Math.max(sum_4, 50000);
+							sum_4 *= 1.1;
+							sum_4 = Math.round(sum_4);
+							jdanga = 0;
+							break;
+					    case 8: // PUR무선
+					    	var from = {pgubn: t_panhb, jgubn: 8}
+					    	$.ajax({
+					    		type: "POST",
+					    		contentType: "application/json; charset=utf-8;",
+					    		dataType: "json",
+					    		async: false,
+					    		url: SETTING_URL + "/jpjejak/select_startbj18",
+					    		data : JSON.stringify(from),
+					    		success: function (result7) {
+					    			jdanga = result7[0]["jcost"];
+					    		}
+					    	});
+							pdanga7 = jdanga * t_myunsu;
+							sum_4 = jdanga * t_myunsu * bnum;
+							sum_4 *= 1.1;
+							sum_4 = Math.round(sum_4);
+							break;
+						default: // 기타
+							// 절공 부록은 무조건 40원 - 2016.08.10
+							jdanga = 0.4;
+							pdanga7 = 40;
+							sum_4 = pdanga7 * bnum;
+							sum_4 *= 1.1;
+							sum_4 = Math.round(sum_4);
+							break;
+					}
+					if (i > 0) eval("custcode = m3" + i + ";");
+					else custcode = m3;
+					
+					var from = {
+						ccode7: custcode, 
+						bcode7: bcode, 
+						cdate7: bdate, 
+						cgubn7: t_janhb, 
+						cnum7: bnum, 
+						cpage7: t_myunsu, 
+						cprice17: jdanga, 
+						cprice27: 0, 
+						crnum7: tuid2, 
+						totcost7: sum_4, 
+						pdanga7: pdanga7
+					}
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8;",
+						dataType: "json",
+						url: SETTING_URL + "/jpjejak/insert_startbj10",
+						async: false,
+						data: JSON.stringify(from),
+						success: function (result) {
+						},
+							error: function () {
+							alert("제본비 error 2");			
+						}
+					});
+					
+				}
+			}
+		}
+	});
+	// 코팅
+	t_pyojm = pyo_jm % 500;
+	pyo_jm = Math.floor(pyo_jm / 500);
+	
+	if (t_pyojm >= 438) pyo_jm += 1;
+	else{
+		if (t_pyojm >= 313) pyo_jm += 0.75;
+		else{
+			if (t_pyojm >= 188) pyo_jm += 0.5;
+			else{
+				if (t_pyojm >= 1) pyo_jm += 0.25;
+			}
+		}
+	}
+	var data;
+	if ((coating == 3) || (coating == 4)){// 홀로그램, 홀로그램(크리스탈)
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: SETTING_URL + "/books/select_bookList22",
+			async: false,
+			success: function (result) {
+				data = result[0];
+			}
+		});
+	}else{
+		var from = {cpanh: pyo_jijl, cgub: coating }
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			async: false,
+			url: SETTING_URL + "/jpjejak/select_startbj23",
+			data : JSON.stringify(from),
+			success: function (result) {
+				data = result[0];
+			}
+		});
+	}
+	coa_dan = data["ccost"];
+	coat_cost = pyo_jm * data["ccost"];
+		
+	var new_uid8;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "select_startbj13",
+		async: false,
+		success: function (result8) {
+			if (result8[0]["max_uid"]) new_uid8 = result8[0]["max_uid"] + 1;
+			else new_uid8 = 1;
+		}
+	});
+	
+	var from = {
+		uid : new_uid8,
+		ccode8 : m2,
+		bcode8 : bcode,
+		cdate8 : bdate,
+		cnum8 : pyo_jm,
+		cprice8 : coa_dan,
+		totcost8 : coat_cost,
+		crnum8 : tuid2
+	}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/insert_startbj6",
+		async: false,
+		data: JSON.stringify(from),
+		success: function (result) {
+		},
+		error: function () {
+			alert("코팅비 error 2");
+		}
+	});
+	
+	if (overcoating){
+		if (overcoating == 4){
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: SETTING_URL + "select_startbj12",
+				async: false,
+				success: function (result) {
+					data = result[0];
+				}
+			});
+		}else{
+			var from = {cpanh: pyo_jijl, cgub: overcoating }
+			$.ajax({
+				type: "POST",
+				contentType: "application/json; charset=utf-8;",
+				dataType: "json",
+				async: false,
+				url: SETTING_URL + "/jpjejak/select_startbj23",
+				data : JSON.stringify(from),
+				success: function (result) {
+					data = result[0];
+				}
+			});
+		}
+		coa_dan = data["ccost"];
+		coat_cost = pyo_jm * data["ccost"];
+		
+		var new_uid8;
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: SETTING_URL + "select_startbj13",
+			async: false,
+			success: function (result8) {
+				if (result8[0]["max_uid"]) new_uid8 = result8[0]["max_uid"] + 1;
+				else new_uid8 = 1;
+			}
+		});
+			
+		var from = {
+			uid : new_uid8,
+			ccode8 : m2,
+			bcode8 : bcode,
+			cdate8 : bdate,
+			cnum8 : pyo_jm,
+			cprice8 : coa_dan,
+			totcost8 : coat_cost,
+			crnum8 : tuid2
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj6",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+				alert("추가코팅 error");
+			}
+		});
+	}
+	
+	// 기타비용
+	var w1 = 0;	// 원고
+	var w2 = 0;	// 저작
+	var w3 = 0;	// 출력
+	var w4 = 0;	// 사보
+	var w5 = 0;	// 증지
+	var w6 = 0;	// 케이스
+	var w7 = 0;	// 스티커
+	var w8 = 0;	// 음반
+	var w9 = 0;	// 기타
+	var w10 = 0;	// 비닐
+	var w11 = 0; // 목형비
+
+	if (inse){
+		w2 = inse * bookprice * bnum * 0.01;
+	}
+
+	if (m10){ // 증지
+		var from = {
+			ccode5: m10, 
+			bcode5: bcode, 
+			cdate5: bdate, 
+			cnum5: bnum, 
+			crnum5: tuid2
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj11",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+				alert("증지대 기록 오류");
+			}
+		});
+	}
+	if (m5){ // 스티커
+		var from = {
+			ccode9: m5, 
+			bcode9: bcode, 
+			cdate9: bdate, 
+			cnum9: bnum, 
+			cprice9: 0, 
+			bitag: 4, 
+			crnum9: tuid2
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj12",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+				alert("스티커 기록 오류");
+			}
+		});
+	}
+	if (m11){ // 목형
+		var from = {
+			ccode9: m11, 
+			bcode9: bcode, 
+			cdate9: bdate, 
+			cnum9: bnum, 
+			cprice9: 0, 
+			bitag: 4, 
+			crnum9: tuid2
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj12",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+				alert("목형비 기록 오류");
+			}
+		});
+	}
+	if (m6){ // cd
+		var from = {
+			ccode9: m6, 
+			bcode9: bcode, 
+			cdate9: bdate, 
+			cnum9: bnum, 
+			cprice9: 0, 
+			bitag: 3, 
+			crnum9: tuid2
+		}
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8;",
+			dataType: "json",
+			url: SETTING_URL + "/jpjejak/insert_startbj12",
+			async: false,
+			data: JSON.stringify(from),
+			success: function (result) {
+			},
+			error: function () {
+				alert("CD 오류 1");
+			}
+		});
+	}
+	
+	var new_wuid;
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: SETTING_URL + "select_startbj24",
+		async: false,
+		success: function (result) {
+			if (result[0]["max_uid"]) new_wuid = result[0]["max_uid"] + 1;
+			else new_wuid = 1;
+		}
+	});
+	
+	var from = {
+		uid: new_wuid, 
+		jenum: tuid2, 
+		w1: w1, 
+		w2: w2,
+		w3: w3,
+		w4: w4,
+		w5: w5,
+		w6: w6,
+		w7: w7,
+		w8: w8,
+		w9: w9,
+		w10: w10,
+		w11: w11
+	}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		url: SETTING_URL + "/jpjejak/insert_startbj13",
+		async: false,
+		data: JSON.stringify(from),
+		success: function (result) {
+		},
+		error: function () {
+			alert("총원가 error");
+		}
+	});
+	
+	var from = {bcode: bcode}
+	$.ajax({
+		type: "POST",
+		contentType: "application/json; charset=utf-8;",
+		dataType: "json",
+		async: false,
+		url: SETTING_URL + "/jpjejak/select_startbj25",
+		data : JSON.stringify(from),
+		success: function (result) {
+			if(result.length != 0){
+				var from = { uid : result[0]["uid"] }
+				$.ajax({
+					type : "POST",
+					contentType : "application/json; charset=utf-8;",
+					dataType : "json",
+					url : SETTING_URL + "/jpjejak/update_startbj4",
+					async : false,
+					data : JSON.stringify(from),
+					success : function(result) {
+					},
+					error : function() {
+					}
+				});
+			}
+		}
+	});
+	
 }
 
-//제작계획표
+// 제작계획표
 function Searchjejakplan(code, date1, date2, lm_s, lm_t){ //제품이랑 잡물이랑 나누기 code 분리
 	if(code == 1){ //제품
 		var from = {date1: date1, date2: date2, lm_s: lm_s, lm_t: lm_t}
