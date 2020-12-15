@@ -5586,11 +5586,16 @@ function AddBaljuYjJpList(uid){
 								alert("도서집계 읽기 오류");
 							},
 							success: function (result) {
+								object_num = Object.keys(result);
+								for(i in object_num)
+								{
 								for (ii = b_index ; ii < 13 ; ii++)
 								{
-									var row = result[Object.keys(result)];
+									var row = result[object_num];
+									logNow(row);
 									if(result[0] != null)
 									pan_s2 += row["tbcsr"] - row["tbdsr"];
+								}
 								}
 								if (b_index > 1) // 다음해
 								{
@@ -5607,6 +5612,8 @@ function AddBaljuYjJpList(uid){
 											alert("도서집계 읽기 오류");
 										},
 										success: function (result) {
+											logNow("bb");
+											logNow(result);
 											for (ii = 1 ; ii < b_index ; ii++)
 											{
 												row = result[Object.keys(result)];
