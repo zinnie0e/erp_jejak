@@ -5161,7 +5161,7 @@ function AddBaljuYjJpList(uid){
 							}
 						}
 						
-						switch (row["sbcoti"]){
+						switch (row_book["sbcoti"]){
 						    case 1:
 						        tbigo = "유광"; break;
 						    case 2:
